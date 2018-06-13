@@ -36,7 +36,7 @@ func CheckCPF(cpf string) bool {}
 
 // CheckCNPJ returns true if the cnpj is valid
 // Thanks to https://gopher.net.br/validacao-de-cpf-e-cnpj-em-go/
-// CNPJ is the Brazilian TAXPayerID document for cpmpanies
+// CNPJ is the Brazilian TAXPayerID document for companies
 func CheckCNPJ(cnpj string) bool {}
 
 // CheckEmail returns true if the given sequence is a valid email address
