@@ -386,17 +386,23 @@ func AmountAsWord(n int64) string {
 	return fmt.Sprintf("%s%d", menos, n)
 }
 
+const (
+	CheckNewPasswordResultOK = 0
+	CheckNewPasswordResultDivergent = 1
+	CheckNewPasswordResultTooShort = 2
+	CheckNewPasswordResultTooSimple = 3
+)
 // Run some basic checks on new password strings
 // My rule requires at least six chars, with at least one letter and at least one number.
-func CheckNewPassword(password, passwordConfirmation string) (bool, string) {
+func CheckNewPassword(password, passwordConfirmation string) (bool, uint8) {
 	const minPasswordLength = 6
 
 	if utf8.RuneCountInString(strings.TrimSpace(password)) < minPasswordLength {
-		return false, fmt.Sprintf("Senha deve conter ao menos %d caracteres, com ao menos uma letra ou ao menos um número", minPasswordLength)
+		return false, CheckNewPasswordResultTooShort
 	}
 
 	if password != passwordConfirmation {
-		return false, "Senha e confirmação diferentes entre si"
+		return false, CheckNewPasswordResultDivergent
 	}
 
 	re, _ := regexp.Compile("[\\d]")
@@ -408,10 +414,10 @@ func CheckNewPassword(password, passwordConfirmation string) (bool, string) {
 	digits := re.ReplaceAllString(password, "")
 
 	if letters == "" || digits == "" {
-		return false, fmt.Sprintf("Senha deve conter ao menos %d caracteres, com ao menos uma letra ou ao menos um número", minPasswordLength)
+		return false, CheckNewPasswordResultTooSimple
 	}
 
-	return true, ""
+	return true, 0
 }
 
 // StringHash simply generates a SHA256 hash from the given string
