@@ -22,7 +22,7 @@ None. It relies on standard library.
 
 
 # Breaking Changes
-* Function CheckNewPassword now returns (bool,uint8), instead the old (bool,string), in order to be more generic and internationalizable.
+* Function CheckNewPassword now returns uint8, instead the old (bool,string), in order to be simpler, more generic and easily internationalizable.
 
 
 # Functions
@@ -73,7 +73,7 @@ const (
 // Run some basic checks on new password strings
 // My rule requires at least six chars, with at least one letter and at least one number.
 // The uint8 return is one of the CheckNewPasswordResult constants above
-func CheckNewPassword(password, passwordConfirmation string) (bool, uint8) {}
+func CheckNewPassword(password, passwordConfirmation string) uint8 {}
 
 // StringHash simply generates a SHA256 hash from the given string
 func StringHash( sequence string ) string {}
