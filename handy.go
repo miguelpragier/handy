@@ -394,15 +394,15 @@ const (
 )
 // Run some basic checks on new password strings
 // My rule requires at least six chars, with at least one letter and at least one number.
-func CheckNewPassword(password, passwordConfirmation string) (bool, uint8) {
+func CheckNewPassword(password, passwordConfirmation string) uint8 {
 	const minPasswordLength = 6
 
 	if utf8.RuneCountInString(strings.TrimSpace(password)) < minPasswordLength {
-		return false, CheckNewPasswordResultTooShort
+		return CheckNewPasswordResultTooShort
 	}
 
 	if password != passwordConfirmation {
-		return false, CheckNewPasswordResultDivergent
+		return CheckNewPasswordResultDivergent
 	}
 
 	re, _ := regexp.Compile("[\\d]")
@@ -414,10 +414,10 @@ func CheckNewPassword(password, passwordConfirmation string) (bool, uint8) {
 	digits := re.ReplaceAllString(password, "")
 
 	if letters == "" || digits == "" {
-		return false, CheckNewPasswordResultTooSimple
+		return CheckNewPasswordResultTooSimple
 	}
 
-	return true, CheckNewPasswordResultOK
+	return CheckNewPasswordResultOK
 }
 
 // StringHash simply generates a SHA256 hash from the given string
