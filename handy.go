@@ -417,7 +417,7 @@ func CheckNewPassword(password, passwordConfirmation string) (bool, uint8) {
 		return false, CheckNewPasswordResultTooSimple
 	}
 
-	return true, 0
+	return true, CheckNewPasswordResultOK
 }
 
 // StringHash simply generates a SHA256 hash from the given string
