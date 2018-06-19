@@ -21,6 +21,10 @@ None. It relies on standard library.
 * Add those cool badges to repository
 
 
+# Breaking Changes
+* Function CheckNewPassword now returns (bool,uint8), instead the old (bool,string), in order to be more generic and internationalizable.
+
+
 # Functions
 ```golang
 // CheckPersonName returns true if the name contains at least two words, one >= 3 chars and one >=2 chars.
@@ -57,7 +61,19 @@ func AmountAsWord(n int64) string {}
 
 // Run some basic checks on new password strings
 // My rule requires at least six chars, with at least one letter and at least one number.
-func CheckNewPassword(password, passwordConfirmation string) (bool, string) {}
+
+// CheckNewPasswordResult Constants
+const (
+	CheckNewPasswordResultOK = 0
+	CheckNewPasswordResultDivergent = 1
+	CheckNewPasswordResultTooShort = 2
+	CheckNewPasswordResultTooSimple = 3
+)
+
+// Run some basic checks on new password strings
+// My rule requires at least six chars, with at least one letter and at least one number.
+// The uint8 return is one of the CheckNewPasswordResult constants above
+func CheckNewPassword(password, passwordConfirmation string) (bool, uint8) {}
 
 // StringHash simply generates a SHA256 hash from the given string
 func StringHash( sequence string ) string {}
