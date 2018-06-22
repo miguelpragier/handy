@@ -4,8 +4,16 @@ import "net/http"
 
 // HTTPRequestAsString gets a parameter coming from a http request as string, truncated to maxLenght
 // Only maxLenght >= 1 is considered. Otherwise, it's ignored
-func HTTPRequestAsString(r *http.Request, key string, maxLenght int) string {
+func HTTPRequestAsString(r *http.Request, key string, maxLenght int, transformOptions ...uint8) string {
 	s := r.FormValue(key)
+
+	if s=="" {
+		return ""
+	}
+
+	if len(transformOptions) > 0 {
+		s = Transform(s, maxLenght, transformOptions[0])
+	}
 
 	if s=="" {
 		return ""
