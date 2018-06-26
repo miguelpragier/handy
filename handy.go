@@ -762,7 +762,7 @@ func Transform(s string, maxLen int, transformFlags uint8) string {
 // MatchesAny returns true if any of the given items matches ( equals ) the subject ( search parameter )
 func MatchesAny(search interface{}, items ...interface{}) bool {
 	for _, v := range items {
-		if fmt.Sprintf("%T", search) != fmt.Sprintf("%T", v) {
+		if fmt.Sprintf("%T", search) == fmt.Sprintf("%T", v) {
 			if search == v {
 				return true
 			}
