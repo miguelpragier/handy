@@ -21,11 +21,16 @@ func CheckPersonName(name string, acceptEmpty bool) bool {
 		return acceptEmpty
 	}
 
-	re, _ := regexp.Compile("[\\d]")
+	var tmp []rune
 
-	if name != re.ReplaceAllString(name, "") {
-		return false
+	for _,r := range []rune(name) {
+		// If is letter or space, can get through
+		if unicode.IsLetter(r) || r==' ' {
+			tmp = append(tmp, r)
+		}
 	}
+
+	name = string(tmp)
 
 	a := strings.Fields(name)
 
