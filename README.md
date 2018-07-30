@@ -156,3 +156,6 @@ func TrimLen(text string) int {}
 // It returns true if the given string has length greater than or equal than minLength parameter
 func CheckMinLen(value string, minLength int) bool {}
 
+// DateTimeAsString formats time.Time variables as strings, considering the format directive
+// Check it up on playground: https://play.golang.org/p/NnnjgznI1hU
+func DateTimeAsString(dt time.Time, format string) string {
