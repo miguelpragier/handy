@@ -763,7 +763,7 @@ func Boolean(x interface{}) bool {
 	}
 
 	if s, ok := x.(string); ok {
-		s = Transform(s, TransformFlagLowerCase|TransformFlagTrim)
+		s = Transform(s, 4, TransformFlagLowerCase|TransformFlagTrim)
 		return MatchesAny(s, "1", "true", "t")
 	}
 
