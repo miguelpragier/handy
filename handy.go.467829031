@@ -825,64 +825,91 @@ func CheckMinLen(value string, minLength int) bool {
 	return TrimLen(value) >= minLength
 }
 
-// IsNumericType checks if an interface's concrete type corresponds to some of golang native numeric types
-func IsNumericType( x interface{} ) bool {
-	switch x.(type) {
-	case uint:
-		return true
-	case uint8: // Or byte
-		return true
-	case uint16:
-		return true
-	case uint32:
-		return true
-	case uint64:
-		return true
-	case int:
-		return true
-	case int8:
-		return true
-	case int16:
-		return true
-	case int32:
-		return true
-	case float32:
-		return true
-	case float64:
-		return true
-	case complex64:
-		return true
-	case complex128:
-		return true
-	default:
-		return false
-	}
-}
+func isNumericType( x interface{} ) bool {
+	var t1 byte
+	var t2 complex64
+	var t3 complex128
+	var t4 uint
+	var t5 uint8
+	var t6 uint16
+	var t7 uint32
+	var t8 uint64
+	var t9 int
+	var t10 int8
+	var t11 int16
+	var t12 int32
+	var t14 int64
+	var t15 float32
+	var t16 float64
 
-// Bit returns only uint8(0) or uint8(1).
-// It receives an interface, and when it's a number, and when this number is 0 (zero) it returns 0. Otherwise it returns 1 (one)
-// If the interface is not a number, it returns 0 (zero)
-func Bit( x interface{} ) uint8 {
-	if IsNumericType(x) && x != 0 {
-		return 1
+	if t1,ok:=x.(byte);ok{		return true	}
+
+	if t1,ok:=x.(byte);ok{		return true	}
+
+	if t1,ok:=x.(uint);ok{		return true	}
+
+	if t1,ok:=x.(uint8);ok{		return true	}
+
+	if t1,ok:=x.(uint16);ok{
+		return true
 	}
 
-	return 0
-}
-
-// Boolean returns the bool version/interpretation of some value;
-// It receives an interface, and when this is a number, Boolean() returns flase of zero and true for different from zero.
-// If it's a string, try to find "1", "T", "TRUE" to return true.
-// Any other case returns false
-func Boolean( x interface{} ) bool {
-	if IsNumericType(x) {
-		return x!=0
+	if t1,ok:=x.(uint32);ok{
+		return true
 	}
 
-	if s,ok:=x.(string);ok{
-		s = Transform(s,TransformFlagLowerCase|TransformFlagTrim)
-		return MatchesAny(s,"1","true","t")
+	if t1,ok:=x.(uint64);ok{
+		return true
+	}
+
+	if t1,ok:=x.(int);ok{
+		return true
+	}
+
+	if t1,ok:=x.(int8);ok{
+		return true
+	}
+
+	if t1,ok:=x.(int16);ok{
+		return true
+	}
+
+	if t1,ok:=x.(int32);ok{
+		return true
+	}
+
+	if t1,ok:=x.(float32);ok{
+		return true
+	}
+
+	if t1,ok:=x.(float64);ok{
+		return true
+	}
+
+	if t1,ok:=x.(complex64);ok{
+		return true
+	}
+
+	if t1,ok:=x.(complex128);ok{
+		return true
 	}
 
 	return false
+}
+
+// Bit receives a number, and when this number is different from zero, it must be 1 (one)
+func Bit( value interface{} ) interface{} {
+
+	if value.(uint8) {
+
+	}
+	for _, v := range items {
+		if fmt.Sprintf("%T", search) != fmt.Sprintf("%T", v) {
+			if search == v {
+				return true
+			}
+		}
+	}
+
+	return uint8(0)
 }
