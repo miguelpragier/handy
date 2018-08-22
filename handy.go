@@ -117,9 +117,7 @@ func CheckDate(yyyymmdd string) bool {
 	}
 
 	// Sanitiza a string deixando apenas dígitos
-	re, _ := regexp.Compile("[\\D]")
-
-	yyyymmdd = re.ReplaceAllString(yyyymmdd, "")
+	yyyymmdd = OnlyDigits(yyyymmdd)
 
 	// Se a string tiver comprimento diferente de 8, falhar
 	if len(yyyymmdd) != 8 {
@@ -137,135 +135,6 @@ func CheckDate(yyyymmdd string) bool {
 	}
 
 	return false
-}
-
-// AmountAsWord receives an int64 e returns the value as its text representation
-// Today I have only the PT-BR text.
-// Ex: AmountAsWord(129) => "cento e vinte e nove"
-// Supports up to one trillion and does not add commas.
-func AmountAsWord(n int64) string {
-	if n == 0 {
-		return "zero"
-	}
-
-	negativo := n < 0
-	menos := ""
-
-	if negativo {
-		n *= -1
-		menos = "menos "
-	}
-
-	const (
-		umTrilhao = 1000000000000
-		umBilhao  = 1000000000
-		umMilhao  = 1000000
-		mil       = 1000
-		cem       = 100
-		vinte     = 20
-	)
-
-	if n < vinte {
-		a := [...]string{"", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove"}
-
-		return fmt.Sprintf("%s%s", menos, a[n])
-	}
-
-	if n < cem {
-		quantos := n / 10
-		resto := n % 10
-
-		a := [...]string{"", "", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"}
-		e := " "
-
-		if resto > 0 {
-			e = " e "
-		}
-
-		return strings.Replace(fmt.Sprintf("%s%s%s%s", menos, a[quantos], e, AmountAsWord(resto)), "  ", " ", -1)
-	}
-
-	if n < mil {
-		if n == cem {
-			return "cem"
-		}
-
-		quantos := n / cem
-		resto := n % cem
-
-		a := [...]string{"", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seicentos", "setecentos", "oitocentos", "novecentos"}
-		e := " "
-
-		if resto > 0 {
-			e = " e "
-		}
-
-		return strings.Replace(fmt.Sprintf("%s%s%s%s", menos, a[quantos], e, AmountAsWord(resto)), "  ", " ", -1)
-	}
-
-	if n < umMilhao {
-		if n == mil {
-			return "mil"
-		}
-
-		quantos := n / mil
-		resto := n % mil
-		e := " "
-
-		if (resto > 0) && (resto < cem) {
-			e = " e "
-		}
-
-		return strings.Replace(fmt.Sprintf("%s%s mil %s%s", menos, AmountAsWord(quantos), e, AmountAsWord(resto)), "  ", " ", -1)
-	}
-
-	if n < umBilhao {
-		if n == umMilhao {
-			return "um milhão"
-		}
-
-		quantos := n / umMilhao
-		resto := n % umMilhao
-		e := " "
-		u := " milhão "
-
-		if quantos > 1 {
-			u = " milhões "
-		}
-
-		if (resto > 0) && (resto < mil) {
-			e = " e "
-		}
-
-		return strings.Replace(fmt.Sprintf("%s%s%s%s%s", menos, AmountAsWord(quantos), u, e, AmountAsWord(resto)), "  ", " ", -1)
-	}
-
-	if n < umTrilhao {
-		if n == umBilhao {
-			return "um bilhão"
-		}
-
-		quantos := n / umBilhao
-		resto := n % umBilhao
-		e := " "
-		u := " bilhão "
-
-		if quantos > 1 {
-			u = " bilhões "
-		}
-
-		if (resto > 0) && (resto < mil) {
-			e = " e "
-		}
-
-		return strings.Replace(fmt.Sprintf("%s%s%s%s%s", menos, AmountAsWord(quantos), u, e, AmountAsWord(resto)), "  ", " ", -1)
-	}
-
-	if n == umTrilhao {
-		return "um trilhão"
-	}
-
-	return fmt.Sprintf("%s%d", menos, n)
 }
 
 const (
@@ -288,13 +157,9 @@ func CheckNewPassword(password, passwordConfirmation string) uint8 {
 		return CheckNewPasswordResultDivergent
 	}
 
-	re, _ := regexp.Compile("[\\d]")
+	letters := OnlyAlpha(password)
 
-	letters := re.ReplaceAllString(password, "")
-
-	re, _ = regexp.Compile("[\\D]")
-
-	digits := re.ReplaceAllString(password, "")
+	digits := OnlyDigits(password)
 
 	if letters == "" || digits == "" {
 		return CheckNewPasswordResultTooSimple
