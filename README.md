@@ -156,3 +156,15 @@ func TrimLen(text string) int {}
 // It returns true if the given string has length greater than or equal than minLength parameter
 func CheckMinLen(value string, minLength int) bool {}
 
+
+// Bit returns only uint8(0) or uint8(1).
+// It receives an interface, and when it's a number, and when this number is 0 (zero) it returns 0. Otherwise it returns 1 (one)
+// If the interface is not a number, it returns 0 (zero)
+func Bit( x interface{} ) uint8 {}
+
+// Boolean returns the bool version/interpretation of some value;
+// It receives an interface, and when this is a number, Boolean() returns flase of zero and true for different from zero.
+// If it's a string, try to find "1", "T", "TRUE" to return true.
+// Any other case returns false
+func Boolean( x interface{} ) bool {}
+```
