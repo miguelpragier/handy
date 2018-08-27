@@ -12,30 +12,41 @@ import (
 	"unicode/utf8"
 )
 
+
+const (
+	CheckPersonNameResultOK        = 0
+	CheckPersonNameResultPolluted  = 1
+	CheckPersonNameResultTooFewWords  = 2
+	CheckPersonNameResultTooShort  = 3
+	CheckPersonNameResultTooSimple = 4
+)
+
 // CheckPersonName returns true if the name contains at least two words, one >= 3 chars and one >=2 chars.
 // I understand that this is a particular criteria, but this is the OpenSourceMagic, where you can change and adapt to your own specs.
-func CheckPersonName(name string, acceptEmpty bool) bool {
+func CheckPersonName(name string, acceptEmpty bool) uint8 {
 	name = strings.TrimSpace(name)
 
+	// If name is empty, AND it's accepted, return ok. Else, cry!
 	if name == "" {
-		return acceptEmpty
-	}
-
-	var tmp []rune
-
-	for _, r := range []rune(name) {
-		// If is letter or space, can get through
-		if unicode.IsLetter(r) || r == ' ' {
-			tmp = append(tmp, r)
+		if acceptEmpty {
+			return CheckPersonNameResultTooShort
+		} else {
+			return CheckPersonNameResultOK
 		}
 	}
 
-	name = string(tmp)
+	// Person names doesn't accept other than letters
+	for _, r := range []rune(name) {
+		if !unicode.IsLetter(r) && r != ' ' {
+			return CheckPersonNameResultPolluted
+		}
+	}
 
+	// A complete name has to be at least 2 words.
 	a := strings.Fields(name)
 
 	if len(a) < 2 {
-		return false
+		return CheckPersonNameResultTooFewWords
 	}
 
 	// At least two words, one with 3 chars and other with 2
@@ -54,7 +65,11 @@ func CheckPersonName(name string, acceptEmpty bool) bool {
 		}
 	}
 
-	return found2 && found3
+	if !found2 || !found3 {
+		return CheckPersonNameResultTooSimple
+	}
+
+	return CheckPersonNameResultOK
 }
 
 // CheckCompanyName returns true if the name contains at least two words, digits allowed, one >= 3 chars and one >=2 chars.
