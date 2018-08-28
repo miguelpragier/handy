@@ -172,7 +172,7 @@ func CheckNewPassword(password, passwordConfirmation string) uint8 {
 		return CheckNewPasswordResultDivergent
 	}
 
-	letters := OnlyAlpha(password)
+	letters := OnlyLetters(password)
 
 	digits := OnlyDigits(password)
 
@@ -194,8 +194,8 @@ func StringHash(password string) string {
 	return fmt.Sprintf("%x", sum)
 }
 
-// OnlyAlpha returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
-func OnlyAlpha(sequence string) string {
+// OnlyLetters returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
+func OnlyLetters(sequence string) string {
 	if utf8.RuneCountInString(sequence) == 0 {
 		return ""
 	}
@@ -461,6 +461,7 @@ const (
 	TransformFlagOnlyDigits           = uint8(16)
 	TransformFlagOnlyLetters          = uint8(32)
 	TransformFlagOnlyLettersAndDigits = uint8(64)
+	TransformFlagHash = uint8(128)
 )
 
 // Transform handles a string according given flags/parametrization, as follows:
@@ -472,6 +473,7 @@ const (
 //	TransformFlagOnlyDigits - Filter/strip all but digits
 //	TransformFlagOnlyLetters - Filter/strip all but letters
 //	TransformFlagOnlyLettersAndDigits - Filter/strip all but numbers and letters. Removes spaces, punctuation and special symbols
+// 	TransformFlagHash - Apply handy.StringHash() routine to string
 func Transform(s string, maxLen int, transformFlags uint8) string {
 	if s == "" {
 		return s
@@ -490,7 +492,7 @@ func Transform(s string, maxLen int, transformFlags uint8) string {
 			return s
 		}
 	} else if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
-		s = OnlyAlpha(s)
+		s = OnlyLetters(s)
 
 		if s == "" {
 			return s
@@ -517,6 +519,10 @@ func Transform(s string, maxLen int, transformFlags uint8) string {
 
 	if (transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
 		s = strings.ToUpper(s)
+	}
+
+	if (transformFlags & TransformFlagHash) == TransformFlagHash {
+		s = StringHash(s)
 	}
 
 	return s
