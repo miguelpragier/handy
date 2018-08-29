@@ -680,3 +680,20 @@ func DateTimeAsString(dt time.Time, format string) string {
 
 	return dt.Format(newFormat)
 }
+
+func Reverse( s string ) string {
+	if utf8.RuneCountInString(s) < 2 {
+		return s
+	}
+
+	r := []rune(s)
+
+	buffer := make([]rune, len(r))
+
+	for i, j := len(r)-1, 0; i >= 0; i-- {
+		buffer[j] = r[i]
+		j++
+	}
+
+	return string(buffer)
+}
