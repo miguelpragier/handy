@@ -27,7 +27,7 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {
 
 	// If name is empty, AND it's accepted, return ok. Else, cry!
 	if name == "" {
-		if acceptEmpty {
+		if !acceptEmpty {
 			return CheckPersonNameResultTooShort
 		} else {
 			return CheckPersonNameResultOK
