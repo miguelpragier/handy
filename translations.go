@@ -1,7 +1,7 @@
 package handy
 
 // CheckPersonNameResult returns a meaningful message describing the code generated bu CheckPersonName
-// The routine considers the given idiom
+// The routine considers the given idiom. The fallback is in english
 func CheckPersonNameResult( idiom string, r uint8 ) string {
 	switch idiom {
 	case "bra":
@@ -37,8 +37,8 @@ func CheckPersonNameResult( idiom string, r uint8 ) string {
 	}
 }
 
-// CheckPersonNameResult returns a meaningful message describing the code generated bu CheckPersonName
-// The routine considers the given idiom
+// CheckNewPasswordResult returns a meaningful message describing the code generated bu CheckNewPassword()
+// The routine considers the given idiom. The fallback is in english
 func CheckNewPasswordResult( idiom string, r uint8 ) string {
 	if idiom=="bra" {
 		switch r {

@@ -7,7 +7,7 @@ import "net/http"
 func HTTPRequestAsString(r *http.Request, key string, maxLenght int, transformOptions ...uint8) string {
 	s := r.FormValue(key)
 
-	if s=="" {
+	if s == "" {
 		return ""
 	}
 
@@ -15,23 +15,23 @@ func HTTPRequestAsString(r *http.Request, key string, maxLenght int, transformOp
 		s = Transform(s, maxLenght, transformOptions[0])
 	}
 
-	if s=="" {
+	if s == "" {
 		return ""
 	}
 
-	if ( maxLenght > 0 ) && ( len([]rune(s)) >= maxLenght ) {
+	if (maxLenght > 0) && (len([]rune(s)) >= maxLenght) {
 		return s[0:maxLenght]
 	}
 
 	return s
 }
 
-// HTTPRequestAsinteger gets a parameter coming from a http request as an integer
+// HTTPRequestAsInteger gets a parameter coming from a http request as an integer
 // It tries to guess if it's a signed/negative integer
 func HTTPRequestAsInteger(r *http.Request, key string) int {
 	s := r.FormValue(key)
 
-	if s=="" {
+	if s == "" {
 		return 0
 	}
 
@@ -39,20 +39,20 @@ func HTTPRequestAsInteger(r *http.Request, key string) int {
 
 	i := StringAsInteger(s)
 
-	if neg && ( i > 0 ) {
-		return i*-1
+	if neg && (i > 0) {
+		return i * -1
 	}
 
 	return i
 }
 
-// HTTPRequestAsFloat gets a parameter coming from a http request as float64 number
+// HTTPRequestAsFloat64 gets a parameter coming from a http request as float64 number
 // You have to inform the decimal separator symbol.
 // If decimalSeparator is period, engine considers thousandSeparator is comma, and vice-versa.
 func HTTPRequestAsFloat64(r *http.Request, key string, decimalSeparator rune) float64 {
 	s := r.FormValue(key)
 
-	if s=="" {
+	if s == "" {
 		return 0
 	}
 
@@ -60,5 +60,3 @@ func HTTPRequestAsFloat64(r *http.Request, key string, decimalSeparator rune) fl
 
 	return StringAsFloat(s, decimalSeparator, thousandSeparator)
 }
-
-

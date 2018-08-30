@@ -1,4 +1,4 @@
-// These file contains routines to handle Brazilian-specific rules
+// Package handy routines to handle Brazilian-specific rules
 package handy
 
 import (
@@ -259,4 +259,3 @@ func AmountAsWord(n int64) string {
 
 	return fmt.Sprintf("%s%d", menos, n)
 }
-

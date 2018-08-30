@@ -12,13 +12,12 @@ import (
 	"unicode/utf8"
 )
 
-
 const (
-	CheckPersonNameResultOK        = 0
-	CheckPersonNameResultPolluted  = 1
-	CheckPersonNameResultTooFewWords  = 2
-	CheckPersonNameResultTooShort  = 3
-	CheckPersonNameResultTooSimple = 4
+	CheckPersonNameResultOK          = 0
+	CheckPersonNameResultPolluted    = 1
+	CheckPersonNameResultTooFewWords = 2
+	CheckPersonNameResultTooShort    = 3
+	CheckPersonNameResultTooSimple   = 4
 )
 
 // CheckPersonName returns true if the name contains at least two words, one >= 3 chars and one >=2 chars.
@@ -461,7 +460,7 @@ const (
 	TransformFlagOnlyDigits           = uint8(16)
 	TransformFlagOnlyLetters          = uint8(32)
 	TransformFlagOnlyLettersAndDigits = uint8(64)
-	TransformFlagHash = uint8(128)
+	TransformFlagHash                 = uint8(128)
 )
 
 // Transform handles a string according given flags/parametrization, as follows:
@@ -681,7 +680,8 @@ func DateTimeAsString(dt time.Time, format string) string {
 	return dt.Format(newFormat)
 }
 
-func Reverse( s string ) string {
+// Reverse returns the given string written backwards, with letters reversed.
+func Reverse(s string) string {
 	if utf8.RuneCountInString(s) < 2 {
 		return s
 	}
@@ -696,4 +696,68 @@ func Reverse( s string ) string {
 	}
 
 	return string(buffer)
+}
+
+// InArray searches for "item" in "array" and returns true if it's found
+func InArray(array interface{}, item interface{}) bool {
+	switch array.(type) {
+	case []int:
+		a, _ := array.([]int)
+
+		if len(a) < 1 {
+			return false
+		}
+
+		i, ok := item.(int)
+
+		if !ok {
+			return false
+		}
+
+		for _, x := range a {
+			if x == i {
+				return true
+			}
+		}
+
+	case []float64:
+		a, _ := array.([]float64)
+
+		if len(a) < 1 {
+			return false
+		}
+
+		f, ok := item.(float64)
+
+		if !ok {
+			return false
+		}
+
+		for _, x := range a {
+			if x == f {
+				return true
+			}
+		}
+
+	case []string:
+		a, _ := array.([]string)
+
+		if len(a) < 1 {
+			return false
+		}
+
+		s, ok := item.(string)
+
+		if !ok {
+			return false
+		}
+
+		for _, x := range a {
+			if x == s {
+				return true
+			}
+		}
+	}
+
+	return false
 }
