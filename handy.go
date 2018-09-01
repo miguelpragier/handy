@@ -28,17 +28,17 @@ const (
 	// CheckNewPassword() Possible results
 
 	// CheckNewPasswordResultOK Means the checking ran alright
-	CheckNewPasswordResultOK        = 0
-	// CheckNewPasswordResultDivergent Password is differente from confirmation
+	CheckNewPasswordResultOK = 0
+	// CheckNewPasswordResultDivergent Password is different from confirmation
 	CheckNewPasswordResultDivergent = 1
 	// CheckNewPasswordResultTooShort Password is too short
-	CheckNewPasswordResultTooShort  = 2
+	CheckNewPasswordResultTooShort = 2
 	// CheckNewPasswordResultTooSimple Given string doesn't satisfy complexity rules
 	CheckNewPasswordResultTooSimple = 3
 
 	// CheckNewPassword() Complexity Rules
 
-	// CheckNewPasswordComplexityLowest There's no rules besides the minimum lenght
+	// CheckNewPasswordComplexityLowest There's no rules besides the minimum length
 	// >>> This flag turns all others off <<<
 	CheckNewPasswordComplexityLowest = 1
 	// CheckNewPasswordComplexityRequireLetter At least one letter is required in order to aprove password
@@ -56,16 +56,16 @@ const (
 
 // CheckNewPassword Run some basic checks on new password strings, based on given options
 // This routine requires at least 4 (four) characters
-// Example requiring only basic minimum lenght: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityLowest)
+// Example requiring only basic minimum length: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityLowest)
 // Example requiring number and symbol: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityRequireNumber|CheckNewPasswordComplexityRequireSymbol)
-func CheckNewPassword(password, passwordConfirmation string, minimumLenght uint, flagComplexity uint8) uint8 {
+func CheckNewPassword(password, passwordConfirmation string, minimumlength uint, flagComplexity uint8) uint8 {
 	const minPasswordLengthDefault = 4
 
-	if minimumLenght<minPasswordLengthDefault {
-		minimumLenght = 4
+	if minimumlength < minPasswordLengthDefault {
+		minimumlength = 4
 	}
 
-	if utf8.RuneCountInString(strings.TrimSpace(password)) < int(minimumLenght) {
+	if utf8.RuneCountInString(strings.TrimSpace(password)) < int(minimumlength) {
 		return CheckNewPasswordResultTooShort
 	}
 
@@ -79,7 +79,7 @@ func CheckNewPassword(password, passwordConfirmation string, minimumLenght uint,
 	spaceFound := false
 	upperCaseFound := false
 
-	if flagComplexity & CheckNewPasswordComplexityLowest != CheckNewPasswordComplexityLowest {
+	if flagComplexity&CheckNewPasswordComplexityLowest != CheckNewPasswordComplexityLowest {
 		s := []rune(password)
 
 		for _, r := range s {
@@ -105,33 +105,32 @@ func CheckNewPassword(password, passwordConfirmation string, minimumLenght uint,
 		}
 	}
 
-	if flagComplexity & CheckNewPasswordComplexityRequireLetter == CheckNewPasswordComplexityRequireLetter {
+	if flagComplexity&CheckNewPasswordComplexityRequireLetter == CheckNewPasswordComplexityRequireLetter {
 		if !letterFound {
 			return CheckNewPasswordResultTooSimple
 		}
 
 		// Only checks uppercase if letter is required
-		if flagComplexity & CheckNewPasswordComplexityRequireUpperCase == CheckNewPasswordComplexityRequireUpperCase {
+		if flagComplexity&CheckNewPasswordComplexityRequireUpperCase == CheckNewPasswordComplexityRequireUpperCase {
 			if !upperCaseFound {
 				return CheckNewPasswordResultTooSimple
 			}
 		}
 	}
 
-
-	if flagComplexity & CheckNewPasswordComplexityRequireNumber == CheckNewPasswordComplexityRequireNumber {
+	if flagComplexity&CheckNewPasswordComplexityRequireNumber == CheckNewPasswordComplexityRequireNumber {
 		if !numberFound {
 			return CheckNewPasswordResultTooSimple
 		}
 	}
 
-	if flagComplexity & CheckNewPasswordComplexityRequireSymbol == CheckNewPasswordComplexityRequireSymbol {
+	if flagComplexity&CheckNewPasswordComplexityRequireSymbol == CheckNewPasswordComplexityRequireSymbol {
 		if !symbolFound {
 			return CheckNewPasswordResultTooSimple
 		}
 	}
 
-	if flagComplexity & CheckNewPasswordComplexityRequireSpace == CheckNewPasswordComplexityRequireSpace {
+	if flagComplexity&CheckNewPasswordComplexityRequireSpace == CheckNewPasswordComplexityRequireSpace {
 		if !spaceFound {
 			return CheckNewPasswordResultTooSimple
 		}
@@ -279,22 +278,22 @@ func Truncate(s string, maxLen int, trim bool) string {
 }
 
 const (
-	// TransformNone No transformations are ordered. Only constraints maximum lenght
-	TransformNone                     = uint8(1)
+	// TransformNone No transformations are ordered. Only constraints maximum length
+	TransformNone = uint8(1)
 	// TransformFlagTrim Trims the string, removing leading and trailing spaces
-	TransformFlagTrim                 = uint8(2)
+	TransformFlagTrim = uint8(2)
 	// TransformFlagLowerCase Makes the string lowercase
-	TransformFlagLowerCase            = uint8(4)
+	TransformFlagLowerCase = uint8(4)
 	// TransformFlagUpperCase Makes the string uppercase
-	TransformFlagUpperCase            = uint8(8)
+	TransformFlagUpperCase = uint8(8)
 	// TransformFlagOnlyDigits Removes all non-numeric characters
-	TransformFlagOnlyDigits           = uint8(16)
+	TransformFlagOnlyDigits = uint8(16)
 	// TransformFlagOnlyLetters Removes all non-letter characters
-	TransformFlagOnlyLetters          = uint8(32)
+	TransformFlagOnlyLetters = uint8(32)
 	// TransformFlagOnlyLettersAndDigits Leaves only letters and numbers
 	TransformFlagOnlyLettersAndDigits = uint8(64)
 	// TransformFlagHash After process all pther flags, applies SHA256 hashing on string for output
-	TransformFlagHash                 = uint8(128)
+	TransformFlagHash = uint8(128)
 )
 
 // Transform handles a string according given flags/parametrization, as follows:
@@ -312,7 +311,7 @@ func Transform(s string, maxLen int, transformFlags uint8) string {
 		return s
 	}
 
-	if transformFlags & TransformNone != TransformNone {
+	if transformFlags&TransformNone != TransformNone {
 
 		if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
 			s = OnlyLettersAndNumbers(s)

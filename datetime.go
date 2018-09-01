@@ -65,15 +65,17 @@ func CheckDateYMD(yyyymmdd string) bool {
 func YMDasDateUTC(yyyymmdd string, utc bool) (time.Time, error) {
 	yyyymmdd = OnlyDigits(yyyymmdd)
 
-	if t, err := time.Parse("20060102", yyyymmdd); err == nil {
-		if utc {
-			return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC), nil
-		} else {
-			return t, nil
-		}
-	} else {
+	t, err := time.Parse("20060102", yyyymmdd)
+
+	if err != nil {
 		return time.Time{}, err
 	}
+
+	if utc {
+		return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC), nil
+	}
+
+	return t, nil
 }
 
 // YMDasDate returns a valid time from the given yyymmdd-formatted sequence
