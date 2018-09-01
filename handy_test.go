@@ -4,156 +4,156 @@ import (
 	"testing"
 )
 
-func TestCheckPersonName(t *testing.T) {
-	type TestStructForCheckPersonName struct {
-		summary string
-		name string
-		acceptEmpty bool
-		expectedOutput bool
-	}
-
-	testlist := []TestStructForCheckPersonName{
-		{"Only two letters","T S",false,false},
-		{"only four letters","AB CD",false,false},
-		{"five letters with non-ascii runes","ça vá",false,false},
-		{"mixing letters and numbers","W0RDS W1TH NUMB3RS",false,false},
-		{"Sending and accepting empty string","",true,true},
-		{"Sending spaces-only string and accepting empty","     ",true,true},
-		{"Sending but not accepting empty string","",false,false},
-		{"Sending spaces-only string and refusing empty","     ",false,false},
-		{"Sending numbers, expecting false"," 5454 ",true,false},
-		{"OneWorded string","ONEWORD",false,false},
-		{"Minimum acceptable","AB CDE",false,true},
-		{"Non-ascii stuff","ÑÔÑ-ÀSÇÏÏ ÇÃO ÀË",false,true},
-		{"Words with symbols. Expecting true","WORDS-WITH SYMBOLS'",false,true},
-		{"Words with symbols. Expecting false","WORDS WITH SYMBOLS`",false,true},
-	}
-
-	for _,tst := range testlist {
-		tr := CheckPersonName(tst.name, tst.acceptEmpty)
-
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tName: ",tst.name, "\n\tAcceptEmpty: ",tst.acceptEmpty, "\n\tExpected: ",tst.expectedOutput, "\n\tSummary: ",tst.summary)
-		}
-	}
-}
+//func TestCheckPersonName(t *testing.T) {
+//	type TestStructForCheckPersonName struct {
+//		summary        string
+//		name           string
+//		acceptEmpty    bool
+//		expectedOutput bool
+//	}
+//
+//	testlist := []TestStructForCheckPersonName{
+//		{"Only two letters", "T S", false, false},
+//		{"only four letters", "AB CD", false, false},
+//		{"five letters with non-ascii runes", "ça vá", false, false},
+//		{"mixing letters and numbers", "W0RDS W1TH NUMB3RS", false, false},
+//		{"Sending and accepting empty string", "", true, true},
+//		{"Sending spaces-only string and accepting empty", "     ", true, true},
+//		{"Sending but not accepting empty string", "", false, false},
+//		{"Sending spaces-only string and refusing empty", "     ", false, false},
+//		{"Sending numbers, expecting false", " 5454 ", true, false},
+//		{"OneWorded string", "ONEWORD", false, false},
+//		{"Minimum acceptable", "AB CDE", false, true},
+//		{"Non-ascii stuff", "ÑÔÑ-ÀSÇÏÏ ÇÃO ÀË", false, true},
+//		{"Words with symbols. Expecting true", "WORDS-WITH SYMBOLS'", false, true},
+//		{"Words with symbols. Expecting false", "WORDS WITH SYMBOLS`", false, true},
+//	}
+//
+//	for _, tst := range testlist {
+//		tr := CheckPersonName(tst.name, tst.acceptEmpty)
+//
+//		if tr != tst.expectedOutput {
+//			t.Error("Test has failed!\n", "\n\tName: ", tst.name, "\n\tAcceptEmpty: ", tst.acceptEmpty, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
+//		}
+//	}
+//}
 
 func TestCheckCPF(t *testing.T) {
 	type TestStructForCheckCPF struct {
-		summary string
-		cpf string
+		summary        string
+		cpf            string
 		expectedOutput bool
 	}
 
 	testlist := []TestStructForCheckCPF{
-		{"send empty string","",false},
-		{"send wrong length string (10)","153.255.555.4",false},
-		{"send wrong length string (12)","153.255.555.455",false},
-		{"send cheating cpf","55555555555",false},
-		{"send invalid string","153.278.966.A6",false},
-		{"send alright string","03818534110",true},
+		{"send empty string", "", false},
+		{"send wrong length string (10)", "153.255.555.4", false},
+		{"send wrong length string (12)", "153.255.555.455", false},
+		{"send cheating cpf", "55555555555", false},
+		{"send invalid string", "153.278.966.A6", false},
+		{"send alright string", "03818534110", true},
 	}
 
-	for _,tst := range testlist {
+	for _, tst := range testlist {
 		tr := CheckCPF(tst.cpf)
 
 		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tCPF: ",tst.cpf, "\n\tExpected: ",tst.expectedOutput, "\n\tSummary: ",tst.summary)
+			t.Error("Test has failed!\n", "\n\tCPF: ", tst.cpf, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
 		}
 	}
 }
 
 func TestCheckCNPJ(t *testing.T) {
 	type TestStructForCheckCNPJ struct {
-		summary string
-		cnpj string
+		summary        string
+		cnpj           string
 		expectedOutput bool
 	}
 
 	testlist := []TestStructForCheckCNPJ{
-		{"send empty string","",false},
-		{"send wrong length string (13)","88.015.315/0001-5",false},
-		{"send wrong length string (15)","88.015.315/0001-5003",false},
-		{"send cheating cnpj","55555555555555",false},
-		{"send invalid string","88.015.315/0001-5A",false},
-		{"send alright string with punctuation","88.015.315/0001-53",true},
-		{"send alright string","88015315000153",true},
+		{"send empty string", "", false},
+		{"send wrong length string (13)", "88.015.315/0001-5", false},
+		{"send wrong length string (15)", "88.015.315/0001-5003", false},
+		{"send cheating cnpj", "55555555555555", false},
+		{"send invalid string", "88.015.315/0001-5A", false},
+		{"send alright string with punctuation", "88.015.315/0001-53", true},
+		{"send alright string", "88015315000153", true},
 	}
 
-	for _,tst := range testlist {
+	for _, tst := range testlist {
 		tr := CheckCNPJ(tst.cnpj)
 
 		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tCNPJ: ",tst.cnpj, "\n\tExpected: ",tst.expectedOutput, "\n\tSummary: ",tst.summary)
+			t.Error("Test has failed!\n", "\n\tCNPJ: ", tst.cnpj, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
 		}
 	}
 }
 
 func TestCheckEmail(t *testing.T) {
 	type TestStructForCheckEmail struct {
-		summary string
-		email string
+		summary        string
+		email          string
 		expectedOutput bool
 	}
 
 	testlist := []TestStructForCheckEmail{
-		{"send empty string","",false},
-		{"send invalid address","email-gmail.com",false},
-		{"send valid address","email@gmail.com",true},
+		{"send empty string", "", false},
+		{"send invalid address", "email-gmail.com", false},
+		{"send valid address", "email@gmail.com", true},
 	}
 
-	for _,tst := range testlist {
+	for _, tst := range testlist {
 		tr := CheckEmail(tst.email)
 
 		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tEmail: ",tst.email, "\n\tExpected: ",tst.expectedOutput, "\n\tSummary: ",tst.summary)
+			t.Error("Test has failed!\n", "\n\tEmail: ", tst.email, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
 		}
 	}
 }
 
 func TestCheckDate(t *testing.T) {
 	type TestStructForCheckDate struct {
-		summary string
-		date string
+		summary        string
+		date           string
 		expectedOutput bool
 	}
 
 	testlist := []TestStructForCheckDate{
-		{"empty string","",false},
-		{"invalid date","2018-02-29",false},
-		{"invalid date","2018-13-01",false},
-		{"invalid date","2018-12-32",false},
-		{"valid date 1","2018-12-31",true},
-		{"valid date 2","2018-01-01",true},
+		{"empty string", "", false},
+		{"invalid date", "2018-02-29", false},
+		{"invalid date", "2018-13-01", false},
+		{"invalid date", "2018-12-32", false},
+		{"valid date 1", "2018-12-31", true},
+		{"valid date 2", "2018-01-01", true},
 	}
 
-	for _,tst := range testlist {
-		tr := CheckDate(tst.date)
+	for _, tst := range testlist {
+		tr := CheckDateYMD(tst.date)
 
 		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tDate: ",tst.date, "\n\tExpected: ",tst.expectedOutput, "\n\tSummary: ",tst.summary)
+			t.Error("Test has failed!\n", "\n\tDate: ", tst.date, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
 		}
 	}
 }
 
 func TestPorExtenso(t *testing.T) {
 	type TestStructForPorExtenso struct {
-		summary string
-		value int64
+		summary        string
+		value          int64
 		expectedOutput string
 	}
 
 	testlist := []TestStructForPorExtenso{
-		{"zero",0,"zero"},
-		{"-125",-125,"menos cento e vinte e cinco"},
-		{"-987654321",-987654321,"menos novecentos e oitenta e sete milhões seicentos e cinquenta e quatro mil trezentos e vinte e um"},
+		{"zero", 0, "zero"},
+		{"-125", -125, "menos cento e vinte e cinco"},
+		{"-987654321", -987654321, "menos novecentos e oitenta e sete milhões seicentos e cinquenta e quatro mil trezentos e vinte e um"},
 	}
 
-	for _,tst := range testlist {
+	for _, tst := range testlist {
 		tr := AmountAsWord(tst.value)
 
 		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tValue: ",tst.value, "\n\tExpected: ",tst.expectedOutput, "\n\tReceived: ",tr,  "\n\tSummary: ",tst.summary)
+			t.Error("Test has failed!\n", "\n\tValue: ", tst.value, "\n\tExpected: ", tst.expectedOutput, "\n\tReceived: ", tr, "\n\tSummary: ", tst.summary)
 		}
 	}
 }
