@@ -25,18 +25,47 @@ func CheckEmail(email string) bool {
 }
 
 const (
+	// CheckNewPassword() Possible results
+
+	// CheckNewPasswordResultOK Means the checking ran alright
 	CheckNewPasswordResultOK        = 0
+	// CheckNewPasswordResultDivergent Password is differente from confirmation
 	CheckNewPasswordResultDivergent = 1
+	// CheckNewPasswordResultTooShort Password is too short
 	CheckNewPasswordResultTooShort  = 2
+	// CheckNewPasswordResultTooSimple Given string doesn't satisfy complexity rules
 	CheckNewPasswordResultTooSimple = 3
+
+	// CheckNewPassword() Complexity Rules
+
+	// CheckNewPasswordComplexityLowest There's no rules besides the minimum lenght
+	// >>> This flag turns all others off <<<
+	CheckNewPasswordComplexityLowest = 1
+	// CheckNewPasswordComplexityRequireLetter At least one letter is required in order to aprove password
+	CheckNewPasswordComplexityRequireLetter = 2
+	// CheckNewPasswordComplexityRequireUpperCase At least one uppercase letter is required in order to aprove password.
+	// Only works if CheckNewPasswordComplexityRequireLetter is included/activated
+	CheckNewPasswordComplexityRequireUpperCase = 4
+	// CheckNewPasswordComplexityRequireNumber At least one number is required in order to aprove password
+	CheckNewPasswordComplexityRequireNumber = 8
+	// CheckNewPasswordComplexityRequireSpace The password must contain at least one space
+	CheckNewPasswordComplexityRequireSpace = 16
+	// CheckNewPasswordComplexityRequireSymbol User have to include at least one special character, like # or -
+	CheckNewPasswordComplexityRequireSymbol = 32
 )
 
-// Run some basic checks on new password strings
-// My rule requires at least six chars, with at least one letter and at least one number.
-func CheckNewPassword(password, passwordConfirmation string) uint8 {
-	const minPasswordLength = 6
+// CheckNewPassword Run some basic checks on new password strings, based on given options
+// This routine requires at least 4 (four) characters
+// Example requiring only basic minimum lenght: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityLowest)
+// Example requiring number and symbol: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityRequireNumber|CheckNewPasswordComplexityRequireSymbol)
+func CheckNewPassword(password, passwordConfirmation string, minimumLenght uint, flagComplexity uint8) uint8 {
+	const minPasswordLengthDefault = 4
 
-	if utf8.RuneCountInString(strings.TrimSpace(password)) < minPasswordLength {
+	if minimumLenght<minPasswordLengthDefault {
+		minimumLenght = 4
+	}
+
+	if utf8.RuneCountInString(strings.TrimSpace(password)) < int(minimumLenght) {
 		return CheckNewPasswordResultTooShort
 	}
 
@@ -44,22 +73,78 @@ func CheckNewPassword(password, passwordConfirmation string) uint8 {
 		return CheckNewPasswordResultDivergent
 	}
 
-	letters := OnlyLetters(password)
+	letterFound := false
+	numberFound := false
+	symbolFound := false
+	spaceFound := false
+	upperCaseFound := false
 
-	digits := OnlyDigits(password)
+	if flagComplexity & CheckNewPasswordComplexityLowest != CheckNewPasswordComplexityLowest {
+		s := []rune(password)
 
-	if letters == "" || digits == "" {
-		return CheckNewPasswordResultTooSimple
+		for _, r := range s {
+			if unicode.IsLetter(r) {
+				letterFound = true
+
+				if unicode.IsUpper(r) {
+					upperCaseFound = true
+				}
+			}
+
+			if unicode.IsNumber(r) {
+				numberFound = true
+			}
+
+			if unicode.IsSymbol(r) {
+				symbolFound = true
+			}
+
+			if r == ' ' {
+				spaceFound = true
+			}
+		}
+	}
+
+	if flagComplexity & CheckNewPasswordComplexityRequireLetter == CheckNewPasswordComplexityRequireLetter {
+		if !letterFound {
+			return CheckNewPasswordResultTooSimple
+		}
+
+		// Only checks uppercase if letter is required
+		if flagComplexity & CheckNewPasswordComplexityRequireUpperCase == CheckNewPasswordComplexityRequireUpperCase {
+			if !upperCaseFound {
+				return CheckNewPasswordResultTooSimple
+			}
+		}
+	}
+
+
+	if flagComplexity & CheckNewPasswordComplexityRequireNumber == CheckNewPasswordComplexityRequireNumber {
+		if !numberFound {
+			return CheckNewPasswordResultTooSimple
+		}
+	}
+
+	if flagComplexity & CheckNewPasswordComplexityRequireSymbol == CheckNewPasswordComplexityRequireSymbol {
+		if !symbolFound {
+			return CheckNewPasswordResultTooSimple
+		}
+	}
+
+	if flagComplexity & CheckNewPasswordComplexityRequireSpace == CheckNewPasswordComplexityRequireSpace {
+		if !spaceFound {
+			return CheckNewPasswordResultTooSimple
+		}
 	}
 
 	return CheckNewPasswordResultOK
 }
 
 // StringHash simply generates a SHA256 hash from the given string
-func StringHash(password string) string {
+func StringHash(s string) string {
 	h := sha256.New()
 
-	h.Write([]byte(password))
+	h.Write([]byte(s))
 
 	sum := h.Sum(nil)
 
@@ -171,9 +256,9 @@ func Between(n, low, high int) bool {
 func Tif(condition bool, tifThen, tifElse interface{}) interface{} {
 	if condition {
 		return tifThen
-	} else {
-		return tifElse
 	}
+
+	return tifElse
 }
 
 // Truncate limits the length of a given string, trimming or not, according parameters
@@ -194,75 +279,86 @@ func Truncate(s string, maxLen int, trim bool) string {
 }
 
 const (
-	TransformNone                     = uint8(0)
+	// TransformNone No transformations are ordered. Only constraints maximum lenght
+	TransformNone                     = uint8(1)
+	// TransformFlagTrim Trims the string, removing leading and trailing spaces
 	TransformFlagTrim                 = uint8(2)
+	// TransformFlagLowerCase Makes the string lowercase
 	TransformFlagLowerCase            = uint8(4)
+	// TransformFlagUpperCase Makes the string uppercase
 	TransformFlagUpperCase            = uint8(8)
+	// TransformFlagOnlyDigits Removes all non-numeric characters
 	TransformFlagOnlyDigits           = uint8(16)
+	// TransformFlagOnlyLetters Removes all non-letter characters
 	TransformFlagOnlyLetters          = uint8(32)
+	// TransformFlagOnlyLettersAndDigits Leaves only letters and numbers
 	TransformFlagOnlyLettersAndDigits = uint8(64)
+	// TransformFlagHash After process all pther flags, applies SHA256 hashing on string for output
 	TransformFlagHash                 = uint8(128)
 )
 
 // Transform handles a string according given flags/parametrization, as follows:
 // Available Flags to be used alone or combined:
-//	TransformNone - Does nothing. It's only for truncation.
-//	TransformFlagTrim - Trim spaces before and after proccess the input
-//	TransformFlagLowerCase - Change string case to lower
-//	TransformFlagUpperCase - Change string case to upper
-//	TransformFlagOnlyDigits - Filter/strip all but digits
-//	TransformFlagOnlyLetters - Filter/strip all but letters
-//	TransformFlagOnlyLettersAndDigits - Filter/strip all but numbers and letters. Removes spaces, punctuation and special symbols
-// 	TransformFlagHash - Apply handy.StringHash() routine to string
+//	TransformNone Does nothing, and turns all other flags OFF.
+//	TransformFlagTrim Trim spaces before and after process the input
+//	TransformFlagLowerCase Change string case to lower. If it's combined with TransformFlagUpperCase, only uppercase remains, once is executed later.
+//	TransformFlagUpperCase Change string case to upper. If it's combined with TransformFlagLowerCase, only uppercase remains, once it's executed later.
+//	TransformFlagOnlyDigits Filter/strip all but digits
+//	TransformFlagOnlyLetters Filter/strip all but letters
+//	TransformFlagOnlyLettersAndDigits Filter/strip all but numbers and letters. Removes spaces, punctuation and special symbols
+// 	TransformFlagHash Apply handy.StringHash() routine to string
 func Transform(s string, maxLen int, transformFlags uint8) string {
 	if s == "" {
 		return s
 	}
 
-	if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
-		s = OnlyLettersAndNumbers(s)
+	if transformFlags & TransformNone != TransformNone {
 
-		if s == "" {
-			return s
+		if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
+			s = OnlyLettersAndNumbers(s)
+
+			if s == "" {
+				return s
+			}
+		} else if (transformFlags & TransformFlagOnlyDigits) == TransformFlagOnlyDigits {
+			s = OnlyDigits(s)
+
+			if s == "" {
+				return s
+			}
+		} else if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
+			s = OnlyLetters(s)
+
+			if s == "" {
+				return s
+			}
 		}
-	} else if (transformFlags & TransformFlagOnlyDigits) == TransformFlagOnlyDigits {
-		s = OnlyDigits(s)
 
-		if s == "" {
-			return s
+		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
+		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
+			s = strings.TrimSpace(s)
 		}
-	} else if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
-		s = OnlyLetters(s)
 
-		if s == "" {
-			return s
+		if utf8.RuneCountInString(s) > maxLen {
+			s = string([]rune(s)[:maxLen])
 		}
-	}
 
-	// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-	if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
-		s = strings.TrimSpace(s)
-	}
+		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
+		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
+			s = strings.TrimSpace(s)
+		}
 
-	if utf8.RuneCountInString(s) > maxLen {
-		s = string([]rune(s)[:maxLen])
-	}
+		if (transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
+			s = strings.ToLower(s)
+		}
 
-	// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-	if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
-		s = strings.TrimSpace(s)
-	}
+		if (transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
+			s = strings.ToUpper(s)
+		}
 
-	if (transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
-		s = strings.ToLower(s)
-	}
-
-	if (transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
-		s = strings.ToUpper(s)
-	}
-
-	if (transformFlags & TransformFlagHash) == TransformFlagHash {
-		s = StringHash(s)
+		if (transformFlags & TransformFlagHash) == TransformFlagHash {
+			s = StringHash(s)
+		}
 	}
 
 	return s
@@ -296,7 +392,7 @@ func HasOnlyNumbers(sequence string) bool {
 	return true
 }
 
-// HasOnlyNumbers returns true if the sequence is entirely composed by letters
+// HasOnlyLetters returns true if the sequence is entirely composed by letters
 func HasOnlyLetters(sequence string) bool {
 	if utf8.RuneCountInString(sequence) == 0 {
 		return false
@@ -451,9 +547,9 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {
 	if name == "" {
 		if !acceptEmpty {
 			return CheckPersonNameResultTooShort
-		} else {
-			return CheckPersonNameResultOK
 		}
+
+		return CheckPersonNameResultOK
 	}
 
 	// Person names doesn't accept other than letters, spaces and single quotes

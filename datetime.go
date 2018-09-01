@@ -42,8 +42,8 @@ func DateTimeAsString(dt time.Time, format string) string {
 	return dt.Format(newFormat)
 }
 
-// CheckDatef validates a date using the given format
-func CheckDatef(format, dateTime string) bool {
+// CheckDate validates a date using the given format
+func CheckDate(format, dateTime string) bool {
 	f := golangDateTimeFormat(format)
 
 	if f == "" {
@@ -55,25 +55,10 @@ func CheckDatef(format, dateTime string) bool {
 	return err == nil
 }
 
-// CheckDate returns true if given sequence is a valid date in format yyyymmdd
+// CheckDateYMD returns true if given sequence is a valid date in format yyyymmdd
 // The function removes non-digit characteres like "yyyy/mm/dd" or "yyyy-mm-dd", filtering to "yyyymmdd"
 func CheckDateYMD(yyyymmdd string) bool {
-	// Se já chegar vazio, falha
-	if yyyymmdd == "" {
-		return false
-	}
-
-	// Allow 9 digits in order to check if consoumer sent a wrong date
-	// It means I won't truncate a badlyFormated string
-	yyyymmdd = Transform(yyyymmdd, 9, TransformFlagOnlyDigits)
-
-	if len(yyyymmdd) != 8 {
-		return false
-	}
-
-	_, err := time.Parse("20060102", yyyymmdd)
-
-	return err == nil
+	return CheckDate("yyyymmdd", yyyymmdd)
 }
 
 // YMDasDateUTC returns a valid UTC time from the given yyymmdd-formatted sequence

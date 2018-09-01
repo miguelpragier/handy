@@ -1,5 +1,7 @@
+[![Go Report Card](https://goreportcard.com/badge/miguelpragier/handy)](https://goreportcard.com/report/miguelpragier/handy) ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)
+
 # Handy Go utilities
-GO Golang Utilities and helpers like validators and string formatters
+GO Golang Utilities and helpers like validators, sanitizers and string formatters
 
 
 # Dependencies
@@ -7,22 +9,13 @@ None. It relies on standard library.
 
 
 # ToDo list
-
-* Add configuration engine for internationalization of messages - A json or yml file with mnemonics and message translations
-
 * Translate all API documentaion/comments to english
 
-* To consider some engine to - conditionally - preCompile all regex once at init() and store them in variables. The tradeoff would be the initial loadWeight, specially painful if you do not use those regex functions often
-
-* Add config for rules, to customize passwords and other strings checking/validation
+* Replaces all simple regex with procedural
 
 * Assure that all functions are covered by automated tests
 
 * Add those cool badges to repository
-
-
-# Breaking Changes
-* Function CheckNewPassword now returns uint8, instead the old (bool,string), in order to be simpler, more generic and easily internationalizable.
 
 
 # Functions
@@ -31,12 +24,14 @@ None. It relies on standard library.
 // See https://tools.ietf.org/html/rfc2822#section-3.4.1 for details about email address anatomy
 func CheckEmail(email string) bool {}
 
-// Run some basic checks on new password strings
-// My rule requires at least six chars, with at least one letter and at least one number.
-func CheckNewPassword(password, passwordConfirmation string) uint8 {}
+// CheckNewPassword Run some basic checks on new password strings, based on given options
+// This routine requires at least 4 (four) characters
+// Example requiring only basic minimum lenght: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityLowest)
+// Example requiring number and symbol: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityRequireNumber|CheckNewPasswordComplexityRequireSymbol)
+func CheckNewPassword(password, passwordConfirmation string, minimumLenght uint, flagComplexity uint8) uint8 {
 
 // StringHash simply generates a SHA256 hash from the given string
-func StringHash(password string) string {}
+func StringHash(s string) string {}
 
 // OnlyLetters returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
 func OnlyLetters(sequence string) string {}
@@ -128,8 +123,8 @@ func InArray(array interface{}, item interface{}) bool {}
 // DateTimeAsString formats time.Time variables as strings, considering the format directive
 func DateTimeAsString(dt time.Time, format string) string {}
 
-// CheckDatef validates a date using the given format
-func CheckDatef(format, dateTime string) bool {}
+// CheckDate validates a date using the given format
+func CheckDate(format, dateTime string) bool {
 
 // CheckDate returns true if given sequence is a valid date in format yyyymmdd
 // The function removes non-digit characteres like "yyyy/mm/dd" or "yyyy-mm-dd", filtering to "yyyymmdd"
