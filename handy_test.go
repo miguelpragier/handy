@@ -4,6 +4,28 @@ import (
 	"testing"
 )
 
+func TestCheckEmail(t *testing.T) {
+	type TestStructForCheckEmail struct {
+		summary        string
+		email          string
+		expectedOutput bool
+	}
+
+	testList := []TestStructForCheckEmail{
+		{"send empty string", "", false},
+		{"send invalid address", "email-gmail.com", false},
+		{"send valid address", "email@gmail.com", true},
+	}
+
+	for _, tst := range testList {
+		tr := CheckEmail(tst.email)
+
+		if tr != tst.expectedOutput {
+			t.Error("Test has failed!\n", "\n\tEmail: ", tst.email, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
+		}
+	}
+}
+
 //func TestCheckPersonName(t *testing.T) {
 //	type TestStructForCheckPersonName struct {
 //		summary        string
@@ -89,28 +111,6 @@ func TestCheckCNPJ(t *testing.T) {
 	}
 }
 
-func TestCheckEmail(t *testing.T) {
-	type TestStructForCheckEmail struct {
-		summary        string
-		email          string
-		expectedOutput bool
-	}
-
-	testlist := []TestStructForCheckEmail{
-		{"send empty string", "", false},
-		{"send invalid address", "email-gmail.com", false},
-		{"send valid address", "email@gmail.com", true},
-	}
-
-	for _, tst := range testlist {
-		tr := CheckEmail(tst.email)
-
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tEmail: ", tst.email, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
-	}
-}
-
 func TestCheckDate(t *testing.T) {
 	type TestStructForCheckDate struct {
 		summary        string
@@ -136,7 +136,7 @@ func TestCheckDate(t *testing.T) {
 	}
 }
 
-func TestPorExtenso(t *testing.T) {
+func TestAmountAsWord(t *testing.T) {
 	type TestStructForPorExtenso struct {
 		summary        string
 		value          int64
@@ -158,43 +158,134 @@ func TestPorExtenso(t *testing.T) {
 	}
 }
 
-//func CheckNewPassword(password, passwordConfirmation string) (bool, string) {
-//	const minPasswordLength = 6
+//const (
+//	// CheckNewPassword() Possible results
 //
-//	if utf8.RuneCountInString(strings.TrimSpace(password)) < minPasswordLength {
-//		return false, fmt.Sprintf("Senha deve conter ao menos %d caracteres, com ao menos uma letra ou ao menos um número", minPasswordLength)
+//	// CheckNewPasswordResultOK Means the checking ran alright
+//	CheckNewPasswordResultOK = 0
+//	// CheckNewPasswordResultDivergent Password is different from confirmation
+//	CheckNewPasswordResultDivergent = 1
+//	// CheckNewPasswordResultTooShort Password is too short
+//	CheckNewPasswordResultTooShort = 2
+//	// CheckNewPasswordResultTooSimple Given string doesn't satisfy complexity rules
+//	CheckNewPasswordResultTooSimple = 3
+//
+//	// CheckNewPassword() Complexity Rules
+//
+//	// CheckNewPasswordComplexityLowest There's no rules besides the minimum length
+//	// >>> This flag turns all others off <<<
+//	CheckNewPasswordComplexityLowest = 1
+//	// CheckNewPasswordComplexityRequireLetter At least one letter is required in order to aprove password
+//	CheckNewPasswordComplexityRequireLetter = 2
+//	// CheckNewPasswordComplexityRequireUpperCase At least one uppercase letter is required in order to aprove password.
+//	// Only works if CheckNewPasswordComplexityRequireLetter is included/activated
+//	CheckNewPasswordComplexityRequireUpperCase = 4
+//	// CheckNewPasswordComplexityRequireNumber At least one number is required in order to aprove password
+//	CheckNewPasswordComplexityRequireNumber = 8
+//	// CheckNewPasswordComplexityRequireSpace The password must contain at least one space
+//	CheckNewPasswordComplexityRequireSpace = 16
+//	// CheckNewPasswordComplexityRequireSymbol User have to include at least one special character, like # or -
+//	CheckNewPasswordComplexityRequireSymbol = 32
+//)
+//
+//// CheckNewPassword Run some basic checks on new password strings, based on given options
+//// This routine requires at least 4 (four) characters
+//// Example requiring only basic minimum length: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityLowest)
+//// Example requiring number and symbol: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityRequireNumber|CheckNewPasswordComplexityRequireSymbol)
+//func CheckNewPassword(password, passwordConfirmation string, minimumlength uint, flagComplexity uint8) uint8 {
+//	const minPasswordLengthDefault = 4
+//
+//	if minimumlength < minPasswordLengthDefault {
+//		minimumlength = 4
+//	}
+//
+//	if utf8.RuneCountInString(strings.TrimSpace(password)) < int(minimumlength) {
+//		return CheckNewPasswordResultTooShort
 //	}
 //
 //	if password != passwordConfirmation {
-//		return false, "Senha e confirmação diferentes entre si"
+//		return CheckNewPasswordResultDivergent
 //	}
 //
-//	re, _ := regexp.Compile("[\\d]")
+//	letterFound := false
+//	numberFound := false
+//	symbolFound := false
+//	spaceFound := false
+//	upperCaseFound := false
 //
-//	letters := re.ReplaceAllString(password, "")
+//	if flagComplexity&CheckNewPasswordComplexityLowest != CheckNewPasswordComplexityLowest {
+//		s := []rune(password)
 //
-//	re, _ = regexp.Compile("[\\D]")
+//		for _, r := range s {
+//			if unicode.IsLetter(r) {
+//				letterFound = true
 //
-//	digits := re.ReplaceAllString(password, "")
+//				if unicode.IsUpper(r) {
+//					upperCaseFound = true
+//				}
+//			}
 //
-//	if letters == "" || digits == "" {
-//		return false, fmt.Sprintf("Senha deve conter ao menos %d caracteres, com ao menos uma letra ou ao menos um número", minPasswordLength)
+//			if unicode.IsNumber(r) {
+//				numberFound = true
+//			}
+//
+//			if unicode.IsSymbol(r) {
+//				symbolFound = true
+//			}
+//
+//			if r == ' ' {
+//				spaceFound = true
+//			}
+//		}
 //	}
 //
-//	return true, ""
+//	if flagComplexity&CheckNewPasswordComplexityRequireLetter == CheckNewPasswordComplexityRequireLetter {
+//		if !letterFound {
+//			return CheckNewPasswordResultTooSimple
+//		}
+//
+//		// Only checks uppercase if letter is required
+//		if flagComplexity&CheckNewPasswordComplexityRequireUpperCase == CheckNewPasswordComplexityRequireUpperCase {
+//			if !upperCaseFound {
+//				return CheckNewPasswordResultTooSimple
+//			}
+//		}
+//	}
+//
+//	if flagComplexity&CheckNewPasswordComplexityRequireNumber == CheckNewPasswordComplexityRequireNumber {
+//		if !numberFound {
+//			return CheckNewPasswordResultTooSimple
+//		}
+//	}
+//
+//	if flagComplexity&CheckNewPasswordComplexityRequireSymbol == CheckNewPasswordComplexityRequireSymbol {
+//		if !symbolFound {
+//			return CheckNewPasswordResultTooSimple
+//		}
+//	}
+//
+//	if flagComplexity&CheckNewPasswordComplexityRequireSpace == CheckNewPasswordComplexityRequireSpace {
+//		if !spaceFound {
+//			return CheckNewPasswordResultTooSimple
+//		}
+//	}
+//
+//	return CheckNewPasswordResultOK
 //}
 //
-//func PasswordHash(password string) string {
+//// StringHash simply generates a SHA256 hash from the given string
+//func StringHash(s string) string {
 //	h := sha256.New()
 //
-//	h.Write([]byte(password))
+//	h.Write([]byte(s))
 //
 //	sum := h.Sum(nil)
 //
 //	return fmt.Sprintf("%x", sum)
 //}
 //
-//func OnlyAlpha(sequence string) string {
+//// OnlyLetters returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
+//func OnlyLetters(sequence string) string {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return ""
 //	}
@@ -210,6 +301,7 @@ func TestPorExtenso(t *testing.T) {
 //	return string(letters)
 //}
 //
+//// OnlyDigits returns only the numbers from the given string, after strip all the rest ( letters, spaces, etc. )
 //func OnlyDigits(sequence string) string {
 //	if utf8.RuneCountInString(sequence) > 0 {
 //		re, _ := regexp.Compile("[\\D]")
@@ -220,6 +312,7 @@ func TestPorExtenso(t *testing.T) {
 //	return sequence
 //}
 //
+//// OnlyLettersAndNumbers returns only the letters and numbers from the given string, after strip all the rest, like spaces and special symbols.
 //func OnlyLettersAndNumbers(sequence string) string {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return ""
@@ -236,150 +329,22 @@ func TestPorExtenso(t *testing.T) {
 //	return string(aplhanumeric)
 //}
 //
+//// RandomInt returns a rondom integer within the given (inclusive) range
 //func RandomInt(min, max int) int {
 //	rand.Seed(time.Now().UTC().UnixNano())
 //
 //	return rand.Intn(max) + min
 //}
 //
+//// CheckPhone returns true if a given sequence has between 9 and 14 digits
 //func CheckPhone(phone string, acceptEmpty bool) bool {
 //	phone = OnlyDigits(phone)
 //
 //	return (acceptEmpty && (phone == "")) || ((len([]rune(phone)) >= 9) && (len([]rune(phone)) <= 14))
 //}
 //
-//func YMDasDateUTC(yyyymmdd string, utc bool) (time.Time, error) {
-//	yyyymmdd = OnlyDigits(yyyymmdd)
-//
-//	if t, err := time.Parse("20060102", yyyymmdd); err == nil {
-//		if utc {
-//			return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC), nil
-//		} else {
-//			return t, nil
-//		}
-//	} else {
-//		return time.Time{}, err
-//	}
-//}
-//
-//func YMDasDate(yyyymmdd string) (time.Time, error) {
-//	return YMDasDateUTC(yyyymmdd, false)
-//}
-//
-//func ElapsedMonths(fromDate, toDate time.Time) int {
-//	// Se toDate for anterior a fromDate, retornar 0
-//	if !fromDate.Before(toDate) {
-//		return 0
-//	}
-//
-//	// Se as datas estiverem no mesmo ano, retornar a diferença em meses
-//	if fromDate.Year() == toDate.Year() {
-//		// Se for o mesmo mês, retornar 0
-//		if fromDate.Month() == toDate.Month() {
-//			return 0
-//		}
-//
-//		// Se o mês for posterior, mas o dia for anterior ( ex: 30/01 --> 15/02 ) então descontar um mês
-//		if (toDate.Month() <= fromDate.Month()) && (fromDate.Day() > toDate.Day()) {
-//			return int(toDate.Month()-fromDate.Month()) - 1
-//		}
-//
-//		return int(toDate.Month() - fromDate.Month())
-//	}
-//
-//	years := toDate.Year() - fromDate.Year()
-//
-//	if years == 1 {
-//		// Se o mês for posterior, mas o dia for anterior ( ex: 30/01 --> 15/02 ) então descontar um mês
-//		if fromDate.Day() > toDate.Day() {
-//			return (12 - fromDate.Year()) + int(toDate.Month()) - 1
-//		}
-//
-//		return (12 - fromDate.Year()) + int(toDate.Month())
-//	}
-//
-//	months := (years - 1) * 12
-//
-//	months += int(toDate.Month())
-//
-//	if toDate.Day() > fromDate.Day() {
-//		return months - 1
-//	}
-//
-//	return months
-//}
-//
-//func ElapsedMonths2(fromDate, toDate time.Time) int {
-//	// Se toDate for anterior a fromDate, retornar 0
-//	if !fromDate.Before(toDate) {
-//		return 0
-//	}
-//
-//	months := 0
-//
-//	if fromDate.Year() == toDate.Year() {
-//		if fromDate.Month() == toDate.Month() {
-//			return 0
-//		}
-//
-//		if toDate.Day() > fromDate.Day() {
-//			return int(toDate.Month() - fromDate.Month())
-//		}
-//
-//		return int(toDate.Month()-fromDate.Month()) - 1
-//	}
-//
-//	for y := fromDate.Year(); y <= toDate.Year(); y++ {
-//		// Se for o primeiro ano, apenas soma os meses restantes
-//		if y == fromDate.Year() {
-//			months += 12 - int(fromDate.Month())
-//			continue
-//		}
-//
-//		// Soma 12 meses para cada ano.
-//		if y < toDate.Year() && y > fromDate.Year() {
-//			months += 12
-//			continue
-//		}
-//
-//		if y == toDate.Year() {
-//			months += int(toDate.Month())
-//		}
-//	}
-//
-//	if fromDate.Day() > toDate.Day() {
-//		return months - 1
-//	}
-//
-//	return months
-//}
-//
-///*func ElapsedYears(birthdate, today time.Time) int {
-//	bday := birthdate.YearDay()
-//
-//	years := today.Year() - birthdate.Year()
-//
-//	leapy := func(d time.Time) bool {
-//		year := d.Year()
-//
-//		return (year%400 == 0) || (year%100 != 0) || (year%4 == 0)
-//	}
-//
-//	if (bday >= 60) && leapy(birthdate) && !leapy(today) {
-//		return bday - 1
-//	}
-//
-//	if (today.YearDay() >= 60) && !leapy(birthdate) && leapy(today) {
-//		return bday + 1
-//	}
-//
-//	if today.YearDay() < bday {
-//		return years - 1
-//	}
-//
-//	return years
-//}
-//*/
+//// StringAsFloat tries to convert a string to float, and if it can't, just returns zero
+//// It's limited to one billion
 //func StringAsFloat(s string, decimalSeparator, thousandsSeparator rune) float64 {
 //	if s == "" {
 //		return 0.0
@@ -402,39 +367,36 @@ func TestPorExtenso(t *testing.T) {
 //	return 0.0
 //}
 //
-//// Between checks if param n is greather or equal to param low and lower than or equal param high
+//// StringAsInteger returns the integer value extracted from string, or zero
+//func StringAsInteger(s string) int {
+//	if s == "" {
+//		return 0
+//	}
+//
+//	if i, err := strconv.ParseInt(s, 10, 32); err == nil {
+//		return int(i)
+//	}
+//
+//	return 0
+//}
+//
+//// Between checks if param n in between low and high integer params
 //func Between(n, low, high int) bool {
 //	return n >= low && n <= high
 //}
 //
+//// Tif is a simple implementation of the dear ternary IF operator
 //func Tif(condition bool, tifThen, tifElse interface{}) interface{} {
 //	if condition {
 //		return tifThen
-//	} else {
-//		return tifElse
-//	}
-//}
-//
-//func ElapsedYears(from, to time.Time) int {
-//	if from.IsZero() || to.IsZero() {
-//		return 0
 //	}
 //
-//	elapsedYears := to.Year() - from.Year()
-//
-//	if to.YearDay() < from.YearDay() {
-//		elapsedYears--
-//	}
-//
-//	return elapsedYears
+//	return tifElse
 //}
 //
-//func YearsAge(birthdate time.Time) int {
-//	return ElapsedYears(birthdate, time.Now())
-//}
-//
-//func Truncate( s string, maxLen int, trim bool) string {
-//	if s=="" {
+//// Truncate limits the length of a given string, trimming or not, according parameters
+//func Truncate(s string, maxLen int, trim bool) string {
+//	if s == "" {
 //		return s
 //	}
 //
@@ -450,67 +412,95 @@ func TestPorExtenso(t *testing.T) {
 //}
 //
 //const (
-//	TransformFlagTrim                 = uint8(2)
-//	TransformFlagLowerCase            = uint8(4)
-//	TransformFlagUpperCase            = uint8(8)
-//	TransformFlagOnlyDigits           = uint8(16)
-//	TransformFlagOnlyLetters          = uint8(32)
+//	// TransformNone No transformations are ordered. Only constraints maximum length
+//	TransformNone = uint8(1)
+//	// TransformFlagTrim Trims the string, removing leading and trailing spaces
+//	TransformFlagTrim = uint8(2)
+//	// TransformFlagLowerCase Makes the string lowercase
+//	TransformFlagLowerCase = uint8(4)
+//	// TransformFlagUpperCase Makes the string uppercase
+//	TransformFlagUpperCase = uint8(8)
+//	// TransformFlagOnlyDigits Removes all non-numeric characters
+//	TransformFlagOnlyDigits = uint8(16)
+//	// TransformFlagOnlyLetters Removes all non-letter characters
+//	TransformFlagOnlyLetters = uint8(32)
+//	// TransformFlagOnlyLettersAndDigits Leaves only letters and numbers
 //	TransformFlagOnlyLettersAndDigits = uint8(64)
+//	// TransformFlagHash After process all pther flags, applies SHA256 hashing on string for output
+//	TransformFlagHash = uint8(128)
 //)
 //
-//func Transform( s string, maxLen int, transformFlags uint8) string {
-//	if s=="" {
+//// Transform handles a string according given flags/parametrization, as follows:
+//// Available Flags to be used alone or combined:
+////	TransformNone Does nothing, and turns all other flags OFF.
+////	TransformFlagTrim Trim spaces before and after process the input
+////	TransformFlagLowerCase Change string case to lower. If it's combined with TransformFlagUpperCase, only uppercase remains, once is executed later.
+////	TransformFlagUpperCase Change string case to upper. If it's combined with TransformFlagLowerCase, only uppercase remains, once it's executed later.
+////	TransformFlagOnlyDigits Filter/strip all but digits
+////	TransformFlagOnlyLetters Filter/strip all but letters
+////	TransformFlagOnlyLettersAndDigits Filter/strip all but numbers and letters. Removes spaces, punctuation and special symbols
+//// 	TransformFlagHash Apply handy.StringHash() routine to string
+//func Transform(s string, maxLen int, transformFlags uint8) string {
+//	if s == "" {
 //		return s
 //	}
 //
-//	if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
-//		s = OnlyLettersAndNumbers(s)
+//	if transformFlags&TransformNone != TransformNone {
 //
-//		if s == "" {
-//			return s
+//		if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
+//			s = OnlyLettersAndNumbers(s)
+//
+//			if s == "" {
+//				return s
+//			}
+//		} else if (transformFlags & TransformFlagOnlyDigits) == TransformFlagOnlyDigits {
+//			s = OnlyDigits(s)
+//
+//			if s == "" {
+//				return s
+//			}
+//		} else if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
+//			s = OnlyLetters(s)
+//
+//			if s == "" {
+//				return s
+//			}
 //		}
-//	} else if (transformFlags & TransformFlagOnlyDigits) == TransformFlagOnlyDigits {
-//		s = OnlyDigits(s)
 //
-//		if s == "" {
-//			return s
+//		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
+//		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
+//			s = strings.TrimSpace(s)
 //		}
-//	} else if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
-//		s = OnlyAlpha(s)
 //
-//		if s == "" {
-//			return s
+//		if utf8.RuneCountInString(s) > maxLen {
+//			s = string([]rune(s)[:maxLen])
 //		}
-//	}
 //
-//	// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-//	if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
-//		s = strings.TrimSpace(s)
-//	}
+//		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
+//		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
+//			s = strings.TrimSpace(s)
+//		}
 //
-//	if utf8.RuneCountInString(s) > maxLen {
-//		s = string([]rune(s)[:maxLen])
-//	}
+//		if (transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
+//			s = strings.ToLower(s)
+//		}
 //
-//	// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-//	if ( transformFlags & TransformFlagTrim ) == TransformFlagTrim {
-//		s = strings.TrimSpace(s)
-//	}
+//		if (transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
+//			s = strings.ToUpper(s)
+//		}
 //
-//	if ( transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
-//		s = strings.ToLower(s)
-//	}
-//
-//	if ( transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
-//		s = strings.ToUpper(s)
+//		if (transformFlags & TransformFlagHash) == TransformFlagHash {
+//			s = StringHash(s)
+//		}
 //	}
 //
 //	return s
 //}
 //
+//// MatchesAny returns true if any of the given items matches ( equals ) the subject ( search parameter )
 //func MatchesAny(search interface{}, items ...interface{}) bool {
 //	for _, v := range items {
-//		if fmt.Sprintf("%T", search) != fmt.Sprintf("%T", v) {
+//		if fmt.Sprintf("%T", search) == fmt.Sprintf("%T", v) {
 //			if search == v {
 //				return true
 //			}
@@ -520,6 +510,7 @@ func TestPorExtenso(t *testing.T) {
 //	return false
 //}
 //
+//// HasOnlyNumbers returns true if the sequence is entirely numeric
 //func HasOnlyNumbers(sequence string) bool {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return false
@@ -534,6 +525,7 @@ func TestPorExtenso(t *testing.T) {
 //	return true
 //}
 //
+//// HasOnlyLetters returns true if the sequence is entirely composed by letters
 //func HasOnlyLetters(sequence string) bool {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return false
@@ -546,4 +538,207 @@ func TestPorExtenso(t *testing.T) {
 //	}
 //
 //	return true
+//}
+//
+//// TrimLen returns the runes count after trim the spaces
+//func TrimLen(text string) int {
+//	if text == "" {
+//		return 0
+//	}
+//
+//	text = strings.TrimSpace(text)
+//
+//	if text == "" {
+//		return 0
+//	}
+//
+//	return utf8.RuneCountInString(text)
+//}
+//
+//// CheckMinLen verifies if the rune-count is greater then or equal the given minimum
+//// It returns true if the given string has length greater than or equal than minLength parameter
+//func CheckMinLen(value string, minLength int) bool {
+//	value = strings.TrimSpace(value)
+//
+//	return TrimLen(value) >= minLength
+//}
+//
+//// IsNumericType checks if an interface's concrete type corresponds to some of golang native numeric types
+//func IsNumericType(x interface{}) bool {
+//	switch x.(type) {
+//	case uint:
+//		return true
+//	case uint8: // Or byte
+//		return true
+//	case uint16:
+//		return true
+//	case uint32:
+//		return true
+//	case uint64:
+//		return true
+//	case int:
+//		return true
+//	case int8:
+//		return true
+//	case int16:
+//		return true
+//	case int32:
+//		return true
+//	case float32:
+//		return true
+//	case float64:
+//		return true
+//	case complex64:
+//		return true
+//	case complex128:
+//		return true
+//	default:
+//		return false
+//	}
+//}
+//
+//// Bit returns only uint8(0) or uint8(1).
+//// It receives an interface, and when it's a number, and when this number is 0 (zero) it returns 0. Otherwise it returns 1 (one)
+//// If the interface is not a number, it returns 0 (zero)
+//func Bit(x interface{}) uint8 {
+//	if IsNumericType(x) && x != 0 {
+//		return 1
+//	}
+//
+//	return 0
+//}
+//
+//// Boolean returns the bool version/interpretation of some value;
+//// It receives an interface, and when this is a number, Boolean() returns flase of zero and true for different from zero.
+//// If it's a string, try to find "1", "T", "TRUE" to return true.
+//// Any other case returns false
+//func Boolean(x interface{}) bool {
+//	if IsNumericType(x) {
+//		return x != 0
+//	}
+//
+//	if s, ok := x.(string); ok {
+//		s = Transform(s, 4, TransformFlagLowerCase|TransformFlagTrim)
+//		return MatchesAny(s, "1", "true", "t")
+//	}
+//
+//	return false
+//}
+//
+//// Reverse returns the given string written backwards, with letters reversed.
+//func Reverse(s string) string {
+//	if utf8.RuneCountInString(s) < 2 {
+//		return s
+//	}
+//
+//	r := []rune(s)
+//
+//	buffer := make([]rune, len(r))
+//
+//	for i, j := len(r)-1, 0; i >= 0; i-- {
+//		buffer[j] = r[i]
+//		j++
+//	}
+//
+//	return string(buffer)
+//}
+//
+//// OnlyURL strip all symbols non allowed in URLs and returns the sanitized url.
+//func OnlyURL(url string) string {
+//	allowedSymbols := []rune("$-_.+!*'(),{}|\\^~[]`<>#%\";/?:@&=.")
+//	tmp := []rune(url)
+//	var target []rune
+//
+//	for _, r := range tmp {
+//		if InArray(r, allowedSymbols) || unicode.IsLetter(r) || unicode.IsNumber(r) {
+//			target = append(target, r)
+//		}
+//	}
+//
+//	return string(tmp)
+//}
+//
+//const (
+//	// CheckPersonNameResultOK means the name was validated
+//	CheckPersonNameResultOK = 0
+//	// CheckPersonNameResultPolluted The routine only accepts letters, single quotes and spaces
+//	CheckPersonNameResultPolluted = 1
+//	// CheckPersonNameResultTooFewWords The funcion requires at least 2 words
+//	CheckPersonNameResultTooFewWords = 2
+//	// CheckPersonNameResultTooShort the sum of all characters must be >= 6
+//	CheckPersonNameResultTooShort = 3
+//	// CheckPersonNameResultTooSimple The name rule requires that at least one word
+//	CheckPersonNameResultTooSimple = 4
+//)
+//
+//// CheckPersonName returns true if the name contains at least two words, one >= 3 chars and one >=2 chars.
+//// I understand that this is a particular criteria, but this is the OpenSourceMagic, where you can change and adapt to your own specs.
+//func CheckPersonName(name string, acceptEmpty bool) uint8 {
+//	name = strings.TrimSpace(name)
+//
+//	// If name is empty, AND it's accepted, return ok. Else, cry!
+//	if name == "" {
+//		if !acceptEmpty {
+//			return CheckPersonNameResultTooShort
+//		}
+//
+//		return CheckPersonNameResultOK
+//	}
+//
+//	// Person names doesn't accept other than letters, spaces and single quotes
+//	for _, r := range []rune(name) {
+//		if !unicode.IsLetter(r) && r != ' ' && r != '\'' {
+//			return CheckPersonNameResultPolluted
+//		}
+//	}
+//
+//	// A complete name has to be at least 2 words.
+//	a := strings.Fields(name)
+//
+//	if len(a) < 2 {
+//		return CheckPersonNameResultTooFewWords
+//	}
+//
+//	// At least two words, one with 3 chars and other with 2
+//	found2 := false
+//	found3 := false
+//
+//	for _, s := range a {
+//		if !found3 && utf8.RuneCountInString(s) >= 3 {
+//			found3 = true
+//			continue
+//		}
+//
+//		if !found2 && utf8.RuneCountInString(s) >= 2 {
+//			found2 = true
+//			continue
+//		}
+//	}
+//
+//	if !found2 || !found3 {
+//		return CheckPersonNameResultTooSimple
+//	}
+//
+//	return CheckPersonNameResultOK
+//}
+//
+//// StringReplaceAll keeps replacing until there's no more ocurrences to replace.
+//func StringReplaceAll(original string, replacementPairs ...string) string {
+//	if original==""{
+//		return original
+//	}
+//
+//	r := strings.NewReplacer(replacementPairs...)
+//
+//	for {
+//		result := r.Replace(original)
+//
+//		if original!=result {
+//			original = result
+//		} else {
+//			break
+//		}
+//	}
+//
+//	return original
 //}

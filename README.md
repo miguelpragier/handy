@@ -9,7 +9,7 @@ None. It relies on standard library.
 
 
 # ToDo list
-* Translate all API documentaion/comments to english
+* Translate all API documentation/comments to english
 
 * Replaces all simple regex with procedural
 

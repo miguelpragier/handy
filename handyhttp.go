@@ -2,9 +2,9 @@ package handy
 
 import "net/http"
 
-// HTTPRequestAsString gets a parameter coming from a http request as string, truncated to maxLenght
-// Only maxLenght >= 1 is considered. Otherwise, it's ignored
-func HTTPRequestAsString(r *http.Request, key string, maxLenght int, transformOptions ...uint8) string {
+// HTTPRequestAsString gets a parameter coming from a http request as string, truncated to maxLength
+// Only maxLength >= 1 is considered. Otherwise, it's ignored
+func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOptions ...uint8) string {
 	s := r.FormValue(key)
 
 	if s == "" {
@@ -12,15 +12,15 @@ func HTTPRequestAsString(r *http.Request, key string, maxLenght int, transformOp
 	}
 
 	if len(transformOptions) > 0 {
-		s = Transform(s, maxLenght, transformOptions[0])
+		s = Transform(s, maxLength, transformOptions[0])
 	}
 
 	if s == "" {
 		return ""
 	}
 
-	if (maxLenght > 0) && (len([]rune(s)) >= maxLenght) {
-		return s[0:maxLenght]
+	if (maxLength > 0) && (len([]rune(s)) >= maxLength) {
+		return s[0:maxLength]
 	}
 
 	return s

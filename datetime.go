@@ -56,7 +56,7 @@ func CheckDate(format, dateTime string) bool {
 }
 
 // CheckDateYMD returns true if given sequence is a valid date in format yyyymmdd
-// The function removes non-digit characteres like "yyyy/mm/dd" or "yyyy-mm-dd", filtering to "yyyymmdd"
+// The function removes non-digit characters like "yyyy/mm/dd" or "yyyy-mm-dd", filtering to "yyyymmdd"
 func CheckDateYMD(yyyymmdd string) bool {
 	return CheckDate("yyyymmdd", yyyymmdd)
 }
@@ -85,7 +85,7 @@ func YMDasDate(yyyymmdd string) (time.Time, error) {
 
 // ElapsedMonths returns the number of elapsed months between two given dates
 func ElapsedMonths(from, to time.Time) int {
-	// To produce calculations, todate must be greater than from
+	// To produce calculations, "to" must be greater than "from"
 	if to.Before(from) || (from.Year() == to.Year() && from.Month() == to.Month()) {
 		return 0
 	}

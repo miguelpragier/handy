@@ -1,6 +1,6 @@
-# THE HUMBLE HANDY ROADMAP
+# THE HUMBLE HANDY ROAD-MAP
 
-* Translate all API documentaion/comments to english
+* Translate all API documentation/comments to english
 
 * Replaces all simple regex with procedural
 

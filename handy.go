@@ -587,3 +587,24 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {
 
 	return CheckPersonNameResultOK
 }
+
+// StringReplaceAll keeps replacing until there's no more ocurrences to replace.
+func StringReplaceAll(original string, replacementPairs ...string) string {
+	if original == "" {
+		return original
+	}
+
+	r := strings.NewReplacer(replacementPairs...)
+
+	for {
+		result := r.Replace(original)
+
+		if original != result {
+			original = result
+		} else {
+			break
+		}
+	}
+
+	return original
+}
