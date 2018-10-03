@@ -553,7 +553,7 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {
 
 	// Person names doesn't accept other than letters, spaces and single quotes
 	for _, r := range []rune(name) {
-		if !unicode.IsLetter(r) && r != ' ' && r != '\'' {
+		if !unicode.IsLetter(r) && r != ' ' && r != '\'' && r != '-'{
 			return CheckPersonNameResultPolluted
 		}
 	}

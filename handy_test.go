@@ -4,70 +4,69 @@ import (
 	"testing"
 )
 
-func TestCheckEmail(t *testing.T) {
-	type TestStructForCheckEmail struct {
-		summary        string
-		email          string
-		expectedOutput bool
-	}
+type TestDefaultTestStruct struct {
+	summary        string
+	input          interface{}
+	expectedOutput interface{}
+}
 
-	testList := []TestStructForCheckEmail{
+func TestCheckEmail(t *testing.T) {
+
+	testList := []TestDefaultTestStruct{
 		{"send empty string", "", false},
 		{"send invalid address", "email-gmail.com", false},
 		{"send valid address", "email@gmail.com", true},
 	}
 
 	for _, tst := range testList {
-		tr := CheckEmail(tst.email)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckEmail(tst.input.(string))
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tEmail: ", tst.email, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tEmail: %s, \n\tExpected: %s", tst.input, tst.expectedOutput)
+			}
+		})
 	}
 }
 
-//func TestCheckPersonName(t *testing.T) {
-//	type TestStructForCheckPersonName struct {
-//		summary        string
-//		name           string
-//		acceptEmpty    bool
-//		expectedOutput bool
-//	}
-//
-//	testlist := []TestStructForCheckPersonName{
-//		{"Only two letters", "T S", false, false},
-//		{"only four letters", "AB CD", false, false},
-//		{"five letters with non-ascii runes", "ça vá", false, false},
-//		{"mixing letters and numbers", "W0RDS W1TH NUMB3RS", false, false},
-//		{"Sending and accepting empty string", "", true, true},
-//		{"Sending spaces-only string and accepting empty", "     ", true, true},
-//		{"Sending but not accepting empty string", "", false, false},
-//		{"Sending spaces-only string and refusing empty", "     ", false, false},
-//		{"Sending numbers, expecting false", " 5454 ", true, false},
-//		{"OneWorded string", "ONEWORD", false, false},
-//		{"Minimum acceptable", "AB CDE", false, true},
-//		{"Non-ascii stuff", "ÑÔÑ-ÀSÇÏÏ ÇÃO ÀË", false, true},
-//		{"Words with symbols. Expecting true", "WORDS-WITH SYMBOLS'", false, true},
-//		{"Words with symbols. Expecting false", "WORDS WITH SYMBOLS`", false, true},
-//	}
-//
-//	for _, tst := range testlist {
-//		tr := CheckPersonName(tst.name, tst.acceptEmpty)
-//
-//		if tr != tst.expectedOutput {
-//			t.Error("Test has failed!\n", "\n\tName: ", tst.name, "\n\tAcceptEmpty: ", tst.acceptEmpty, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-//		}
-//	}
-//}
-
-func TestCheckCPF(t *testing.T) {
-	type TestStructForCheckCPF struct {
+func TestCheckPersonName(t *testing.T) {
+	type TestStructForCheckPersonName struct {
 		summary        string
-		cpf            string
-		expectedOutput bool
+		name           string
+		acceptEmpty    bool
+		expectedOutput uint8
 	}
 
-	testlist := []TestStructForCheckCPF{
+	testlist := []TestStructForCheckPersonName{
+		{"Only two letters", "T S", false, CheckPersonNameResultTooSimple},
+		{"only four letters", "AB CD", false, CheckPersonNameResultTooSimple},
+		{"five letters with non-ascii runes", "ça vá", false, CheckPersonNameResultTooSimple},
+		{"mixing letters and numbers", "W0RDS W1TH NUMB3RS", false, CheckPersonNameResultPolluted},
+		{"Sending and accepting empty string", "", true, CheckPersonNameResultOK},
+		{"Sending spaces-only string and accepting empty", "     ", true, CheckPersonNameResultOK},
+		{"Sending but not accepting empty string", "", false, CheckPersonNameResultTooShort},
+		{"Sending spaces-only string and refusing empty", "     ", false, CheckPersonNameResultTooShort},
+		{"Sending numbers, expecting false", " 5454 ", true, CheckPersonNameResultPolluted},
+		{"OneWorded string", "ONEWORD", false, CheckPersonNameResultTooFewWords},
+		{"Minimum acceptable", "AB CDE", false, CheckPersonNameResultOK},
+		{"Non-ascii stuff", "ÑÔÑÀSÇÏÏ ÇÃO ÀË", false, CheckPersonNameResultOK},
+		{"Words with symbols. Expecting true", "WORDS-WITH SYMBOLS'", false, CheckPersonNameResultOK},
+		{"Words with symbols. Expecting false", "WORDS WITH SYMBOLS`", false, CheckPersonNameResultPolluted},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckPersonName(tst.name, tst.acceptEmpty)
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tName: %s\n\tAcceptEmpty: %t, \n\tExpected: %d, \n\tGot: %d,", tst.name, tst.acceptEmpty, tst.expectedOutput, tr)
+			}
+		})
+	}
+}
+
+func TestCheckCPF(t *testing.T) {
+	testlist := []TestDefaultTestStruct{
 		{"send empty string", "", false},
 		{"send wrong length string (10)", "153.255.555.4", false},
 		{"send wrong length string (12)", "153.255.555.455", false},
@@ -77,22 +76,18 @@ func TestCheckCPF(t *testing.T) {
 	}
 
 	for _, tst := range testlist {
-		tr := CheckCPF(tst.cpf)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckCPF(tst.input.(string))
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tCPF: ", tst.cpf, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tCPF: %s,\n\tExpected: %t,\n\tGot: %t", tst.input, tst.expectedOutput, tr)
+			}
+		})
 	}
 }
 
 func TestCheckCNPJ(t *testing.T) {
-	type TestStructForCheckCNPJ struct {
-		summary        string
-		cnpj           string
-		expectedOutput bool
-	}
-
-	testlist := []TestStructForCheckCNPJ{
+	testlist := []TestDefaultTestStruct{
 		{"send empty string", "", false},
 		{"send wrong length string (13)", "88.015.315/0001-5", false},
 		{"send wrong length string (15)", "88.015.315/0001-5003", false},
@@ -103,36 +98,43 @@ func TestCheckCNPJ(t *testing.T) {
 	}
 
 	for _, tst := range testlist {
-		tr := CheckCNPJ(tst.cnpj)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckCNPJ(tst.input.(string))
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tCNPJ: ", tst.cnpj, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tCNPJ: %s,\n\tExpected: %t, \n\tGot: %t", tst.input, tst.expectedOutput, tr)
+			}
+		})
 	}
 }
 
 func TestCheckDate(t *testing.T) {
 	type TestStructForCheckDate struct {
 		summary        string
+		format         string
 		date           string
 		expectedOutput bool
 	}
 
 	testlist := []TestStructForCheckDate{
-		{"empty string", "", false},
-		{"invalid date", "2018-02-29", false},
-		{"invalid date", "2018-13-01", false},
-		{"invalid date", "2018-12-32", false},
-		{"valid date 1", "2018-12-31", true},
-		{"valid date 2", "2018-01-01", true},
+		{"empty string", "", "", false},
+		{"invalid date", "2006-01-02", "2018-02-29", false},
+		{"invalid date", "2006-01-02", "2018-13-01", false},
+		{"invalid date", "2006-01-02", "2018-12-32", false},
+		{"valid date 1", "2006-01-02", "2018-12-31", true},
+		{"valid date 2", "20060102", "20180101", true},
+		{"invalid date format 1", "20060102", "2018-01-01", false},
+		{"invalid date format 1", "2006-01-02", "20180201", false},
 	}
 
 	for _, tst := range testlist {
-		tr := CheckDateYMD(tst.date)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckDate(tst.format, tst.date)
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tDate: ", tst.date, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tDate: %s,\n\tExpected: %t, \n\tGot: %t, \n\tFormat: %s", tst.date, tst.expectedOutput, tr, tst.format)
+			}
+		})
 	}
 }
 
