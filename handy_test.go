@@ -139,142 +139,45 @@ func TestCheckDate(t *testing.T) {
 }
 
 func TestAmountAsWord(t *testing.T) {
-	type TestStructForPorExtenso struct {
-		summary        string
-		value          int64
-		expectedOutput string
-	}
-
-	testlist := []TestStructForPorExtenso{
+	testlist := []TestDefaultTestStruct{
 		{"zero", 0, "zero"},
 		{"-125", -125, "menos cento e vinte e cinco"},
 		{"-987654321", -987654321, "menos novecentos e oitenta e sete milhões seicentos e cinquenta e quatro mil trezentos e vinte e um"},
 	}
-
 	for _, tst := range testlist {
-		tr := AmountAsWord(tst.value)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := AmountAsWord(int64(tst.input.(int)))
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tValue: ", tst.value, "\n\tExpected: ", tst.expectedOutput, "\n\tReceived: ", tr, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %d,\n\tExpected: %s, \n\tGot: %s", tst.input, tst.expectedOutput, tr)
+			}
+		})
 	}
 }
 
-//const (
-//	// CheckNewPassword() Possible results
-//
-//	// CheckNewPasswordResultOK Means the checking ran alright
-//	CheckNewPasswordResultOK = 0
-//	// CheckNewPasswordResultDivergent Password is different from confirmation
-//	CheckNewPasswordResultDivergent = 1
-//	// CheckNewPasswordResultTooShort Password is too short
-//	CheckNewPasswordResultTooShort = 2
-//	// CheckNewPasswordResultTooSimple Given string doesn't satisfy complexity rules
-//	CheckNewPasswordResultTooSimple = 3
-//
-//	// CheckNewPassword() Complexity Rules
-//
-//	// CheckNewPasswordComplexityLowest There's no rules besides the minimum length
-//	// >>> This flag turns all others off <<<
-//	CheckNewPasswordComplexityLowest = 1
-//	// CheckNewPasswordComplexityRequireLetter At least one letter is required in order to aprove password
-//	CheckNewPasswordComplexityRequireLetter = 2
-//	// CheckNewPasswordComplexityRequireUpperCase At least one uppercase letter is required in order to aprove password.
-//	// Only works if CheckNewPasswordComplexityRequireLetter is included/activated
-//	CheckNewPasswordComplexityRequireUpperCase = 4
-//	// CheckNewPasswordComplexityRequireNumber At least one number is required in order to aprove password
-//	CheckNewPasswordComplexityRequireNumber = 8
-//	// CheckNewPasswordComplexityRequireSpace The password must contain at least one space
-//	CheckNewPasswordComplexityRequireSpace = 16
-//	// CheckNewPasswordComplexityRequireSymbol User have to include at least one special character, like # or -
-//	CheckNewPasswordComplexityRequireSymbol = 32
-//)
-//
-//// CheckNewPassword Run some basic checks on new password strings, based on given options
-//// This routine requires at least 4 (four) characters
-//// Example requiring only basic minimum length: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityLowest)
-//// Example requiring number and symbol: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityRequireNumber|CheckNewPasswordComplexityRequireSymbol)
-//func CheckNewPassword(password, passwordConfirmation string, minimumlength uint, flagComplexity uint8) uint8 {
-//	const minPasswordLengthDefault = 4
-//
-//	if minimumlength < minPasswordLengthDefault {
-//		minimumlength = 4
-//	}
-//
-//	if utf8.RuneCountInString(strings.TrimSpace(password)) < int(minimumlength) {
-//		return CheckNewPasswordResultTooShort
-//	}
-//
-//	if password != passwordConfirmation {
-//		return CheckNewPasswordResultDivergent
-//	}
-//
-//	letterFound := false
-//	numberFound := false
-//	symbolFound := false
-//	spaceFound := false
-//	upperCaseFound := false
-//
-//	if flagComplexity&CheckNewPasswordComplexityLowest != CheckNewPasswordComplexityLowest {
-//		s := []rune(password)
-//
-//		for _, r := range s {
-//			if unicode.IsLetter(r) {
-//				letterFound = true
-//
-//				if unicode.IsUpper(r) {
-//					upperCaseFound = true
-//				}
-//			}
-//
-//			if unicode.IsNumber(r) {
-//				numberFound = true
-//			}
-//
-//			if unicode.IsSymbol(r) {
-//				symbolFound = true
-//			}
-//
-//			if r == ' ' {
-//				spaceFound = true
-//			}
-//		}
-//	}
-//
-//	if flagComplexity&CheckNewPasswordComplexityRequireLetter == CheckNewPasswordComplexityRequireLetter {
-//		if !letterFound {
-//			return CheckNewPasswordResultTooSimple
-//		}
-//
-//		// Only checks uppercase if letter is required
-//		if flagComplexity&CheckNewPasswordComplexityRequireUpperCase == CheckNewPasswordComplexityRequireUpperCase {
-//			if !upperCaseFound {
-//				return CheckNewPasswordResultTooSimple
-//			}
-//		}
-//	}
-//
-//	if flagComplexity&CheckNewPasswordComplexityRequireNumber == CheckNewPasswordComplexityRequireNumber {
-//		if !numberFound {
-//			return CheckNewPasswordResultTooSimple
-//		}
-//	}
-//
-//	if flagComplexity&CheckNewPasswordComplexityRequireSymbol == CheckNewPasswordComplexityRequireSymbol {
-//		if !symbolFound {
-//			return CheckNewPasswordResultTooSimple
-//		}
-//	}
-//
-//	if flagComplexity&CheckNewPasswordComplexityRequireSpace == CheckNewPasswordComplexityRequireSpace {
-//		if !spaceFound {
-//			return CheckNewPasswordResultTooSimple
-//		}
-//	}
-//
-//	return CheckNewPasswordResultOK
-//}
-//
+func TestCheckNewPassword(t *testing.T) {
+	testCases := []struct {
+		summary        string
+		password       string
+		checkpassword  string
+		minimumlength  uint
+		flag           uint8
+		expectedOutput uint8
+	}{
+		{"test lowest flag", "1234AB", "1234AB", 6, CheckNewPasswordComplexityLowest, CheckNewPasswordResultOK},
+		{"test check password", "1234AB", "1234A", 6, CheckNewPasswordComplexityLowest, CheckNewPasswordResultDivergent},
+		{"Only Numbers with Default Flag", "1234", "1234", 4, CheckNewPasswordComplexityLowest, CheckNewPasswordResultOK},
+		{"Only letters with Default Flag", "lala", "lala", 4, CheckNewPasswordComplexityLowest, CheckNewPasswordResultOK},
+		{"testing minimum length", "1234", "1234", 2, CheckNewPasswordComplexityLowest, CheckNewPasswordResultOK},
+		{"testing minimum length for password", "123", "123", 2, CheckNewPasswordComplexityLowest, CheckNewPasswordResultTooShort},
+		{"test require letter success", "1234AB", "1234AB", 4, CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultOK},
+		{"test require letter error", "1234", "1234", 4, CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultTooSimple},
+		{"test require letuppercaseter success", "1234Ab", "1234Ab", 4, CheckNewPasswordComplexityRequireUpperCase, CheckNewPasswordResultOK},
+		{"test require uppercase error", "1234ab", "1234ab", 4, CheckNewPasswordComplexityRequireUpperCase, CheckNewPasswordResultTooSimple},
+
+	}
+}
+
 //// StringHash simply generates a SHA256 hash from the given string
 //func StringHash(s string) string {
 //	h := sha256.New()
