@@ -1,6 +1,7 @@
 package handy
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -156,7 +157,7 @@ func TestAmountAsWord(t *testing.T) {
 }
 
 func TestCheckNewPassword(t *testing.T) {
-	testCases := []struct {
+	testlist := []struct {
 		summary        string
 		password       string
 		checkpassword  string
@@ -172,24 +173,47 @@ func TestCheckNewPassword(t *testing.T) {
 		{"testing minimum length for password", "123", "123", 2, CheckNewPasswordComplexityLowest, CheckNewPasswordResultTooShort},
 		{"test require letter success", "1234AB", "1234AB", 4, CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultOK},
 		{"test require letter error", "1234", "1234", 4, CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultTooSimple},
-		{"test require letuppercaseter success", "1234Ab", "1234Ab", 4, CheckNewPasswordComplexityRequireUpperCase, CheckNewPasswordResultOK},
-		{"test require uppercase error", "1234ab", "1234ab", 4, CheckNewPasswordComplexityRequireUpperCase, CheckNewPasswordResultTooSimple},
+		{"test require uppercase success", "1234Ab", "1234Ab", 4, CheckNewPasswordComplexityRequireUpperCase|CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultOK},
+		{"test require uppercase error", "1234ab", "1234ab", 4, CheckNewPasswordComplexityRequireUpperCase|CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultTooSimple},
+		{"test require number success", "abc1", "abc1", 4, CheckNewPasswordComplexityRequireNumber, CheckNewPasswordResultOK},
+		{"test require number error", "abcd", "abcd", 4, CheckNewPasswordComplexityRequireNumber, CheckNewPasswordResultTooSimple},
+		{"test require space success", "abc d", "abc d", 4, CheckNewPasswordComplexityRequireSpace, CheckNewPasswordResultOK},
+		{"test require space error", "abcd", "abcd", 4, CheckNewPasswordComplexityRequireSpace, CheckNewPasswordResultTooSimple},
+		{"test require symbol success", "abc#", "abc#", 4, CheckNewPasswordComplexityRequireSymbol, CheckNewPasswordResultOK},
+		{"test require symbol error", "abcd", "abcd", 4, CheckNewPasswordComplexityRequireSymbol, CheckNewPasswordResultTooSimple},
+	}
 
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckNewPassword(tst.password, tst.checkpassword, tst.minimumlength, tst.flag)
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %d, \n\tGot: %d", tst.password, tst.expectedOutput, tr)
+			}
+		})
 	}
 }
 
-//// StringHash simply generates a SHA256 hash from the given string
-//func StringHash(s string) string {
-//	h := sha256.New()
-//
-//	h.Write([]byte(s))
-//
-//	sum := h.Sum(nil)
-//
-//	return fmt.Sprintf("%x", sum)
-//}
-//
-//// OnlyLetters returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
+func TestStringHash(t *testing.T) {
+	testcases := []TestDefaultTestStruct {
+		{"Normal Test", "Handy", "E80649A6418B6C24FCCB199DAB7CB5BD6EC37593EA0285D52D717FCC7AEE5FB3"},
+		{"string with number", "123456", "8D969EEF6ECAD3C29A3A629280E686CF0C3F5D5A86AFF3CA12020C923ADC6C92"},
+		{"mashup", "Handy12345", "C82333DB3A6D91F98BE188C6C7B928DF4960B9EC3F3EB8CB50293368C673BE3D"},
+		{"with symbols", "#handy_12Ax", "507512071AAEA24A94ECBB0F32EE74169FD59160EE9232819C504F39656E61F7"},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := StringHash(tc.input.(string))
+
+			if r != strings.ToLower(tc.expectedOutput.(string)) {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %d, \n\tGot: %d", tc.input, tc.expectedOutput, r)
+			}
+		})
+	}
+}
+
+// OnlyLetters returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
 //func OnlyLetters(sequence string) string {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return ""
