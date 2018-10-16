@@ -213,220 +213,267 @@ func TestStringHash(t *testing.T) {
 	}
 }
 
-// OnlyLetters returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
-//func OnlyLetters(sequence string) string {
-//	if utf8.RuneCountInString(sequence) == 0 {
-//		return ""
-//	}
-//
-//	var letters []rune
-//
-//	for _, r := range []rune(sequence) {
-//		if unicode.IsLetter(r) {
-//			letters = append(letters, r)
-//		}
-//	}
-//
-//	return string(letters)
-//}
-//
-//// OnlyDigits returns only the numbers from the given string, after strip all the rest ( letters, spaces, etc. )
-//func OnlyDigits(sequence string) string {
-//	if utf8.RuneCountInString(sequence) > 0 {
-//		re, _ := regexp.Compile("[\\D]")
-//
-//		sequence = re.ReplaceAllString(sequence, "")
-//	}
-//
-//	return sequence
-//}
-//
-//// OnlyLettersAndNumbers returns only the letters and numbers from the given string, after strip all the rest, like spaces and special symbols.
-//func OnlyLettersAndNumbers(sequence string) string {
-//	if utf8.RuneCountInString(sequence) == 0 {
-//		return ""
-//	}
-//
-//	var aplhanumeric []rune
-//
-//	for _, r := range []rune(sequence) {
-//		if unicode.IsLetter(r) || unicode.IsDigit(r) {
-//			aplhanumeric = append(aplhanumeric, r)
-//		}
-//	}
-//
-//	return string(aplhanumeric)
-//}
-//
-//// RandomInt returns a rondom integer within the given (inclusive) range
-//func RandomInt(min, max int) int {
-//	rand.Seed(time.Now().UTC().UnixNano())
-//
-//	return rand.Intn(max) + min
-//}
-//
-//// CheckPhone returns true if a given sequence has between 9 and 14 digits
-//func CheckPhone(phone string, acceptEmpty bool) bool {
-//	phone = OnlyDigits(phone)
-//
-//	return (acceptEmpty && (phone == "")) || ((len([]rune(phone)) >= 9) && (len([]rune(phone)) <= 14))
-//}
-//
-//// StringAsFloat tries to convert a string to float, and if it can't, just returns zero
-//// It's limited to one billion
-//func StringAsFloat(s string, decimalSeparator, thousandsSeparator rune) float64 {
-//	if s == "" {
-//		return 0.0
-//	}
-//
-//	const BillionLength = 12
-//
-//	if len([]rune(s)) > BillionLength {
-//		s = s[0:12]
-//	}
-//
-//	s = strings.Replace(s, string(thousandsSeparator), "", -1)
-//
-//	s = strings.Replace(s, string(decimalSeparator), ".", -1)
-//
-//	if f, err := strconv.ParseFloat(s, 64); err == nil {
-//		return f
-//	}
-//
-//	return 0.0
-//}
-//
-//// StringAsInteger returns the integer value extracted from string, or zero
-//func StringAsInteger(s string) int {
-//	if s == "" {
-//		return 0
-//	}
-//
-//	if i, err := strconv.ParseInt(s, 10, 32); err == nil {
-//		return int(i)
-//	}
-//
-//	return 0
-//}
-//
-//// Between checks if param n in between low and high integer params
-//func Between(n, low, high int) bool {
-//	return n >= low && n <= high
-//}
-//
-//// Tif is a simple implementation of the dear ternary IF operator
-//func Tif(condition bool, tifThen, tifElse interface{}) interface{} {
-//	if condition {
-//		return tifThen
-//	}
-//
-//	return tifElse
-//}
-//
-//// Truncate limits the length of a given string, trimming or not, according parameters
-//func Truncate(s string, maxLen int, trim bool) string {
-//	if s == "" {
-//		return s
-//	}
-//
-//	if len(s) > maxLen {
-//		s = s[0:maxLen]
-//	}
-//
-//	if trim {
-//		s = strings.TrimSpace(s)
-//	}
-//
-//	return s
-//}
-//
-//const (
-//	// TransformNone No transformations are ordered. Only constraints maximum length
-//	TransformNone = uint8(1)
-//	// TransformFlagTrim Trims the string, removing leading and trailing spaces
-//	TransformFlagTrim = uint8(2)
-//	// TransformFlagLowerCase Makes the string lowercase
-//	TransformFlagLowerCase = uint8(4)
-//	// TransformFlagUpperCase Makes the string uppercase
-//	TransformFlagUpperCase = uint8(8)
-//	// TransformFlagOnlyDigits Removes all non-numeric characters
-//	TransformFlagOnlyDigits = uint8(16)
-//	// TransformFlagOnlyLetters Removes all non-letter characters
-//	TransformFlagOnlyLetters = uint8(32)
-//	// TransformFlagOnlyLettersAndDigits Leaves only letters and numbers
-//	TransformFlagOnlyLettersAndDigits = uint8(64)
-//	// TransformFlagHash After process all pther flags, applies SHA256 hashing on string for output
-//	TransformFlagHash = uint8(128)
-//)
-//
-//// Transform handles a string according given flags/parametrization, as follows:
-//// Available Flags to be used alone or combined:
-////	TransformNone Does nothing, and turns all other flags OFF.
-////	TransformFlagTrim Trim spaces before and after process the input
-////	TransformFlagLowerCase Change string case to lower. If it's combined with TransformFlagUpperCase, only uppercase remains, once is executed later.
-////	TransformFlagUpperCase Change string case to upper. If it's combined with TransformFlagLowerCase, only uppercase remains, once it's executed later.
-////	TransformFlagOnlyDigits Filter/strip all but digits
-////	TransformFlagOnlyLetters Filter/strip all but letters
-////	TransformFlagOnlyLettersAndDigits Filter/strip all but numbers and letters. Removes spaces, punctuation and special symbols
-//// 	TransformFlagHash Apply handy.StringHash() routine to string
-//func Transform(s string, maxLen int, transformFlags uint8) string {
-//	if s == "" {
-//		return s
-//	}
-//
-//	if transformFlags&TransformNone != TransformNone {
-//
-//		if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
-//			s = OnlyLettersAndNumbers(s)
-//
-//			if s == "" {
-//				return s
-//			}
-//		} else if (transformFlags & TransformFlagOnlyDigits) == TransformFlagOnlyDigits {
-//			s = OnlyDigits(s)
-//
-//			if s == "" {
-//				return s
-//			}
-//		} else if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
-//			s = OnlyLetters(s)
-//
-//			if s == "" {
-//				return s
-//			}
-//		}
-//
-//		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-//		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
-//			s = strings.TrimSpace(s)
-//		}
-//
-//		if utf8.RuneCountInString(s) > maxLen {
-//			s = string([]rune(s)[:maxLen])
-//		}
-//
-//		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-//		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
-//			s = strings.TrimSpace(s)
-//		}
-//
-//		if (transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
-//			s = strings.ToLower(s)
-//		}
-//
-//		if (transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
-//			s = strings.ToUpper(s)
-//		}
-//
-//		if (transformFlags & TransformFlagHash) == TransformFlagHash {
-//			s = StringHash(s)
-//		}
-//	}
-//
-//	return s
-//}
-//
-//// MatchesAny returns true if any of the given items matches ( equals ) the subject ( search parameter )
+func TestOnlyLetters(t *testing.T)  {
+	tcs := []TestDefaultTestStruct {
+		{"empty", "", ""},
+		{"only letters", "haoplhu", "haoplhu"},
+		{"letters and numbers", "hlo1234", "hlo"},
+		{"symbols", "$#@", ""},
+		{"numbers", "1234", ""},
+		{"with space", "with space", "withspace"},
+		{"A full phrase", "Hello Sr! Tell me, how are you?", "HelloSrTellmehowareyou"},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := OnlyLetters(tc.input.(string))
+
+			if r != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %s, \n\tGot: %s", tc.input, tc.expectedOutput, r)
+			}
+		})
+	}
+}
+
+func TestOnlyDigits(t *testing.T)  {
+	tcs := []TestDefaultTestStruct {
+		{"empty", "", ""},
+		{"only letters", "haoplhu", ""},
+		{"letters and numbers", "hlo1234", "1234"},
+		{"symbols", "$#@", ""},
+		{"numbers", "1234", "1234"},
+		{"with space", "with space 10", "10"},
+		{"A full phrase", "Hello Sr! I'm 24 Years Old!", "24"},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := OnlyDigits(tc.input.(string))
+
+			if r != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %s, \n\tGot: %s", tc.input, tc.expectedOutput, r)
+			}
+		})
+	}
+}
+
+func TestOnlyLettersAndNumbers(t *testing.T) {
+	tcs := []TestDefaultTestStruct {
+		{"empty", "", ""},
+		{"only letters", "haoplhu", "haoplhu"},
+		{"letters and numbers", "hlo1234", "hlo1234"},
+		{"symbols", "$#@", ""},
+		{"numbers", "1234", "1234"},
+		{"with space", "with space 10", "withspace10"},
+		{"A full phrase", "Hello Sr! I'm 24 Years Old!", "HelloSrIm24YearsOld"},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := OnlyLettersAndNumbers(tc.input.(string))
+
+			if r != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %s, \n\tGot: %s", tc.input, tc.expectedOutput, r)
+			}
+		})
+	}
+}
+
+func TestRandomInt(t *testing.T) {
+	tcs := []struct{
+		summary string
+		min int
+		max int
+	}{
+		{"normal test", int(10), int(20)},
+		{"big range", int(10), int(1000)},
+		{"negative", int(-10), int(1000)},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := RandomInt(tc.min, tc.max)
+
+			if r < tc.min || r > tc.max {
+				t.Errorf("Test has failed!\n\tMin: %d, \n\tMax: %d, \n\tGot: %d", tc.min, tc.max, r)
+			}
+		})
+	}
+}
+
+func TestCheckPhone(t *testing.T)  {
+	tcs := []struct {
+		summary        string
+		input          string
+		allowEmpty     bool
+		expectedOutput bool
+	}{
+		{"Normal input", "948034118", false, true},
+		{"Empty return false", "", false, false},
+		{"Empty allowing empty", "", true, true},
+		{"Normal input but allowing empty", "948034118", true, true},
+		{"invalid input", "48034118", false, false},
+	}
+	
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := CheckPhone(tc.input, tc.allowEmpty)
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %s\n\tAllowEmpty: %t", tc.expectedOutput, tr, tc.input, tc.allowEmpty)
+			}
+		})
+	}
+}
+
+func TestStringAsFloat(t *testing.T) {
+	tcs := []struct {
+		summary string
+		input string
+		decimalSeparator rune
+		thousandSeparator rune
+		expectedOutput	float64
+	}{
+		{"Normal Test", "60.42", '.', ',', 60.42},
+		{"Negative Test", "-60.42", '.', ',', -60.42},
+		{"Virgula como decimal Test", "60.42", ',', '.', 6042.000000},
+		{"ERROR TEST", "bla", '.', ',', 00.00},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := StringAsFloat(tc.input, tc.decimalSeparator, tc.thousandSeparator)
+			 if tr != tc.expectedOutput {
+				 t.Errorf("Test has failed!\n\tExpected: %f, \n\tGot: %f, \n\tInput: %s\n\tDecimalSeparator: %c\n\tThousandSeparator: %c", tc.expectedOutput, tr, tc.input, tc.decimalSeparator, tc.thousandSeparator)
+			 }
+		})
+	}
+}
+
+func TestStringAsInteger(t *testing.T) {
+	tcs := []TestDefaultTestStruct {
+		{"default test", "30", 30},
+		{"negative", "-30", -30},
+		{"double", "30.5", 0},
+		{"text", "text", 0},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := StringAsInteger(tc.input.(string))
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %d, \n\tGot: %d, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
+
+func TestBetween(t *testing.T) {
+	tcs := []struct{
+		summary        string
+		number         int
+		min            int
+		max            int
+		expectedOutput bool
+	}{
+		{"normal test", 5, 0, 10, true},
+		{"with negative", -5, -10, 0, true},
+		{"mix with negative", 5, -10, 100, true},
+		{"Large Numbers", 1000, -1000, 10000, true},
+		{"Give me a false!", -5, -4, 0, false},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Between(tc.number, tc.min, tc.max)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %d, \n\tMin: %d, \n\tMax: %d", tc.expectedOutput, tr, tc.number, tc.min, tc.max)
+			}
+		})
+	}
+}
+
+func TestTif(t *testing.T){
+
+	tcs := []struct{
+		summary        string
+		condition      bool
+		tifThen        interface{}
+		tifElse        interface{}
+		expectedOutput interface{}
+	} {
+		{"Normal Test", 5 < 10, "true", "false", "true"},
+		{"False", 5 > 10, "true", "false", "false"},
+		{"False with numbers", 5 > 10, 10, 15, 15},
+		{"True with numbers", 5 < 10, 10, 15, 10},
+		{"True with bool", 5 < 10, 5<10, 5>10, 5<10},
+		{"False with bool", 5 > 10, 5<10, 5>10, 5>10},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Tif(tc.condition, tc.tifThen, tc.tifElse)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %v, \n\tInput: %t, \n\tThen: %v, \n\tElse: %v", tc.expectedOutput, tr, tc.condition, tc.tifThen, tc.tifElse)
+
+			}
+		})
+	}
+}
+
+func TestTruncate(t *testing.T) {
+	tcs := []struct{
+		summary 	   string
+		input   	   string
+		limit   	   int
+		trim    	   bool
+		expectedOutput string
+
+	}{
+		{"normal Test", "The Go programming language is an open source project to make programmers more productive.", 25, false, "The Go programming langua"},
+		{"normal Test with trim", "   The Go programming language is an open source project to make programmers more productive.", 45, true, "The Go programming language is an open sou"},
+		{"zero", "The Go programming language is an open source project to make programmers more productive.", 0, true, ""},
+		{"zero zero", "", 45, true, ""},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Truncate(tc.input, tc.limit, tc.trim)
+			 if tr != tc.expectedOutput {
+				 t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\ttrim: %t", tc.expectedOutput, tr, tc.input, tc.limit, tc.trim)
+			 }
+		})
+	}
+}
+
+func TestTransform(t *testing.T) {
+	tcs := []struct{
+		summary        string
+		input          string
+		max            int
+		flags          uint8
+		expectedOutput string
+	}{
+		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, TransformNone, "The Go programming l"},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Transform(tc.input, tc.max, tc.flags)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\tflags: %d", tc.expectedOutput, tr, tc.input, tc.max, tc.flags)
+			}
+		})
+	}
+}
+
 //func MatchesAny(search interface{}, items ...interface{}) bool {
 //	for _, v := range items {
 //		if fmt.Sprintf("%T", search) == fmt.Sprintf("%T", v) {
@@ -438,8 +485,7 @@ func TestStringHash(t *testing.T) {
 //
 //	return false
 //}
-//
-//// HasOnlyNumbers returns true if the sequence is entirely numeric
+
 //func HasOnlyNumbers(sequence string) bool {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return false
@@ -453,8 +499,7 @@ func TestStringHash(t *testing.T) {
 //
 //	return true
 //}
-//
-//// HasOnlyLetters returns true if the sequence is entirely composed by letters
+
 //func HasOnlyLetters(sequence string) bool {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return false
@@ -468,8 +513,7 @@ func TestStringHash(t *testing.T) {
 //
 //	return true
 //}
-//
-//// TrimLen returns the runes count after trim the spaces
+
 //func TrimLen(text string) int {
 //	if text == "" {
 //		return 0
@@ -483,16 +527,13 @@ func TestStringHash(t *testing.T) {
 //
 //	return utf8.RuneCountInString(text)
 //}
-//
-//// CheckMinLen verifies if the rune-count is greater then or equal the given minimum
-//// It returns true if the given string has length greater than or equal than minLength parameter
+
 //func CheckMinLen(value string, minLength int) bool {
 //	value = strings.TrimSpace(value)
 //
 //	return TrimLen(value) >= minLength
 //}
-//
-//// IsNumericType checks if an interface's concrete type corresponds to some of golang native numeric types
+
 //func IsNumericType(x interface{}) bool {
 //	switch x.(type) {
 //	case uint:
@@ -525,10 +566,7 @@ func TestStringHash(t *testing.T) {
 //		return false
 //	}
 //}
-//
-//// Bit returns only uint8(0) or uint8(1).
-//// It receives an interface, and when it's a number, and when this number is 0 (zero) it returns 0. Otherwise it returns 1 (one)
-//// If the interface is not a number, it returns 0 (zero)
+
 //func Bit(x interface{}) uint8 {
 //	if IsNumericType(x) && x != 0 {
 //		return 1
@@ -536,11 +574,7 @@ func TestStringHash(t *testing.T) {
 //
 //	return 0
 //}
-//
-//// Boolean returns the bool version/interpretation of some value;
-//// It receives an interface, and when this is a number, Boolean() returns flase of zero and true for different from zero.
-//// If it's a string, try to find "1", "T", "TRUE" to return true.
-//// Any other case returns false
+
 //func Boolean(x interface{}) bool {
 //	if IsNumericType(x) {
 //		return x != 0
@@ -553,8 +587,7 @@ func TestStringHash(t *testing.T) {
 //
 //	return false
 //}
-//
-//// Reverse returns the given string written backwards, with letters reversed.
+
 //func Reverse(s string) string {
 //	if utf8.RuneCountInString(s) < 2 {
 //		return s
@@ -571,8 +604,7 @@ func TestStringHash(t *testing.T) {
 //
 //	return string(buffer)
 //}
-//
-//// OnlyURL strip all symbols non allowed in URLs and returns the sanitized url.
+
 //func OnlyURL(url string) string {
 //	allowedSymbols := []rune("$-_.+!*'(),{}|\\^~[]`<>#%\";/?:@&=.")
 //	tmp := []rune(url)
@@ -586,22 +618,7 @@ func TestStringHash(t *testing.T) {
 //
 //	return string(tmp)
 //}
-//
-//const (
-//	// CheckPersonNameResultOK means the name was validated
-//	CheckPersonNameResultOK = 0
-//	// CheckPersonNameResultPolluted The routine only accepts letters, single quotes and spaces
-//	CheckPersonNameResultPolluted = 1
-//	// CheckPersonNameResultTooFewWords The funcion requires at least 2 words
-//	CheckPersonNameResultTooFewWords = 2
-//	// CheckPersonNameResultTooShort the sum of all characters must be >= 6
-//	CheckPersonNameResultTooShort = 3
-//	// CheckPersonNameResultTooSimple The name rule requires that at least one word
-//	CheckPersonNameResultTooSimple = 4
-//)
-//
-//// CheckPersonName returns true if the name contains at least two words, one >= 3 chars and one >=2 chars.
-//// I understand that this is a particular criteria, but this is the OpenSourceMagic, where you can change and adapt to your own specs.
+
 //func CheckPersonName(name string, acceptEmpty bool) uint8 {
 //	name = strings.TrimSpace(name)
 //
@@ -650,8 +667,7 @@ func TestStringHash(t *testing.T) {
 //
 //	return CheckPersonNameResultOK
 //}
-//
-//// StringReplaceAll keeps replacing until there's no more ocurrences to replace.
+
 //func StringReplaceAll(original string, replacementPairs ...string) string {
 //	if original==""{
 //		return original

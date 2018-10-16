@@ -95,7 +95,7 @@ func CheckNewPassword(password, passwordConfirmation string, minimumlength uint,
 				numberFound = true
 			}
 
-			if unicode.IsSymbol(r) {
+			if RuneHasSymbol(r) {
 				symbolFound = true
 			}
 
@@ -137,6 +137,18 @@ func CheckNewPassword(password, passwordConfirmation string, minimumlength uint,
 	}
 
 	return CheckNewPasswordResultOK
+}
+
+func RuneHasSymbol(ru rune) bool {
+	allowedSymbols:=[]rune("!\"#$%&'()*+´-./:;<=>?@[\\]^_`{|}~")
+
+	for _,r:=range allowedSymbols {
+		if ru==r{
+			return true
+		}
+	}
+
+	return false
 }
 
 // StringHash simply generates a SHA256 hash from the given string
