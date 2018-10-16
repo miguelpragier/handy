@@ -279,12 +279,16 @@ func Truncate(s string, maxLen int, trim bool) string {
 
 const (
 	// TransformNone No transformations are ordered. Only constraints maximum length
+	// TransformNone turns all other flags OFF.
 	TransformNone = uint8(1)
+	// TransformFlagTrim Trim spaces before and after process the input
 	// TransformFlagTrim Trims the string, removing leading and trailing spaces
 	TransformFlagTrim = uint8(2)
 	// TransformFlagLowerCase Makes the string lowercase
+	// If it's combined with TransformFlagUpperCase, only uppercase remains, once is executed later.
 	TransformFlagLowerCase = uint8(4)
 	// TransformFlagUpperCase Makes the string uppercase
+	// If it's combined with TransformFlagLowerCase, only uppercase remains, once it's executed later.
 	TransformFlagUpperCase = uint8(8)
 	// TransformFlagOnlyDigits Removes all non-numeric characters
 	TransformFlagOnlyDigits = uint8(16)
@@ -292,72 +296,104 @@ const (
 	TransformFlagOnlyLetters = uint8(32)
 	// TransformFlagOnlyLettersAndDigits Leaves only letters and numbers
 	TransformFlagOnlyLettersAndDigits = uint8(64)
-	// TransformFlagHash After process all pther flags, applies SHA256 hashing on string for output
+	// TransformFlagHash After process all other flags, applies SHA256 hashing on string for output
+	// 	The routine applies handy.StringHash() on given string
 	TransformFlagHash = uint8(128)
 )
 
 // Transform handles a string according given flags/parametrization, as follows:
-// Available Flags to be used alone or combined:
-//	TransformNone Does nothing, and turns all other flags OFF.
-//	TransformFlagTrim Trim spaces before and after process the input
-//	TransformFlagLowerCase Change string case to lower. If it's combined with TransformFlagUpperCase, only uppercase remains, once is executed later.
-//	TransformFlagUpperCase Change string case to upper. If it's combined with TransformFlagLowerCase, only uppercase remains, once it's executed later.
-//	TransformFlagOnlyDigits Filter/strip all but digits
-//	TransformFlagOnlyLetters Filter/strip all but letters
-//	TransformFlagOnlyLettersAndDigits Filter/strip all but numbers and letters. Removes spaces, punctuation and special symbols
-// 	TransformFlagHash Apply handy.StringHash() routine to string
+// The transformations are made in arbitrary order, what can result in unexpected output. It the sequence matters, use TransformSerially instead.
+// If maxLen==0, truncation is skipped
+// The last operations are, by order, truncation and trimming.
 func Transform(s string, maxLen int, transformFlags uint8) string {
 	if s == "" {
 		return s
 	}
 
-	if transformFlags&TransformNone != TransformNone {
-
-		if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
-			s = OnlyLettersAndNumbers(s)
-
-			if s == "" {
-				return s
-			}
-		} else if (transformFlags & TransformFlagOnlyDigits) == TransformFlagOnlyDigits {
-			s = OnlyDigits(s)
-
-			if s == "" {
-				return s
-			}
-		} else if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
-			s = OnlyLetters(s)
-
-			if s == "" {
-				return s
-			}
-		}
-
-		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
-			s = strings.TrimSpace(s)
-		}
-
-		if utf8.RuneCountInString(s) > maxLen {
+	if transformFlags&TransformNone == TransformNone {
+		if maxLen > 0 && utf8.RuneCountInString(s) > maxLen {
 			s = string([]rune(s)[:maxLen])
 		}
 
-		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
+		return s
+	}
+
+	if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
+		s = OnlyLettersAndNumbers(s)
+	}
+
+	if (transformFlags & TransformFlagOnlyDigits) == TransformFlagOnlyDigits {
+		s = OnlyDigits(s)
+	}
+
+	if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
+		s = OnlyLetters(s)
+	}
+
+	// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
+	if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
+		s = strings.TrimSpace(s)
+	}
+
+	if (transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
+		s = strings.ToLower(s)
+	}
+
+	if (transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
+		s = strings.ToUpper(s)
+	}
+
+	if (transformFlags & TransformFlagHash) == TransformFlagHash {
+		s = StringHash(s)
+	}
+
+	if s == "" {
+		return s
+	}
+
+	if maxLen > 0 && utf8.RuneCountInString(s) > maxLen {
+		s = string([]rune(s)[:maxLen])
+	}
+
+	// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
+	if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
+		s = strings.TrimSpace(s)
+	}
+
+	return s
+}
+
+// Transform reformat given string according parameters, in the order these params were sent
+// Example: TransformSerially("uh lalah 123", 4, TransformFlagOnlyDigits,TransformFlagHash,TransformFlagUpperCase)
+//          First remove non-digits, then hashes string and after make it all uppercase.
+// If maxLen==0, truncation is skipped
+// Truncation is the last operation
+func TransformSerially(s string, maxLen int, transformFlags ...uint8) string {
+	if s == "" {
+		return s
+	}
+
+	for _, flag := range transformFlags {
+		switch flag {
+		case TransformFlagOnlyLettersAndDigits:
+			s = OnlyLettersAndNumbers(s)
+		case TransformFlagOnlyDigits:
+			s = OnlyDigits(s)
+		case TransformFlagOnlyLetters:
+			s = OnlyLetters(s)
+		case TransformFlagTrim:
 			s = strings.TrimSpace(s)
-		}
-
-		if (transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
+		case TransformFlagLowerCase:
 			s = strings.ToLower(s)
-		}
-
-		if (transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
+		case TransformFlagUpperCase:
 			s = strings.ToUpper(s)
-		}
-
-		if (transformFlags & TransformFlagHash) == TransformFlagHash {
+		case TransformFlagHash:
 			s = StringHash(s)
 		}
+	}
+
+	if maxLen > 0 && utf8.RuneCountInString(s) > maxLen {
+		s = string([]rune(s)[:maxLen])
 	}
 
 	return s

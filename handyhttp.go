@@ -1,14 +1,24 @@
 package handy
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
 
 // HTTPRequestAsString gets a parameter coming from a http request as string, truncated to maxLength
 // Only maxLength >= 1 is considered. Otherwise, it's ignored
 func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOptions ...uint8) string {
+	r.ParseForm()
+
 	s := r.FormValue(key)
 
 	if s == "" {
-		return ""
+		vars := mux.Vars(r)
+		ok := false
+		if s, ok = vars[key]; !ok {
+			return ""
+		}
 	}
 
 	if len(transformOptions) > 0 {
@@ -29,10 +39,16 @@ func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOp
 // HTTPRequestAsInteger gets a parameter coming from a http request as an integer
 // It tries to guess if it's a signed/negative integer
 func HTTPRequestAsInteger(r *http.Request, key string) int {
+	r.ParseForm()
+
 	s := r.FormValue(key)
 
 	if s == "" {
-		return 0
+		vars := mux.Vars(r)
+		ok := false
+		if s, ok = vars[key]; !ok {
+			return 0
+		}
 	}
 
 	neg := s[0:1] == "-"
@@ -50,10 +66,16 @@ func HTTPRequestAsInteger(r *http.Request, key string) int {
 // You have to inform the decimal separator symbol.
 // If decimalSeparator is period, engine considers thousandSeparator is comma, and vice-versa.
 func HTTPRequestAsFloat64(r *http.Request, key string, decimalSeparator rune) float64 {
+	r.ParseForm()
+
 	s := r.FormValue(key)
 
 	if s == "" {
-		return 0
+		vars := mux.Vars(r)
+		ok := false
+		if s, ok = vars[key]; !ok {
+			return 0
+		}
 	}
 
 	thousandSeparator := Tif(decimalSeparator == ',', '.', ',').(rune)
