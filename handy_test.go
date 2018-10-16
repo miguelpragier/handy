@@ -173,8 +173,8 @@ func TestCheckNewPassword(t *testing.T) {
 		{"testing minimum length for password", "123", "123", 2, CheckNewPasswordComplexityLowest, CheckNewPasswordResultTooShort},
 		{"test require letter success", "1234AB", "1234AB", 4, CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultOK},
 		{"test require letter error", "1234", "1234", 4, CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultTooSimple},
-		{"test require uppercase success", "1234Ab", "1234Ab", 4, CheckNewPasswordComplexityRequireUpperCase|CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultOK},
-		{"test require uppercase error", "1234ab", "1234ab", 4, CheckNewPasswordComplexityRequireUpperCase|CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultTooSimple},
+		{"test require uppercase success", "1234Ab", "1234Ab", 4, CheckNewPasswordComplexityRequireUpperCase | CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultOK},
+		{"test require uppercase error", "1234ab", "1234ab", 4, CheckNewPasswordComplexityRequireUpperCase | CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultTooSimple},
 		{"test require number success", "abc1", "abc1", 4, CheckNewPasswordComplexityRequireNumber, CheckNewPasswordResultOK},
 		{"test require number error", "abcd", "abcd", 4, CheckNewPasswordComplexityRequireNumber, CheckNewPasswordResultTooSimple},
 		{"test require space success", "abc d", "abc d", 4, CheckNewPasswordComplexityRequireSpace, CheckNewPasswordResultOK},
@@ -195,7 +195,7 @@ func TestCheckNewPassword(t *testing.T) {
 }
 
 func TestStringHash(t *testing.T) {
-	testcases := []TestDefaultTestStruct {
+	testcases := []TestDefaultTestStruct{
 		{"Normal Test", "Handy", "E80649A6418B6C24FCCB199DAB7CB5BD6EC37593EA0285D52D717FCC7AEE5FB3"},
 		{"string with number", "123456", "8D969EEF6ECAD3C29A3A629280E686CF0C3F5D5A86AFF3CA12020C923ADC6C92"},
 		{"mashup", "Handy12345", "C82333DB3A6D91F98BE188C6C7B928DF4960B9EC3F3EB8CB50293368C673BE3D"},
@@ -213,8 +213,8 @@ func TestStringHash(t *testing.T) {
 	}
 }
 
-func TestOnlyLetters(t *testing.T)  {
-	tcs := []TestDefaultTestStruct {
+func TestOnlyLetters(t *testing.T) {
+	tcs := []TestDefaultTestStruct{
 		{"empty", "", ""},
 		{"only letters", "haoplhu", "haoplhu"},
 		{"letters and numbers", "hlo1234", "hlo"},
@@ -222,7 +222,6 @@ func TestOnlyLetters(t *testing.T)  {
 		{"numbers", "1234", ""},
 		{"with space", "with space", "withspace"},
 		{"A full phrase", "Hello Sr! Tell me, how are you?", "HelloSrTellmehowareyou"},
-
 	}
 
 	for _, tc := range tcs {
@@ -236,8 +235,8 @@ func TestOnlyLetters(t *testing.T)  {
 	}
 }
 
-func TestOnlyDigits(t *testing.T)  {
-	tcs := []TestDefaultTestStruct {
+func TestOnlyDigits(t *testing.T) {
+	tcs := []TestDefaultTestStruct{
 		{"empty", "", ""},
 		{"only letters", "haoplhu", ""},
 		{"letters and numbers", "hlo1234", "1234"},
@@ -245,7 +244,6 @@ func TestOnlyDigits(t *testing.T)  {
 		{"numbers", "1234", "1234"},
 		{"with space", "with space 10", "10"},
 		{"A full phrase", "Hello Sr! I'm 24 Years Old!", "24"},
-
 	}
 
 	for _, tc := range tcs {
@@ -260,7 +258,7 @@ func TestOnlyDigits(t *testing.T)  {
 }
 
 func TestOnlyLettersAndNumbers(t *testing.T) {
-	tcs := []TestDefaultTestStruct {
+	tcs := []TestDefaultTestStruct{
 		{"empty", "", ""},
 		{"only letters", "haoplhu", "haoplhu"},
 		{"letters and numbers", "hlo1234", "hlo1234"},
@@ -268,7 +266,6 @@ func TestOnlyLettersAndNumbers(t *testing.T) {
 		{"numbers", "1234", "1234"},
 		{"with space", "with space 10", "withspace10"},
 		{"A full phrase", "Hello Sr! I'm 24 Years Old!", "HelloSrIm24YearsOld"},
-
 	}
 
 	for _, tc := range tcs {
@@ -283,10 +280,10 @@ func TestOnlyLettersAndNumbers(t *testing.T) {
 }
 
 func TestRandomInt(t *testing.T) {
-	tcs := []struct{
+	tcs := []struct {
 		summary string
-		min int
-		max int
+		min     int
+		max     int
 	}{
 		{"normal test", int(10), int(20)},
 		{"big range", int(10), int(1000)},
@@ -304,7 +301,7 @@ func TestRandomInt(t *testing.T) {
 	}
 }
 
-func TestCheckPhone(t *testing.T)  {
+func TestCheckPhone(t *testing.T) {
 	tcs := []struct {
 		summary        string
 		input          string
@@ -317,7 +314,7 @@ func TestCheckPhone(t *testing.T)  {
 		{"Normal input but allowing empty", "948034118", true, true},
 		{"invalid input", "48034118", false, false},
 	}
-	
+
 	for _, tc := range tcs {
 		t.Run(tc.summary, func(t *testing.T) {
 			tr := CheckPhone(tc.input, tc.allowEmpty)
@@ -330,31 +327,30 @@ func TestCheckPhone(t *testing.T)  {
 
 func TestStringAsFloat(t *testing.T) {
 	tcs := []struct {
-		summary string
-		input string
-		decimalSeparator rune
+		summary           string
+		input             string
+		decimalSeparator  rune
 		thousandSeparator rune
-		expectedOutput	float64
+		expectedOutput    float64
 	}{
 		{"Normal Test", "60.42", '.', ',', 60.42},
 		{"Negative Test", "-60.42", '.', ',', -60.42},
 		{"Virgula como decimal Test", "60.42", ',', '.', 6042.000000},
 		{"ERROR TEST", "bla", '.', ',', 00.00},
-
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.summary, func(t *testing.T) {
 			tr := StringAsFloat(tc.input, tc.decimalSeparator, tc.thousandSeparator)
-			 if tr != tc.expectedOutput {
-				 t.Errorf("Test has failed!\n\tExpected: %f, \n\tGot: %f, \n\tInput: %s\n\tDecimalSeparator: %c\n\tThousandSeparator: %c", tc.expectedOutput, tr, tc.input, tc.decimalSeparator, tc.thousandSeparator)
-			 }
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %f, \n\tGot: %f, \n\tInput: %s\n\tDecimalSeparator: %c\n\tThousandSeparator: %c", tc.expectedOutput, tr, tc.input, tc.decimalSeparator, tc.thousandSeparator)
+			}
 		})
 	}
 }
 
 func TestStringAsInteger(t *testing.T) {
-	tcs := []TestDefaultTestStruct {
+	tcs := []TestDefaultTestStruct{
 		{"default test", "30", 30},
 		{"negative", "-30", -30},
 		{"double", "30.5", 0},
@@ -373,7 +369,7 @@ func TestStringAsInteger(t *testing.T) {
 }
 
 func TestBetween(t *testing.T) {
-	tcs := []struct{
+	tcs := []struct {
 		summary        string
 		number         int
 		min            int
@@ -398,21 +394,21 @@ func TestBetween(t *testing.T) {
 	}
 }
 
-func TestTif(t *testing.T){
+func TestTif(t *testing.T) {
 
-	tcs := []struct{
+	tcs := []struct {
 		summary        string
 		condition      bool
 		tifThen        interface{}
 		tifElse        interface{}
 		expectedOutput interface{}
-	} {
+	}{
 		{"Normal Test", 5 < 10, "true", "false", "true"},
 		{"False", 5 > 10, "true", "false", "false"},
 		{"False with numbers", 5 > 10, 10, 15, 15},
 		{"True with numbers", 5 < 10, 10, 15, 10},
-		{"True with bool", 5 < 10, 5<10, 5>10, 5<10},
-		{"False with bool", 5 > 10, 5<10, 5>10, 5>10},
+		{"True with bool", 5 < 10, 5 < 10, 5 > 10, 5 < 10},
+		{"False with bool", 5 > 10, 5 < 10, 5 > 10, 5 > 10},
 	}
 
 	for _, tc := range tcs {
@@ -428,13 +424,12 @@ func TestTif(t *testing.T){
 }
 
 func TestTruncate(t *testing.T) {
-	tcs := []struct{
-		summary 	   string
-		input   	   string
-		limit   	   int
-		trim    	   bool
+	tcs := []struct {
+		summary        string
+		input          string
+		limit          int
+		trim           bool
 		expectedOutput string
-
 	}{
 		{"normal Test", "The Go programming language is an open source project to make programmers more productive.", 25, false, "The Go programming langua"},
 		{"normal Test with trim", "   The Go programming language is an open source project to make programmers more productive.", 45, true, "The Go programming language is an open sou"},
@@ -445,15 +440,15 @@ func TestTruncate(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.summary, func(t *testing.T) {
 			tr := Truncate(tc.input, tc.limit, tc.trim)
-			 if tr != tc.expectedOutput {
-				 t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\ttrim: %t", tc.expectedOutput, tr, tc.input, tc.limit, tc.trim)
-			 }
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\ttrim: %t", tc.expectedOutput, tr, tc.input, tc.limit, tc.trim)
+			}
 		})
 	}
 }
 
 func TestTransform(t *testing.T) {
-	tcs := []struct{
+	tcs := []struct {
 		summary        string
 		input          string
 		max            int
@@ -461,6 +456,14 @@ func TestTransform(t *testing.T) {
 		expectedOutput string
 	}{
 		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, TransformNone, "The Go programming l"},
+		{"with trim", "   The Go programming language is an open source project to make programmers more productive.", 20, TransformFlagTrim, "The Go programming l"},
+		{"with lower case", "The Go programming language is an open source project to make programmers more productive.", 20, TransformFlagLowerCase, "the go programming l"},
+		{"with upper case", "The Go programming language is an open source project to make programmers more productive.", 20, TransformFlagUpperCase, "THE GO PROGRAMMING L"},
+		{"with Only Digits", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, TransformFlagOnlyDigits, "1"},
+		{"with Only Letters", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, TransformFlagOnlyLetters, "TheGoistheºprogrammi"},
+		{"with Only Letters and Numbers", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, TransformFlagOnlyLettersAndDigits, "TheGoisthe1ºprogramm"},
+		{"with Only Hash", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, TransformFlagHash, "e68e17f094e7c05eb7c9"},
+		{"with Only Hash and letters", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, TransformFlagHash | TransformFlagOnlyLetters, "a29f4806226150623d9d"},
 	}
 
 	for _, tc := range tcs {
