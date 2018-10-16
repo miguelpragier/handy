@@ -1,73 +1,73 @@
 package handy
 
 import (
+	"strings"
 	"testing"
 )
 
-func TestCheckEmail(t *testing.T) {
-	type TestStructForCheckEmail struct {
-		summary        string
-		email          string
-		expectedOutput bool
-	}
+type TestDefaultTestStruct struct {
+	summary        string
+	input          interface{}
+	expectedOutput interface{}
+}
 
-	testList := []TestStructForCheckEmail{
+func TestCheckEmail(t *testing.T) {
+
+	testList := []TestDefaultTestStruct{
 		{"send empty string", "", false},
 		{"send invalid address", "email-gmail.com", false},
 		{"send valid address", "email@gmail.com", true},
 	}
 
 	for _, tst := range testList {
-		tr := CheckEmail(tst.email)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckEmail(tst.input.(string))
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tEmail: ", tst.email, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tEmail: %s, \n\tExpected: %s", tst.input, tst.expectedOutput)
+			}
+		})
 	}
 }
 
-//func TestCheckPersonName(t *testing.T) {
-//	type TestStructForCheckPersonName struct {
-//		summary        string
-//		name           string
-//		acceptEmpty    bool
-//		expectedOutput bool
-//	}
-//
-//	testlist := []TestStructForCheckPersonName{
-//		{"Only two letters", "T S", false, false},
-//		{"only four letters", "AB CD", false, false},
-//		{"five letters with non-ascii runes", "ça vá", false, false},
-//		{"mixing letters and numbers", "W0RDS W1TH NUMB3RS", false, false},
-//		{"Sending and accepting empty string", "", true, true},
-//		{"Sending spaces-only string and accepting empty", "     ", true, true},
-//		{"Sending but not accepting empty string", "", false, false},
-//		{"Sending spaces-only string and refusing empty", "     ", false, false},
-//		{"Sending numbers, expecting false", " 5454 ", true, false},
-//		{"OneWorded string", "ONEWORD", false, false},
-//		{"Minimum acceptable", "AB CDE", false, true},
-//		{"Non-ascii stuff", "ÑÔÑ-ÀSÇÏÏ ÇÃO ÀË", false, true},
-//		{"Words with symbols. Expecting true", "WORDS-WITH SYMBOLS'", false, true},
-//		{"Words with symbols. Expecting false", "WORDS WITH SYMBOLS`", false, true},
-//	}
-//
-//	for _, tst := range testlist {
-//		tr := CheckPersonName(tst.name, tst.acceptEmpty)
-//
-//		if tr != tst.expectedOutput {
-//			t.Error("Test has failed!\n", "\n\tName: ", tst.name, "\n\tAcceptEmpty: ", tst.acceptEmpty, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-//		}
-//	}
-//}
-
-func TestCheckCPF(t *testing.T) {
-	type TestStructForCheckCPF struct {
+func TestCheckPersonName(t *testing.T) {
+	type TestStructForCheckPersonName struct {
 		summary        string
-		cpf            string
-		expectedOutput bool
+		name           string
+		acceptEmpty    bool
+		expectedOutput uint8
 	}
 
-	testlist := []TestStructForCheckCPF{
+	testlist := []TestStructForCheckPersonName{
+		{"Only two letters", "T S", false, CheckPersonNameResultTooSimple},
+		{"only four letters", "AB CD", false, CheckPersonNameResultTooSimple},
+		{"five letters with non-ascii runes", "ça vá", false, CheckPersonNameResultTooSimple},
+		{"mixing letters and numbers", "W0RDS W1TH NUMB3RS", false, CheckPersonNameResultPolluted},
+		{"Sending and accepting empty string", "", true, CheckPersonNameResultOK},
+		{"Sending spaces-only string and accepting empty", "     ", true, CheckPersonNameResultOK},
+		{"Sending but not accepting empty string", "", false, CheckPersonNameResultTooShort},
+		{"Sending spaces-only string and refusing empty", "     ", false, CheckPersonNameResultTooShort},
+		{"Sending numbers, expecting false", " 5454 ", true, CheckPersonNameResultPolluted},
+		{"OneWorded string", "ONEWORD", false, CheckPersonNameResultTooFewWords},
+		{"Minimum acceptable", "AB CDE", false, CheckPersonNameResultOK},
+		{"Non-ascii stuff", "ÑÔÑÀSÇÏÏ ÇÃO ÀË", false, CheckPersonNameResultOK},
+		{"Words with symbols. Expecting true", "WORDS-WITH SYMBOLS'", false, CheckPersonNameResultOK},
+		{"Words with symbols. Expecting false", "WORDS WITH SYMBOLS`", false, CheckPersonNameResultPolluted},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckPersonName(tst.name, tst.acceptEmpty)
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tName: %s\n\tAcceptEmpty: %t, \n\tExpected: %d, \n\tGot: %d,", tst.name, tst.acceptEmpty, tst.expectedOutput, tr)
+			}
+		})
+	}
+}
+
+func TestCheckCPF(t *testing.T) {
+	testlist := []TestDefaultTestStruct{
 		{"send empty string", "", false},
 		{"send wrong length string (10)", "153.255.555.4", false},
 		{"send wrong length string (12)", "153.255.555.455", false},
@@ -77,22 +77,18 @@ func TestCheckCPF(t *testing.T) {
 	}
 
 	for _, tst := range testlist {
-		tr := CheckCPF(tst.cpf)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckCPF(tst.input.(string))
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tCPF: ", tst.cpf, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tCPF: %s,\n\tExpected: %t,\n\tGot: %t", tst.input, tst.expectedOutput, tr)
+			}
+		})
 	}
 }
 
 func TestCheckCNPJ(t *testing.T) {
-	type TestStructForCheckCNPJ struct {
-		summary        string
-		cnpj           string
-		expectedOutput bool
-	}
-
-	testlist := []TestStructForCheckCNPJ{
+	testlist := []TestDefaultTestStruct{
 		{"send empty string", "", false},
 		{"send wrong length string (13)", "88.015.315/0001-5", false},
 		{"send wrong length string (15)", "88.015.315/0001-5003", false},
@@ -103,401 +99,381 @@ func TestCheckCNPJ(t *testing.T) {
 	}
 
 	for _, tst := range testlist {
-		tr := CheckCNPJ(tst.cnpj)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckCNPJ(tst.input.(string))
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tCNPJ: ", tst.cnpj, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tCNPJ: %s,\n\tExpected: %t, \n\tGot: %t", tst.input, tst.expectedOutput, tr)
+			}
+		})
 	}
 }
 
 func TestCheckDate(t *testing.T) {
 	type TestStructForCheckDate struct {
 		summary        string
+		format         string
 		date           string
 		expectedOutput bool
 	}
 
 	testlist := []TestStructForCheckDate{
-		{"empty string", "", false},
-		{"invalid date", "2018-02-29", false},
-		{"invalid date", "2018-13-01", false},
-		{"invalid date", "2018-12-32", false},
-		{"valid date 1", "2018-12-31", true},
-		{"valid date 2", "2018-01-01", true},
+		{"empty string", "", "", false},
+		{"invalid date", "2006-01-02", "2018-02-29", false},
+		{"invalid date", "2006-01-02", "2018-13-01", false},
+		{"invalid date", "2006-01-02", "2018-12-32", false},
+		{"valid date 1", "2006-01-02", "2018-12-31", true},
+		{"valid date 2", "20060102", "20180101", true},
+		{"invalid date format 1", "20060102", "2018-01-01", false},
+		{"invalid date format 1", "2006-01-02", "20180201", false},
 	}
 
 	for _, tst := range testlist {
-		tr := CheckDateYMD(tst.date)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckDate(tst.format, tst.date)
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tDate: ", tst.date, "\n\tExpected: ", tst.expectedOutput, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tDate: %s,\n\tExpected: %t, \n\tGot: %t, \n\tFormat: %s", tst.date, tst.expectedOutput, tr, tst.format)
+			}
+		})
 	}
 }
 
 func TestAmountAsWord(t *testing.T) {
-	type TestStructForPorExtenso struct {
-		summary        string
-		value          int64
-		expectedOutput string
-	}
-
-	testlist := []TestStructForPorExtenso{
+	testlist := []TestDefaultTestStruct{
 		{"zero", 0, "zero"},
 		{"-125", -125, "menos cento e vinte e cinco"},
 		{"-987654321", -987654321, "menos novecentos e oitenta e sete milhões seicentos e cinquenta e quatro mil trezentos e vinte e um"},
 	}
-
 	for _, tst := range testlist {
-		tr := AmountAsWord(tst.value)
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := AmountAsWord(int64(tst.input.(int)))
 
-		if tr != tst.expectedOutput {
-			t.Error("Test has failed!\n", "\n\tValue: ", tst.value, "\n\tExpected: ", tst.expectedOutput, "\n\tReceived: ", tr, "\n\tSummary: ", tst.summary)
-		}
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %d,\n\tExpected: %s, \n\tGot: %s", tst.input, tst.expectedOutput, tr)
+			}
+		})
 	}
 }
 
-//const (
-//	// CheckNewPassword() Possible results
-//
-//	// CheckNewPasswordResultOK Means the checking ran alright
-//	CheckNewPasswordResultOK = 0
-//	// CheckNewPasswordResultDivergent Password is different from confirmation
-//	CheckNewPasswordResultDivergent = 1
-//	// CheckNewPasswordResultTooShort Password is too short
-//	CheckNewPasswordResultTooShort = 2
-//	// CheckNewPasswordResultTooSimple Given string doesn't satisfy complexity rules
-//	CheckNewPasswordResultTooSimple = 3
-//
-//	// CheckNewPassword() Complexity Rules
-//
-//	// CheckNewPasswordComplexityLowest There's no rules besides the minimum length
-//	// >>> This flag turns all others off <<<
-//	CheckNewPasswordComplexityLowest = 1
-//	// CheckNewPasswordComplexityRequireLetter At least one letter is required in order to aprove password
-//	CheckNewPasswordComplexityRequireLetter = 2
-//	// CheckNewPasswordComplexityRequireUpperCase At least one uppercase letter is required in order to aprove password.
-//	// Only works if CheckNewPasswordComplexityRequireLetter is included/activated
-//	CheckNewPasswordComplexityRequireUpperCase = 4
-//	// CheckNewPasswordComplexityRequireNumber At least one number is required in order to aprove password
-//	CheckNewPasswordComplexityRequireNumber = 8
-//	// CheckNewPasswordComplexityRequireSpace The password must contain at least one space
-//	CheckNewPasswordComplexityRequireSpace = 16
-//	// CheckNewPasswordComplexityRequireSymbol User have to include at least one special character, like # or -
-//	CheckNewPasswordComplexityRequireSymbol = 32
-//)
-//
-//// CheckNewPassword Run some basic checks on new password strings, based on given options
-//// This routine requires at least 4 (four) characters
-//// Example requiring only basic minimum length: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityLowest)
-//// Example requiring number and symbol: CheckNewPassword("lalala", "lalala", 10, CheckNewPasswordComplexityRequireNumber|CheckNewPasswordComplexityRequireSymbol)
-//func CheckNewPassword(password, passwordConfirmation string, minimumlength uint, flagComplexity uint8) uint8 {
-//	const minPasswordLengthDefault = 4
-//
-//	if minimumlength < minPasswordLengthDefault {
-//		minimumlength = 4
-//	}
-//
-//	if utf8.RuneCountInString(strings.TrimSpace(password)) < int(minimumlength) {
-//		return CheckNewPasswordResultTooShort
-//	}
-//
-//	if password != passwordConfirmation {
-//		return CheckNewPasswordResultDivergent
-//	}
-//
-//	letterFound := false
-//	numberFound := false
-//	symbolFound := false
-//	spaceFound := false
-//	upperCaseFound := false
-//
-//	if flagComplexity&CheckNewPasswordComplexityLowest != CheckNewPasswordComplexityLowest {
-//		s := []rune(password)
-//
-//		for _, r := range s {
-//			if unicode.IsLetter(r) {
-//				letterFound = true
-//
-//				if unicode.IsUpper(r) {
-//					upperCaseFound = true
-//				}
-//			}
-//
-//			if unicode.IsNumber(r) {
-//				numberFound = true
-//			}
-//
-//			if unicode.IsSymbol(r) {
-//				symbolFound = true
-//			}
-//
-//			if r == ' ' {
-//				spaceFound = true
-//			}
-//		}
-//	}
-//
-//	if flagComplexity&CheckNewPasswordComplexityRequireLetter == CheckNewPasswordComplexityRequireLetter {
-//		if !letterFound {
-//			return CheckNewPasswordResultTooSimple
-//		}
-//
-//		// Only checks uppercase if letter is required
-//		if flagComplexity&CheckNewPasswordComplexityRequireUpperCase == CheckNewPasswordComplexityRequireUpperCase {
-//			if !upperCaseFound {
-//				return CheckNewPasswordResultTooSimple
-//			}
-//		}
-//	}
-//
-//	if flagComplexity&CheckNewPasswordComplexityRequireNumber == CheckNewPasswordComplexityRequireNumber {
-//		if !numberFound {
-//			return CheckNewPasswordResultTooSimple
-//		}
-//	}
-//
-//	if flagComplexity&CheckNewPasswordComplexityRequireSymbol == CheckNewPasswordComplexityRequireSymbol {
-//		if !symbolFound {
-//			return CheckNewPasswordResultTooSimple
-//		}
-//	}
-//
-//	if flagComplexity&CheckNewPasswordComplexityRequireSpace == CheckNewPasswordComplexityRequireSpace {
-//		if !spaceFound {
-//			return CheckNewPasswordResultTooSimple
-//		}
-//	}
-//
-//	return CheckNewPasswordResultOK
-//}
-//
-//// StringHash simply generates a SHA256 hash from the given string
-//func StringHash(s string) string {
-//	h := sha256.New()
-//
-//	h.Write([]byte(s))
-//
-//	sum := h.Sum(nil)
-//
-//	return fmt.Sprintf("%x", sum)
-//}
-//
-//// OnlyLetters returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
-//func OnlyLetters(sequence string) string {
-//	if utf8.RuneCountInString(sequence) == 0 {
-//		return ""
-//	}
-//
-//	var letters []rune
-//
-//	for _, r := range []rune(sequence) {
-//		if unicode.IsLetter(r) {
-//			letters = append(letters, r)
-//		}
-//	}
-//
-//	return string(letters)
-//}
-//
-//// OnlyDigits returns only the numbers from the given string, after strip all the rest ( letters, spaces, etc. )
-//func OnlyDigits(sequence string) string {
-//	if utf8.RuneCountInString(sequence) > 0 {
-//		re, _ := regexp.Compile("[\\D]")
-//
-//		sequence = re.ReplaceAllString(sequence, "")
-//	}
-//
-//	return sequence
-//}
-//
-//// OnlyLettersAndNumbers returns only the letters and numbers from the given string, after strip all the rest, like spaces and special symbols.
-//func OnlyLettersAndNumbers(sequence string) string {
-//	if utf8.RuneCountInString(sequence) == 0 {
-//		return ""
-//	}
-//
-//	var aplhanumeric []rune
-//
-//	for _, r := range []rune(sequence) {
-//		if unicode.IsLetter(r) || unicode.IsDigit(r) {
-//			aplhanumeric = append(aplhanumeric, r)
-//		}
-//	}
-//
-//	return string(aplhanumeric)
-//}
-//
-//// RandomInt returns a rondom integer within the given (inclusive) range
-//func RandomInt(min, max int) int {
-//	rand.Seed(time.Now().UTC().UnixNano())
-//
-//	return rand.Intn(max) + min
-//}
-//
-//// CheckPhone returns true if a given sequence has between 9 and 14 digits
-//func CheckPhone(phone string, acceptEmpty bool) bool {
-//	phone = OnlyDigits(phone)
-//
-//	return (acceptEmpty && (phone == "")) || ((len([]rune(phone)) >= 9) && (len([]rune(phone)) <= 14))
-//}
-//
-//// StringAsFloat tries to convert a string to float, and if it can't, just returns zero
-//// It's limited to one billion
-//func StringAsFloat(s string, decimalSeparator, thousandsSeparator rune) float64 {
-//	if s == "" {
-//		return 0.0
-//	}
-//
-//	const BillionLength = 12
-//
-//	if len([]rune(s)) > BillionLength {
-//		s = s[0:12]
-//	}
-//
-//	s = strings.Replace(s, string(thousandsSeparator), "", -1)
-//
-//	s = strings.Replace(s, string(decimalSeparator), ".", -1)
-//
-//	if f, err := strconv.ParseFloat(s, 64); err == nil {
-//		return f
-//	}
-//
-//	return 0.0
-//}
-//
-//// StringAsInteger returns the integer value extracted from string, or zero
-//func StringAsInteger(s string) int {
-//	if s == "" {
-//		return 0
-//	}
-//
-//	if i, err := strconv.ParseInt(s, 10, 32); err == nil {
-//		return int(i)
-//	}
-//
-//	return 0
-//}
-//
-//// Between checks if param n in between low and high integer params
-//func Between(n, low, high int) bool {
-//	return n >= low && n <= high
-//}
-//
-//// Tif is a simple implementation of the dear ternary IF operator
-//func Tif(condition bool, tifThen, tifElse interface{}) interface{} {
-//	if condition {
-//		return tifThen
-//	}
-//
-//	return tifElse
-//}
-//
-//// Truncate limits the length of a given string, trimming or not, according parameters
-//func Truncate(s string, maxLen int, trim bool) string {
-//	if s == "" {
-//		return s
-//	}
-//
-//	if len(s) > maxLen {
-//		s = s[0:maxLen]
-//	}
-//
-//	if trim {
-//		s = strings.TrimSpace(s)
-//	}
-//
-//	return s
-//}
-//
-//const (
-//	// TransformNone No transformations are ordered. Only constraints maximum length
-//	TransformNone = uint8(1)
-//	// TransformFlagTrim Trims the string, removing leading and trailing spaces
-//	TransformFlagTrim = uint8(2)
-//	// TransformFlagLowerCase Makes the string lowercase
-//	TransformFlagLowerCase = uint8(4)
-//	// TransformFlagUpperCase Makes the string uppercase
-//	TransformFlagUpperCase = uint8(8)
-//	// TransformFlagOnlyDigits Removes all non-numeric characters
-//	TransformFlagOnlyDigits = uint8(16)
-//	// TransformFlagOnlyLetters Removes all non-letter characters
-//	TransformFlagOnlyLetters = uint8(32)
-//	// TransformFlagOnlyLettersAndDigits Leaves only letters and numbers
-//	TransformFlagOnlyLettersAndDigits = uint8(64)
-//	// TransformFlagHash After process all pther flags, applies SHA256 hashing on string for output
-//	TransformFlagHash = uint8(128)
-//)
-//
-//// Transform handles a string according given flags/parametrization, as follows:
-//// Available Flags to be used alone or combined:
-////	TransformNone Does nothing, and turns all other flags OFF.
-////	TransformFlagTrim Trim spaces before and after process the input
-////	TransformFlagLowerCase Change string case to lower. If it's combined with TransformFlagUpperCase, only uppercase remains, once is executed later.
-////	TransformFlagUpperCase Change string case to upper. If it's combined with TransformFlagLowerCase, only uppercase remains, once it's executed later.
-////	TransformFlagOnlyDigits Filter/strip all but digits
-////	TransformFlagOnlyLetters Filter/strip all but letters
-////	TransformFlagOnlyLettersAndDigits Filter/strip all but numbers and letters. Removes spaces, punctuation and special symbols
-//// 	TransformFlagHash Apply handy.StringHash() routine to string
-//func Transform(s string, maxLen int, transformFlags uint8) string {
-//	if s == "" {
-//		return s
-//	}
-//
-//	if transformFlags&TransformNone != TransformNone {
-//
-//		if (transformFlags & TransformFlagOnlyLettersAndDigits) == TransformFlagOnlyLettersAndDigits {
-//			s = OnlyLettersAndNumbers(s)
-//
-//			if s == "" {
-//				return s
-//			}
-//		} else if (transformFlags & TransformFlagOnlyDigits) == TransformFlagOnlyDigits {
-//			s = OnlyDigits(s)
-//
-//			if s == "" {
-//				return s
-//			}
-//		} else if (transformFlags & TransformFlagOnlyLetters) == TransformFlagOnlyLetters {
-//			s = OnlyLetters(s)
-//
-//			if s == "" {
-//				return s
-//			}
-//		}
-//
-//		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-//		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
-//			s = strings.TrimSpace(s)
-//		}
-//
-//		if utf8.RuneCountInString(s) > maxLen {
-//			s = string([]rune(s)[:maxLen])
-//		}
-//
-//		// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
-//		if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
-//			s = strings.TrimSpace(s)
-//		}
-//
-//		if (transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
-//			s = strings.ToLower(s)
-//		}
-//
-//		if (transformFlags & TransformFlagUpperCase) == TransformFlagUpperCase {
-//			s = strings.ToUpper(s)
-//		}
-//
-//		if (transformFlags & TransformFlagHash) == TransformFlagHash {
-//			s = StringHash(s)
-//		}
-//	}
-//
-//	return s
-//}
-//
-//// MatchesAny returns true if any of the given items matches ( equals ) the subject ( search parameter )
+func TestCheckNewPassword(t *testing.T) {
+	testlist := []struct {
+		summary        string
+		password       string
+		checkpassword  string
+		minimumlength  uint
+		flag           uint8
+		expectedOutput uint8
+	}{
+		{"test lowest flag", "1234AB", "1234AB", 6, CheckNewPasswordComplexityLowest, CheckNewPasswordResultOK},
+		{"test check password", "1234AB", "1234A", 6, CheckNewPasswordComplexityLowest, CheckNewPasswordResultDivergent},
+		{"Only Numbers with Default Flag", "1234", "1234", 4, CheckNewPasswordComplexityLowest, CheckNewPasswordResultOK},
+		{"Only letters with Default Flag", "lala", "lala", 4, CheckNewPasswordComplexityLowest, CheckNewPasswordResultOK},
+		{"testing minimum length", "1234", "1234", 2, CheckNewPasswordComplexityLowest, CheckNewPasswordResultOK},
+		{"testing minimum length for password", "123", "123", 2, CheckNewPasswordComplexityLowest, CheckNewPasswordResultTooShort},
+		{"test require letter success", "1234AB", "1234AB", 4, CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultOK},
+		{"test require letter error", "1234", "1234", 4, CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultTooSimple},
+		{"test require uppercase success", "1234Ab", "1234Ab", 4, CheckNewPasswordComplexityRequireUpperCase|CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultOK},
+		{"test require uppercase error", "1234ab", "1234ab", 4, CheckNewPasswordComplexityRequireUpperCase|CheckNewPasswordComplexityRequireLetter, CheckNewPasswordResultTooSimple},
+		{"test require number success", "abc1", "abc1", 4, CheckNewPasswordComplexityRequireNumber, CheckNewPasswordResultOK},
+		{"test require number error", "abcd", "abcd", 4, CheckNewPasswordComplexityRequireNumber, CheckNewPasswordResultTooSimple},
+		{"test require space success", "abc d", "abc d", 4, CheckNewPasswordComplexityRequireSpace, CheckNewPasswordResultOK},
+		{"test require space error", "abcd", "abcd", 4, CheckNewPasswordComplexityRequireSpace, CheckNewPasswordResultTooSimple},
+		{"test require symbol success", "abc#", "abc#", 4, CheckNewPasswordComplexityRequireSymbol, CheckNewPasswordResultOK},
+		{"test require symbol error", "abcd", "abcd", 4, CheckNewPasswordComplexityRequireSymbol, CheckNewPasswordResultTooSimple},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckNewPassword(tst.password, tst.checkpassword, tst.minimumlength, tst.flag)
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %d, \n\tGot: %d", tst.password, tst.expectedOutput, tr)
+			}
+		})
+	}
+}
+
+func TestStringHash(t *testing.T) {
+	testcases := []TestDefaultTestStruct {
+		{"Normal Test", "Handy", "E80649A6418B6C24FCCB199DAB7CB5BD6EC37593EA0285D52D717FCC7AEE5FB3"},
+		{"string with number", "123456", "8D969EEF6ECAD3C29A3A629280E686CF0C3F5D5A86AFF3CA12020C923ADC6C92"},
+		{"mashup", "Handy12345", "C82333DB3A6D91F98BE188C6C7B928DF4960B9EC3F3EB8CB50293368C673BE3D"},
+		{"with symbols", "#handy_12Ax", "507512071AAEA24A94ECBB0F32EE74169FD59160EE9232819C504F39656E61F7"},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := StringHash(tc.input.(string))
+
+			if r != strings.ToLower(tc.expectedOutput.(string)) {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %d, \n\tGot: %d", tc.input, tc.expectedOutput, r)
+			}
+		})
+	}
+}
+
+func TestOnlyLetters(t *testing.T)  {
+	tcs := []TestDefaultTestStruct {
+		{"empty", "", ""},
+		{"only letters", "haoplhu", "haoplhu"},
+		{"letters and numbers", "hlo1234", "hlo"},
+		{"symbols", "$#@", ""},
+		{"numbers", "1234", ""},
+		{"with space", "with space", "withspace"},
+		{"A full phrase", "Hello Sr! Tell me, how are you?", "HelloSrTellmehowareyou"},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := OnlyLetters(tc.input.(string))
+
+			if r != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %s, \n\tGot: %s", tc.input, tc.expectedOutput, r)
+			}
+		})
+	}
+}
+
+func TestOnlyDigits(t *testing.T)  {
+	tcs := []TestDefaultTestStruct {
+		{"empty", "", ""},
+		{"only letters", "haoplhu", ""},
+		{"letters and numbers", "hlo1234", "1234"},
+		{"symbols", "$#@", ""},
+		{"numbers", "1234", "1234"},
+		{"with space", "with space 10", "10"},
+		{"A full phrase", "Hello Sr! I'm 24 Years Old!", "24"},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := OnlyDigits(tc.input.(string))
+
+			if r != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %s, \n\tGot: %s", tc.input, tc.expectedOutput, r)
+			}
+		})
+	}
+}
+
+func TestOnlyLettersAndNumbers(t *testing.T) {
+	tcs := []TestDefaultTestStruct {
+		{"empty", "", ""},
+		{"only letters", "haoplhu", "haoplhu"},
+		{"letters and numbers", "hlo1234", "hlo1234"},
+		{"symbols", "$#@", ""},
+		{"numbers", "1234", "1234"},
+		{"with space", "with space 10", "withspace10"},
+		{"A full phrase", "Hello Sr! I'm 24 Years Old!", "HelloSrIm24YearsOld"},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := OnlyLettersAndNumbers(tc.input.(string))
+
+			if r != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %s, \n\tGot: %s", tc.input, tc.expectedOutput, r)
+			}
+		})
+	}
+}
+
+func TestRandomInt(t *testing.T) {
+	tcs := []struct{
+		summary string
+		min int
+		max int
+	}{
+		{"normal test", int(10), int(20)},
+		{"big range", int(10), int(1000)},
+		{"negative", int(-10), int(1000)},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			r := RandomInt(tc.min, tc.max)
+
+			if r < tc.min || r > tc.max {
+				t.Errorf("Test has failed!\n\tMin: %d, \n\tMax: %d, \n\tGot: %d", tc.min, tc.max, r)
+			}
+		})
+	}
+}
+
+func TestCheckPhone(t *testing.T)  {
+	tcs := []struct {
+		summary        string
+		input          string
+		allowEmpty     bool
+		expectedOutput bool
+	}{
+		{"Normal input", "948034118", false, true},
+		{"Empty return false", "", false, false},
+		{"Empty allowing empty", "", true, true},
+		{"Normal input but allowing empty", "948034118", true, true},
+		{"invalid input", "48034118", false, false},
+	}
+	
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := CheckPhone(tc.input, tc.allowEmpty)
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %s\n\tAllowEmpty: %t", tc.expectedOutput, tr, tc.input, tc.allowEmpty)
+			}
+		})
+	}
+}
+
+func TestStringAsFloat(t *testing.T) {
+	tcs := []struct {
+		summary string
+		input string
+		decimalSeparator rune
+		thousandSeparator rune
+		expectedOutput	float64
+	}{
+		{"Normal Test", "60.42", '.', ',', 60.42},
+		{"Negative Test", "-60.42", '.', ',', -60.42},
+		{"Virgula como decimal Test", "60.42", ',', '.', 6042.000000},
+		{"ERROR TEST", "bla", '.', ',', 00.00},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := StringAsFloat(tc.input, tc.decimalSeparator, tc.thousandSeparator)
+			 if tr != tc.expectedOutput {
+				 t.Errorf("Test has failed!\n\tExpected: %f, \n\tGot: %f, \n\tInput: %s\n\tDecimalSeparator: %c\n\tThousandSeparator: %c", tc.expectedOutput, tr, tc.input, tc.decimalSeparator, tc.thousandSeparator)
+			 }
+		})
+	}
+}
+
+func TestStringAsInteger(t *testing.T) {
+	tcs := []TestDefaultTestStruct {
+		{"default test", "30", 30},
+		{"negative", "-30", -30},
+		{"double", "30.5", 0},
+		{"text", "text", 0},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := StringAsInteger(tc.input.(string))
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %d, \n\tGot: %d, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
+
+func TestBetween(t *testing.T) {
+	tcs := []struct{
+		summary        string
+		number         int
+		min            int
+		max            int
+		expectedOutput bool
+	}{
+		{"normal test", 5, 0, 10, true},
+		{"with negative", -5, -10, 0, true},
+		{"mix with negative", 5, -10, 100, true},
+		{"Large Numbers", 1000, -1000, 10000, true},
+		{"Give me a false!", -5, -4, 0, false},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Between(tc.number, tc.min, tc.max)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %d, \n\tMin: %d, \n\tMax: %d", tc.expectedOutput, tr, tc.number, tc.min, tc.max)
+			}
+		})
+	}
+}
+
+func TestTif(t *testing.T){
+
+	tcs := []struct{
+		summary        string
+		condition      bool
+		tifThen        interface{}
+		tifElse        interface{}
+		expectedOutput interface{}
+	} {
+		{"Normal Test", 5 < 10, "true", "false", "true"},
+		{"False", 5 > 10, "true", "false", "false"},
+		{"False with numbers", 5 > 10, 10, 15, 15},
+		{"True with numbers", 5 < 10, 10, 15, 10},
+		{"True with bool", 5 < 10, 5<10, 5>10, 5<10},
+		{"False with bool", 5 > 10, 5<10, 5>10, 5>10},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Tif(tc.condition, tc.tifThen, tc.tifElse)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %v, \n\tInput: %t, \n\tThen: %v, \n\tElse: %v", tc.expectedOutput, tr, tc.condition, tc.tifThen, tc.tifElse)
+
+			}
+		})
+	}
+}
+
+func TestTruncate(t *testing.T) {
+	tcs := []struct{
+		summary 	   string
+		input   	   string
+		limit   	   int
+		trim    	   bool
+		expectedOutput string
+
+	}{
+		{"normal Test", "The Go programming language is an open source project to make programmers more productive.", 25, false, "The Go programming langua"},
+		{"normal Test with trim", "   The Go programming language is an open source project to make programmers more productive.", 45, true, "The Go programming language is an open sou"},
+		{"zero", "The Go programming language is an open source project to make programmers more productive.", 0, true, ""},
+		{"zero zero", "", 45, true, ""},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Truncate(tc.input, tc.limit, tc.trim)
+			 if tr != tc.expectedOutput {
+				 t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\ttrim: %t", tc.expectedOutput, tr, tc.input, tc.limit, tc.trim)
+			 }
+		})
+	}
+}
+
+func TestTransform(t *testing.T) {
+	tcs := []struct{
+		summary        string
+		input          string
+		max            int
+		flags          uint8
+		expectedOutput string
+	}{
+		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, TransformNone, "The Go programming l"},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Transform(tc.input, tc.max, tc.flags)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\tflags: %d", tc.expectedOutput, tr, tc.input, tc.max, tc.flags)
+			}
+		})
+	}
+}
+
 //func MatchesAny(search interface{}, items ...interface{}) bool {
 //	for _, v := range items {
 //		if fmt.Sprintf("%T", search) == fmt.Sprintf("%T", v) {
@@ -509,8 +485,7 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return false
 //}
-//
-//// HasOnlyNumbers returns true if the sequence is entirely numeric
+
 //func HasOnlyNumbers(sequence string) bool {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return false
@@ -524,8 +499,7 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return true
 //}
-//
-//// HasOnlyLetters returns true if the sequence is entirely composed by letters
+
 //func HasOnlyLetters(sequence string) bool {
 //	if utf8.RuneCountInString(sequence) == 0 {
 //		return false
@@ -539,8 +513,7 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return true
 //}
-//
-//// TrimLen returns the runes count after trim the spaces
+
 //func TrimLen(text string) int {
 //	if text == "" {
 //		return 0
@@ -554,16 +527,13 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return utf8.RuneCountInString(text)
 //}
-//
-//// CheckMinLen verifies if the rune-count is greater then or equal the given minimum
-//// It returns true if the given string has length greater than or equal than minLength parameter
+
 //func CheckMinLen(value string, minLength int) bool {
 //	value = strings.TrimSpace(value)
 //
 //	return TrimLen(value) >= minLength
 //}
-//
-//// IsNumericType checks if an interface's concrete type corresponds to some of golang native numeric types
+
 //func IsNumericType(x interface{}) bool {
 //	switch x.(type) {
 //	case uint:
@@ -596,10 +566,7 @@ func TestAmountAsWord(t *testing.T) {
 //		return false
 //	}
 //}
-//
-//// Bit returns only uint8(0) or uint8(1).
-//// It receives an interface, and when it's a number, and when this number is 0 (zero) it returns 0. Otherwise it returns 1 (one)
-//// If the interface is not a number, it returns 0 (zero)
+
 //func Bit(x interface{}) uint8 {
 //	if IsNumericType(x) && x != 0 {
 //		return 1
@@ -607,11 +574,7 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return 0
 //}
-//
-//// Boolean returns the bool version/interpretation of some value;
-//// It receives an interface, and when this is a number, Boolean() returns flase of zero and true for different from zero.
-//// If it's a string, try to find "1", "T", "TRUE" to return true.
-//// Any other case returns false
+
 //func Boolean(x interface{}) bool {
 //	if IsNumericType(x) {
 //		return x != 0
@@ -624,8 +587,7 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return false
 //}
-//
-//// Reverse returns the given string written backwards, with letters reversed.
+
 //func Reverse(s string) string {
 //	if utf8.RuneCountInString(s) < 2 {
 //		return s
@@ -642,8 +604,7 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return string(buffer)
 //}
-//
-//// OnlyURL strip all symbols non allowed in URLs and returns the sanitized url.
+
 //func OnlyURL(url string) string {
 //	allowedSymbols := []rune("$-_.+!*'(),{}|\\^~[]`<>#%\";/?:@&=.")
 //	tmp := []rune(url)
@@ -657,22 +618,7 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return string(tmp)
 //}
-//
-//const (
-//	// CheckPersonNameResultOK means the name was validated
-//	CheckPersonNameResultOK = 0
-//	// CheckPersonNameResultPolluted The routine only accepts letters, single quotes and spaces
-//	CheckPersonNameResultPolluted = 1
-//	// CheckPersonNameResultTooFewWords The funcion requires at least 2 words
-//	CheckPersonNameResultTooFewWords = 2
-//	// CheckPersonNameResultTooShort the sum of all characters must be >= 6
-//	CheckPersonNameResultTooShort = 3
-//	// CheckPersonNameResultTooSimple The name rule requires that at least one word
-//	CheckPersonNameResultTooSimple = 4
-//)
-//
-//// CheckPersonName returns true if the name contains at least two words, one >= 3 chars and one >=2 chars.
-//// I understand that this is a particular criteria, but this is the OpenSourceMagic, where you can change and adapt to your own specs.
+
 //func CheckPersonName(name string, acceptEmpty bool) uint8 {
 //	name = strings.TrimSpace(name)
 //
@@ -721,8 +667,7 @@ func TestAmountAsWord(t *testing.T) {
 //
 //	return CheckPersonNameResultOK
 //}
-//
-//// StringReplaceAll keeps replacing until there's no more ocurrences to replace.
+
 //func StringReplaceAll(original string, replacementPairs ...string) string {
 //	if original==""{
 //		return original
