@@ -477,98 +477,172 @@ func TestTransform(t *testing.T) {
 	}
 }
 
-//func MatchesAny(search interface{}, items ...interface{}) bool {
-//	for _, v := range items {
-//		if fmt.Sprintf("%T", search) == fmt.Sprintf("%T", v) {
-//			if search == v {
-//				return true
-//			}
-//		}
-//	}
-//
-//	return false
-//}
+func TestTransformSerially(t *testing.T) {
+	tcs := []struct {
+		summary        string
+		input          string
+		max            int
+		flags          []uint8
+		expectedOutput string
+	}{
+		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformNone}, "The Go programming l"},
+		{"with trim and lowercase", "   The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagTrim,TransformFlagLowerCase}, "the go programming l"},
+		{"with lower case and only letters", "The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagLowerCase,TransformFlagOnlyLetters}, "thegoprogramminglang"},
+		{"with Only Hash and letters", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagHash,TransformFlagOnlyLetters}, "eefecebcfdbceccbbbcb"},
+	}
 
-//func HasOnlyNumbers(sequence string) bool {
-//	if utf8.RuneCountInString(sequence) == 0 {
-//		return false
-//	}
-//
-//	for _, r := range []rune(sequence) {
-//		if !unicode.IsDigit(r) {
-//			return false
-//		}
-//	}
-//
-//	return true
-//}
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := TransformSerially(tc.input, tc.max, tc.flags...)
 
-//func HasOnlyLetters(sequence string) bool {
-//	if utf8.RuneCountInString(sequence) == 0 {
-//		return false
-//	}
-//
-//	for _, r := range []rune(sequence) {
-//		if !unicode.IsLetter(r) {
-//			return false
-//		}
-//	}
-//
-//	return true
-//}
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\tflags: %d", tc.expectedOutput, tr, tc.input, tc.max, tc.flags)
+			}
+		})
+	}
+}
 
-//func TrimLen(text string) int {
-//	if text == "" {
-//		return 0
-//	}
-//
-//	text = strings.TrimSpace(text)
-//
-//	if text == "" {
-//		return 0
-//	}
-//
-//	return utf8.RuneCountInString(text)
-//}
+func TestMatchesAny(t *testing.T) {
+	tcs := []struct {
+		summary        string
+		input          interface{}
+		items          []interface{}
+		expectedOutput bool
+	}{
+		{"normal test", 20, []interface{}{1, 50, 20}, true},
+		{"with string", "The Go programming language ", []interface{}{"is an open source project to make programmers more productive.", "language", "lalala", "The Go programming language "}, true},
+		{"with part of a string", "The Go programming language ", []interface{}{"is an open source project to make programmers more productive.", "language", "lalala", "The Go programming"}, false},
+		{"with floats", 60.40, []interface{}{1, 50, 60.4}, true},
+		{"with bools", true, []interface{}{false, false, true}, true},
+	}
 
-//func CheckMinLen(value string, minLength int) bool {
-//	value = strings.TrimSpace(value)
-//
-//	return TrimLen(value) >= minLength
-//}
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := MatchesAny(tc.input, tc.items...)
 
-//func IsNumericType(x interface{}) bool {
-//	switch x.(type) {
-//	case uint:
-//		return true
-//	case uint8: // Or byte
-//		return true
-//	case uint16:
-//		return true
-//	case uint32:
-//		return true
-//	case uint64:
-//		return true
-//	case int:
-//		return true
-//	case int8:
-//		return true
-//	case int16:
-//		return true
-//	case int32:
-//		return true
-//	case float32:
-//		return true
-//	case float64:
-//		return true
-//	case complex64:
-//		return true
-//	case complex128:
-//		return true
-//	default:
-//		return false
-//	}
-//}
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %v, \n\titems: %#v,", tc.expectedOutput, tr, tc.input, tc.items)
+			}
+		})
+	}
+}
+
+func TestHasOnlyNumbers(t *testing.T) {
+	tcs := []struct {
+		summary        string
+		input          string
+		expectedOutput bool
+	}{
+		{"normal test", "20", true},
+		{"with string", "The Go programming language ", false},
+		{"with part of a string", "20The Go programming language ", false},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := HasOnlyNumbers(tc.input)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
+
+func TestHasOnlyLetters(t *testing.T) {
+	tcs := []struct {
+	summary        string
+	input          string
+	expectedOutput bool
+	}{
+		{"normal test", "TheGoprogramminglanguage", true},
+		{"normal test with spaces", "The Go programming language", false},
+		{"with numbers", "20", false},
+		{"with part of a string", "20The Go programming language ", false},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := HasOnlyLetters(tc.input)
+
+			if tr != tc.expectedOutput {
+			t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
+
+func TestTrimLen(t *testing.T){
+	tcs := []struct {
+		summary        string
+		input          string
+		expectedOutput int
+	}{
+		{"normal test", "TheGoprogramminglanguage", 24},
+		{"normal test with spaces", "The Go programming language", 27},
+		{"with numbers", "20", 2},
+		{"with part of a string", "20The Go programming language ", 29},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := TrimLen(tc.input)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %d, \n\tGot: %d, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
+
+func TestCheckMinLen(t *testing.T) {
+	tcs := []struct {
+		summary        string
+		input          string
+		min 		   int
+		expectedOutput bool
+	}{
+		{"normal test", "TheGoprogramminglanguage", 24, true},
+		{"normal test with spaces", "The Go programming language", 27, true},
+		{"with numbers", "20", 2, true},
+		{"with part of a string", "20The Go programming language ", 29, true},
+		{"min error", "20The Go programming language ", 260, false},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := CheckMinLen(tc.input, tc.min)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %s, \n\tMinLen: %d", tc.expectedOutput, tr, tc.input, tc.min)
+			}
+		})
+	}
+}
+
+func TestIsNumericType(t *testing.T) {
+	tcs := []struct {
+		summary        string
+		input          interface{}
+		expectedOutput bool
+	}{
+		{"normal test", 22, true},
+		{"float", 22.40, true},
+		{"string with numbers", "20", false},
+
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := IsNumericType(tc.input)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %v", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
 
 //func Bit(x interface{}) uint8 {
 //	if IsNumericType(x) && x != 0 {
