@@ -545,21 +545,6 @@ func Reverse(s string) string {
 	return string(buffer)
 }
 
-// OnlyURL strip all symbols non allowed in URLs and returns the sanitized url.
-func OnlyURL(url string) string {
-	allowedSymbols := []rune("$-_.+!*'(),{}|\\^~[]`<>#%\";/?:@&=.")
-	tmp := []rune(url)
-	var target []rune
-
-	for _, r := range tmp {
-		if InArray(r, allowedSymbols) || unicode.IsLetter(r) || unicode.IsNumber(r) {
-			target = append(target, r)
-		}
-	}
-
-	return string(tmp)
-}
-
 const (
 	// CheckPersonNameResultOK means the name was validated
 	CheckPersonNameResultOK = 0
