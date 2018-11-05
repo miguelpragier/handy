@@ -644,123 +644,83 @@ func TestIsNumericType(t *testing.T) {
 	}
 }
 
-//func Bit(x interface{}) uint8 {
-//	if IsNumericType(x) && x != 0 {
-//		return 1
-//	}
-//
-//	return 0
-//}
+func TestBit(t *testing.T) {
+	tcs := []TestDefaultTestStruct {
+		{"normal test", 0, uint8(0)},
+		{"normal test with 1", 1, uint8(1)},
+		{"String", "ha", uint8(0)},
+		{"String Number", "1", uint8(0)},
+	}
+	
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Bit(tc.input)
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %d, \n\tGot: %d, \n\tInput: %v", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
 
-//func Boolean(x interface{}) bool {
-//	if IsNumericType(x) {
-//		return x != 0
-//	}
-//
-//	if s, ok := x.(string); ok {
-//		s = Transform(s, 4, TransformFlagLowerCase|TransformFlagTrim)
-//		return MatchesAny(s, "1", "true", "t")
-//	}
-//
-//	return false
-//}
+func TestBoolean(t *testing.T) {
+	tcs := []TestDefaultTestStruct {
+		{"normal test", 0, false},
+		{"normal test with 1", 1, true},
+		{"String", "ha", false},
+		{"String Number", "1", true},
+		{"true true", true, false},
+		{"t true string", "t", true},
+		{"true true string ", "true", true},
 
-//func Reverse(s string) string {
-//	if utf8.RuneCountInString(s) < 2 {
-//		return s
-//	}
-//
-//	r := []rune(s)
-//
-//	buffer := make([]rune, len(r))
-//
-//	for i, j := len(r)-1, 0; i >= 0; i-- {
-//		buffer[j] = r[i]
-//		j++
-//	}
-//
-//	return string(buffer)
-//}
+	}
 
-//func OnlyURL(url string) string {
-//	allowedSymbols := []rune("$-_.+!*'(),{}|\\^~[]`<>#%\";/?:@&=.")
-//	tmp := []rune(url)
-//	var target []rune
-//
-//	for _, r := range tmp {
-//		if InArray(r, allowedSymbols) || unicode.IsLetter(r) || unicode.IsNumber(r) {
-//			target = append(target, r)
-//		}
-//	}
-//
-//	return string(tmp)
-//}
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Boolean(tc.input)
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %v", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
 
-//func CheckPersonName(name string, acceptEmpty bool) uint8 {
-//	name = strings.TrimSpace(name)
-//
-//	// If name is empty, AND it's accepted, return ok. Else, cry!
-//	if name == "" {
-//		if !acceptEmpty {
-//			return CheckPersonNameResultTooShort
-//		}
-//
-//		return CheckPersonNameResultOK
-//	}
-//
-//	// Person names doesn't accept other than letters, spaces and single quotes
-//	for _, r := range []rune(name) {
-//		if !unicode.IsLetter(r) && r != ' ' && r != '\'' {
-//			return CheckPersonNameResultPolluted
-//		}
-//	}
-//
-//	// A complete name has to be at least 2 words.
-//	a := strings.Fields(name)
-//
-//	if len(a) < 2 {
-//		return CheckPersonNameResultTooFewWords
-//	}
-//
-//	// At least two words, one with 3 chars and other with 2
-//	found2 := false
-//	found3 := false
-//
-//	for _, s := range a {
-//		if !found3 && utf8.RuneCountInString(s) >= 3 {
-//			found3 = true
-//			continue
-//		}
-//
-//		if !found2 && utf8.RuneCountInString(s) >= 2 {
-//			found2 = true
-//			continue
-//		}
-//	}
-//
-//	if !found2 || !found3 {
-//		return CheckPersonNameResultTooSimple
-//	}
-//
-//	return CheckPersonNameResultOK
-//}
+func TestReverse(t *testing.T) {
+	tcs := []TestDefaultTestStruct {
+		{"normal test", "Miguel", "leugiM"},
+		{"2 chars", "Fe", "eF"},
+		{"With spaces", "Lorem ipsum nibh sem laoreet taciti mattis neque ut, ornare cursus aenean inceptos suspendisse est hac hendrerit malesuada, luctus malesuada sit maecenas lorem arcu justo.", ".otsuj ucra merol saneceam tis adauselam sutcul ,adauselam tirerdneh cah tse essidnepsus sotpecni naenea susruc eranro ,tu euqen sittam iticat teeroal mes hbin muspi meroL"},
+		{"String Number", "Ha1", "1aH"},
+	}
 
-//func StringReplaceAll(original string, replacementPairs ...string) string {
-//	if original==""{
-//		return original
-//	}
-//
-//	r := strings.NewReplacer(replacementPairs...)
-//
-//	for {
-//		result := r.Replace(original)
-//
-//		if original!=result {
-//			original = result
-//		} else {
-//			break
-//		}
-//	}
-//
-//	return original
-//}
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := Reverse(tc.input.(string))
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
+
+func TestStringReplaceAll(t *testing.T) {
+	tcs := []struct {
+		summary string
+		input string
+		pairs []string
+		output string
+	} {
+		{"normal test", "test string", []string{"t", "d"}, "desd sdring"},
+		{"space test", "test string", []string{" ", "e"}, "testestring"},
+		{"a lot of pairs test", "test string", []string{"t", "d"," ", "e"}, "desdesdring"},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := StringReplaceAll(tc.input, tc.pairs...)
+
+			if tr != tc.output {
+				t.Errorf("Error! Expected: %s, Got: %s, Input: %s, Pairs: %s", tc.output, tr, tc.input, tc.pairs)
+			}
+		})
+	}
+}
