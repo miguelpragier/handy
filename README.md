@@ -7,14 +7,6 @@ GO Golang Utilities and helpers like validators, sanitizers and string formatter
 # Dependencies
 None. It relies on standard library.
 
-
-# ToDo list
-- [ ] Translate all API documentation/comments to english
-- [X] Replaces all simple regex with procedural
-- [ ] Full Automated Tests Coverage
-- [X] Add those cool badges to repository
-
-
 ___
 Documentation :green_book:|
 --------------------------|
