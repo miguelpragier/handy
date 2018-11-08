@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/miguelpragier/handy)](https://goreportcard.com/report/miguelpragier/handy) ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)
+[![Go Report Card](https://goreportcard.com/badge/miguelpragier/handy)](https://goreportcard.com/report/miguelpragier/handy) ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg) ![GitHub](https://img.shields.io/badge/goDoc-Yes!-blue.svg)
 
 # Handy Go utilities
 GO Golang Utilities and helpers like validators, sanitizers and string formatters
@@ -9,13 +9,17 @@ None. It relies on standard library.
 
 
 # ToDo list
-* Translate all API documentation/comments to english
+- [ ] Translate all API documentation/comments to english
+- [X] Replaces all simple regex with procedural
+- [ ] Full Automated Tests Coverage
+- [X] Add those cool badges to repository
 
-* Replaces all simple regex with procedural
 
-* Assure that all functions are covered by automated tests
-
-* Add those cool badges to repository
+___
+Documentation :green_book:|
+--------------------------|
+[GoDocs](https://godoc.org/github.com/miguelpragier/handy)|
+___
 
 
 # Functions
