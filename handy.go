@@ -142,10 +142,10 @@ func CheckNewPassword(password, passwordConfirmation string, minimumlength uint,
 }
 
 func RuneHasSymbol(ru rune) bool {
-	allowedSymbols:=[]rune("!\"#$%&'()*+´-./:;<=>?@[\\]^_`{|}~")
+	allowedSymbols := []rune("!\"#$%&'()*+´-./:;<=>?@[\\]^_`{|}~")
 
-	for _,r:=range allowedSymbols {
-		if ru==r{
+	for _, r := range allowedSymbols {
+		if ru == r {
 			return true
 		}
 	}
@@ -588,7 +588,7 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {
 
 	// Person names doesn't accept other than letters, spaces and single quotes
 	for _, r := range []rune(name) {
-		if !unicode.IsLetter(r) && r != ' ' && r != '\'' && r != '-'{
+		if !unicode.IsLetter(r) && r != ' ' && r != '\'' && r != '-' {
 			return CheckPersonNameResultPolluted
 		}
 	}

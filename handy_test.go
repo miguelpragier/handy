@@ -211,7 +211,7 @@ func TestStringHash(t *testing.T) {
 			r := StringHash(tc.input.(string))
 
 			if r != strings.ToLower(tc.expectedOutput.(string)) {
-				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %d, \n\tGot: %d", tc.input, tc.expectedOutput, r)
+				t.Errorf("Test has failed!\n\tInput: %s,\n\tExpected: %d, \n\tGot: %s", tc.input, tc.expectedOutput, r)
 			}
 		})
 	}
@@ -981,7 +981,7 @@ func TestYearsAge(t *testing.T) {
 			tr := YearsAge(tc.input.(time.Time))
 
 			if tr != tc.expectedOutput {
-				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %v, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
 			}
 		})
 	}
