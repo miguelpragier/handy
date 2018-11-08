@@ -1,3 +1,5 @@
+// Handy is a toolbelt with utilities and helpers like validators, sanitizers and string formatters
+// There are routines to filter strings, convert between types, validate passwords with custom rules, easily format dates and much more.
 package handy
 
 import (
