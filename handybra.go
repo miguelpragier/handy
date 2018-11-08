@@ -1,4 +1,3 @@
-// Package handy routines to handle Brazilian-specific rules
 package handy
 
 import (
