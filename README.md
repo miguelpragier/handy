@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/miguelpragier/handy)](https://goreportcard.com/report/miguelpragier/handy) ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg) ![GitHub](https://img.shields.io/badge/goDoc-Yes!-blue.svg)
+[![Go Report Card](https://goreportcard.com/badge/miguelpragier/handy)](https://goreportcard.com/report/miguelpragier/handy) ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg) ![GitHub](https://img.shields.io/badge/goDoc-Yes!-blue.svg) [![Coverage Status](https://coveralls.io/repos/github/miguelpragier/handy/badge.svg?branch=master)](https://coveralls.io/github/miguelpragier/handy?branch=master)
 
 # Handy Go utilities
 GO Golang Utilities and helpers like validators, sanitizers and string formatters
@@ -12,6 +12,9 @@ Documentation :green_book:|
 --------------------------|
 [GoDocs](https://godoc.org/github.com/miguelpragier/handy)|
 ___
+
+### Quality
+-- [GoCover](https://gocover.io/github.com/miguelpragier/handy)
 
 
 # Functions
