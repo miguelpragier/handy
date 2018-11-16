@@ -1,9 +1,9 @@
 package handy
 
 import (
-	"net/http"
-
+	"encoding/json"
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 // HTTPRequestAsString gets a parameter coming from a http request as string, truncated to maxLength
@@ -81,4 +81,13 @@ func HTTPRequestAsFloat64(r *http.Request, key string, decimalSeparator rune) fl
 	thousandSeparator := Tif(decimalSeparator == ',', '.', ',').(rune)
 
 	return StringAsFloat(s, decimalSeparator, thousandSeparator)
+}
+
+// HTTPJSONBodyToStruct decode json to a given anatomically compatible struct
+func HTTPJSONBodyToStruct(r *http.Request, targetStruct interface{})bool {
+	decoder := json.NewDecoder(r.Body)
+
+	err := decoder.Decode(targetStruct)
+
+	return err == nil
 }
