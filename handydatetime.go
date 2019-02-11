@@ -42,6 +42,15 @@ func DateTimeAsString(dt time.Time, format string) string {
 	return dt.Format(newFormat)
 }
 
+// DateTimeAsString formats time.Time variables as strings, considering the format directive
+func StringAsDateTime(s string, format string) time.Time {
+	goFormat := golangDateTimeFormat(format)
+
+	t,_:=time.Parse(goFormat,s)
+
+	return t
+}
+
 // CheckDate validates a date using the given format
 func CheckDate(format, dateTime string) bool {
 	f := golangDateTimeFormat(format)
