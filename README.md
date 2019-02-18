@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/miguelpragier/handy)](https://goreportcard.com/report/miguelpragier/handy) ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg) ![GitHub](https://img.shields.io/badge/goDoc-Yes!-blue.svg) [![Coverage Status](https://coveralls.io/repos/github/miguelpragier/handy/badge.svg?branch=master)](https://coveralls.io/github/miguelpragier/handy?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/miguelpragier/handy)](https://goreportcard.com/report/miguelpragier/handy) ![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg) ![GitHub](https://img.shields.io/badge/goDoc-Yes!-blue.svg) [![Coverage Status](https://coveralls.io/repos/github/miguelpragier/handy/badge.svg?branch=master)](https://coveralls.io/github/miguelpragier/handy?branch=master) [![cover.run](https://cover.run/go/https:/github.com/miguelpragier/handy.svg?style=flat&tag=golang-1.10)](https://cover.run/go?tag=golang-1.10&repo=https%3A%2Fgithub.com%2Fmiguelpragier%2Fhandy)
 
 # Handy Go utilities
 GO Golang Utilities and helpers like validators, sanitizers and string formatters
@@ -191,3 +191,7 @@ func CheckNewPasswordResult(idiom string, r uint8) string {}
 
 ```
 ---
+
+- [We're here too at LIBHunt](https://go.libhunt.com/handy-alternatives)
+- [We're here too at GOCover](https://gocover.io/github.com/miguelpragier/handy)
+
