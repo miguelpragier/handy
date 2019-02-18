@@ -122,6 +122,9 @@ func InArray(array interface{}, item interface{}) bool {}
 // DateTimeAsString formats time.Time variables as strings, considering the format directive
 func DateTimeAsString(dt time.Time, format string) string {}
 
+// StringAsDateTime converts a date-time string using given format string and return it as time.Time
+func StringAsDateTime(s string, format string) time.Time {}
+
 // CheckDate validates a date using the given format
 func CheckDate(format, dateTime string) bool {
 
