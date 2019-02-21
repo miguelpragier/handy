@@ -1,0 +1,8 @@
+language go
+
+go:
+  - 1.10.x
+  
+notifications:
+  email:
+    on_failure: always
