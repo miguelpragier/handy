@@ -251,6 +251,25 @@ func InArray(array interface{}, item interface{}) bool {
 				return true
 			}
 		}
+
+	case []bool:
+		a, _ := array.([]bool)
+
+		if len(a) < 1 {
+			return false
+		}
+
+		s, ok := item.(bool)
+
+		if !ok {
+			return false
+		}
+
+		for _, x := range a {
+			if x == s {
+				return true
+			}
+		}
 	}
 
 	return false

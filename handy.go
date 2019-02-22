@@ -231,10 +231,10 @@ func StringAsFloat(s string, decimalSeparator, thousandsSeparator rune) float64 
 		return 0.0
 	}
 
-	const BillionLength = 12
+	const maxLength = 20
 
-	if len([]rune(s)) > BillionLength {
-		s = s[0:12]
+	if len([]rune(s)) > maxLength {
+		s = s[0:maxLength]
 	}
 
 	s = strings.Replace(s, string(thousandsSeparator), "", -1)

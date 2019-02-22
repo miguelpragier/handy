@@ -188,7 +188,7 @@ func TestStringAsFloat(t *testing.T) {
 		{"Virgula como decimal Test", "60.42", ',', '.', 6042.000000},
 		{"ERROR TEST", "bla", '.', ',', 00.00},
 		{"empty", "", '.', ',', 0.0},
-		{"my test is a explosion", "1234567891236.00", '.', ',', 123456789123.0},
+		{"my test is a explosion", "1234567891236.00", '.', ',', 1234567891236.0},
 	}
 
 	for _, tc := range tcs {
@@ -256,12 +256,12 @@ func TestTif(t *testing.T) {
 		tifElse        interface{}
 		expectedOutput interface{}
 	}{
-		{"Normal Test", 5 < 10, "true", "false", "true"},
-		{"False", 5 > 10, "true", "false", "false"},
-		{"False with numbers", 5 > 10, 10, 15, 15},
-		{"True with numbers", 5 < 10, 10, 15, 10},
-		{"True with bool", 5 < 10, 5 < 10, 5 > 10, 5 < 10},
-		{"False with bool", 5 > 10, 5 < 10, 5 > 10, 5 > 10},
+		{"Normal Test", true, "true", "false", "true"},
+		{"False", false, "true", "false", "false"},
+		{"False with numbers", false, 10, 15, 15},
+		{"True with numbers", true, 10, 15, 10},
+		{"True with bool", true, true, false, true},
+		{"False with bool", false, true, false, false},
 	}
 
 	for _, tc := range tcs {
@@ -591,16 +591,28 @@ func TestInArray(t *testing.T) {
 		input      interface{}
 		output     bool
 	}{
-		{"int test", []int{40, 50, 35}, 40, true},
-		{"int test false", []int8{40, 50, 35}, int8(47), false},
-		{"int test empty", []int16{}, int16(47), false},
-		{"float test false", []float32{40.5, 50.60, 35.98}, float32(47.5), false},
-		{"float test", []float64{40.5, 50.60, 35.98}, float64(50.60), true},
-		{"float test false", []float64{}, float64(50.60), false},
-		{"string test", []string{"ha", "bla", "cle"}, "bla", true},
-		{"string test false", []string{"ha", "bla", "cle"}, "pla", false},
-		{"string test empty", []string{"", "PLA", "plá"}, "pla", false},
-		{"boolean values test", []bool{true, true, true}, false, false},
+		{"int comparison true", []int{40, 50, 35, 42}, 42, true},
+		{"int comparison false", []int{40, 50, 35, 42}, 24, false},
+		{"int negative comparison true", []int{-42, 40, 50, 35, 42}, -42, true},
+		{"int comparison agains empty array false", []int{}, 42, false},
+		{"int8 comparison false", []int8{40, 50, 35}, int8(42), false},
+		{"int16 comparison true", []int16{41, 42, 43}, int16(42), true},
+		{"int32 comparison true", []int32{41, 42, 43}, int32(42), true},
+		{"int64 comparison false", []int64{14, 41, 43, 44, 45, 46}, int32(42), false},
+		{"float32 comparison true", []float32{40.5, 41.9, 42.1, 42.0, 42.9, 50.60, 35.98}, float32(42), true},
+		{"float64 comparison false", []float64{40.5, 41.9, 42.1, 42.0000001, 42.9, 50.60, 35.98}, float64(42), false},
+		{"uint comparison true", []uint{40, 50, 35, 42}, uint(42), true},
+		{"uint comparison agains empty array false", []uint{}, uint(42), false},
+		{"uint8 comparison false", []uint8{40, 50, 35}, uint8(42), false},
+		{"uint16 comparison true", []uint16{41, 42, 43}, uint16(42), true},
+		{"uint32 comparison true", []uint32{41, 42, 43}, uint32(42), true},
+		{"uint64 comparison false", []uint64{14, 41, 43, 44, 45, 46}, uint32(42), false},
+		{"string comparison true", []string{"ha", "bla", "cle"}, "bla", true},
+		{"string comparison false", []string{"abc", "def", "ghi"}, "jkl", false},
+		{"string case-difference false", []string{"", "abc", "def", "ghi"}, "DEF", false},
+		{"string empty comparison true", []string{"", "abc", "def", "ghi"}, "", true},
+		{"boolean comparison false", []bool{true, true, true}, false, false},
+		{"boolean comparison true", []bool{true, true, true}, true, true},
 	}
 
 	for _, tc := range tcs {
