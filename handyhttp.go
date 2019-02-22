@@ -84,7 +84,7 @@ func HTTPRequestAsFloat64(r *http.Request, key string, decimalSeparator rune) fl
 }
 
 // HTTPJSONBodyToStruct decode json to a given anatomically compatible struct
-func HTTPJSONBodyToStruct(r *http.Request, targetStruct interface{})bool {
+func HTTPJSONBodyToStruct(r *http.Request, targetStruct interface{}) bool {
 	decoder := json.NewDecoder(r.Body)
 
 	err := decoder.Decode(targetStruct)
