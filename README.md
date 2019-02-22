@@ -191,6 +191,7 @@ func CheckNewPasswordResult(idiom string, r uint8) string {}
 ```
 ---
 
-- [We're here too at LIBHunt](https://go.libhunt.com/handy-alternatives)
-- [We're here too at GOCover](https://gocover.io/github.com/miguelpragier/handy)
+- [We're here as well at LIBHunt](https://go.libhunt.com/handy-alternatives)
+- [We're also here at GOCover](https://gocover.io/github.com/miguelpragier/handy)
+- [We're here too at GOLangCI](https://golangci.com/r/github.com/miguelpragier/handy)
 
