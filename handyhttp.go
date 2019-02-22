@@ -15,7 +15,9 @@ func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOp
 
 	if s == "" {
 		vars := mux.Vars(r)
-		ok := false
+
+		var ok bool
+
 		if s, ok = vars[key]; !ok {
 			return ""
 		}
@@ -45,7 +47,9 @@ func HTTPRequestAsInteger(r *http.Request, key string) int {
 
 	if s == "" {
 		vars := mux.Vars(r)
-		ok := false
+
+		var ok bool
+
 		if s, ok = vars[key]; !ok {
 			return 0
 		}
@@ -72,7 +76,9 @@ func HTTPRequestAsFloat64(r *http.Request, key string, decimalSeparator rune) fl
 
 	if s == "" {
 		vars := mux.Vars(r)
-		ok := false
+
+		var ok bool
+
 		if s, ok = vars[key]; !ok {
 			return 0
 		}
