@@ -107,9 +107,6 @@ func Boolean(x interface{}) bool {}
 // Reverse returns the given string written backwards, with letters reversed.
 func Reverse(s string) string {}
 
-// OnlyURL strip all symbols non allowed in URLs and returns the sanitized url.
-func OnlyURL(url string) string {}
-
 // CheckPersonName returns true if the name contains at least two words, one >= 3 chars and one >=2 chars.
 // I understand that this is a particular criteria, but this is the OpenSourceMagic, where you can change and adapt to your own specs.
 func CheckPersonName(name string, acceptEmpty bool) uint8 {}

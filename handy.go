@@ -1,4 +1,4 @@
-// Handy is a toolbelt with utilities and helpers like validators, sanitizers and string formatters
+// Package handy is a toolbelt with utilities and helpers like validators, sanitizers and string formatters.
 // There are routines to filter strings, convert between types, validate passwords with custom rules, easily format dates and much more.
 package handy
 
@@ -141,6 +141,7 @@ func CheckNewPassword(password, passwordConfirmation string, minimumlength uint,
 	return CheckNewPasswordResultOK
 }
 
+//RuneHasSymbol returns true if the given rune contains a symbol
 func RuneHasSymbol(ru rune) bool {
 	allowedSymbols := []rune("!\"#$%&'()*+´-./:;<=>?@[\\]^_`{|}~")
 
@@ -213,7 +214,7 @@ func OnlyLettersAndNumbers(sequence string) string {
 func RandomInt(min, max int) int {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	return rand.Intn(max) + min
+	return rand.Intn(max-min) + min
 }
 
 // CheckPhone returns true if a given sequence has between 9 and 14 digits
@@ -377,7 +378,7 @@ func Transform(s string, maxLen int, transformFlags uint8) string {
 	return s
 }
 
-// Transform reformat given string according parameters, in the order these params were sent
+// TransformSerially reformat given string according parameters, in the order these params were sent
 // Example: TransformSerially("uh lalah 123", 4, TransformFlagOnlyDigits,TransformFlagHash,TransformFlagUpperCase)
 //          First remove non-digits, then hashes string and after make it all uppercase.
 // If maxLen==0, truncation is skipped
@@ -643,4 +644,3 @@ func StringReplaceAll(original string, replacementPairs ...string) string {
 
 	return original
 }
-

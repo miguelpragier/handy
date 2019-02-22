@@ -6,15 +6,14 @@ import (
 	"time"
 )
 
-type TestDefaultTestStruct struct {
+type defaultTestStruct struct {
 	summary        string
 	input          interface{}
 	expectedOutput interface{}
 }
 
 func TestCheckEmail(t *testing.T) {
-
-	testList := []TestDefaultTestStruct{
+	testList := []defaultTestStruct{
 		{"send empty string", "", false},
 		{"send invalid address", "email-gmail.com", false},
 		{"send valid address", "email@gmail.com", true},
@@ -26,135 +25,6 @@ func TestCheckEmail(t *testing.T) {
 
 			if tr != tst.expectedOutput {
 				t.Errorf("Test has failed!\n\tEmail: %s, \n\tExpected: %s", tst.input, tst.expectedOutput)
-			}
-		})
-	}
-}
-
-func TestCheckPersonName(t *testing.T) {
-	type TestStructForCheckPersonName struct {
-		summary        string
-		name           string
-		acceptEmpty    bool
-		expectedOutput uint8
-	}
-
-	testlist := []TestStructForCheckPersonName{
-		{"Only two letters", "T S", false, CheckPersonNameResultTooSimple},
-		{"only four letters", "AB CD", false, CheckPersonNameResultTooSimple},
-		{"five letters with non-ascii runes", "ça vá", false, CheckPersonNameResultTooSimple},
-		{"mixing letters and numbers", "W0RDS W1TH NUMB3RS", false, CheckPersonNameResultPolluted},
-		{"Sending and accepting empty string", "", true, CheckPersonNameResultOK},
-		{"Sending spaces-only string and accepting empty", "     ", true, CheckPersonNameResultOK},
-		{"Sending but not accepting empty string", " ", false, CheckPersonNameResultTooShort},
-		{"Sending spaces-only string and refusing empty", "     ", false, CheckPersonNameResultTooShort},
-		{"Sending numbers, expecting false", " 5454 ", true, CheckPersonNameResultPolluted},
-		{"OneWorded string", "ONEWORD", false, CheckPersonNameResultTooFewWords},
-		{"Minimum acceptable", "AB CDE", false, CheckPersonNameResultOK},
-		{"Non-ascii stuff", "ÑÔÑÀSÇÏÏ ÇÃO ÀË", false, CheckPersonNameResultOK},
-		{"Words with symbols. Expecting true", "WORDS-WITH SYMBOLS'", false, CheckPersonNameResultOK},
-		{"Words with symbols. Expecting false", "WORDS WITH SYMBOLS`", false, CheckPersonNameResultPolluted},
-		{"less than two letters", "a", false, CheckPersonNameResultTooFewWords},
-		{"Sending numbers, expecting false", "5454", false, CheckPersonNameResultPolluted},
-	}
-
-	for _, tst := range testlist {
-		t.Run(tst.summary, func(t *testing.T) {
-			tr := CheckPersonName(tst.name, tst.acceptEmpty)
-
-			if tr != tst.expectedOutput {
-				t.Errorf("Test has failed!\n\tName: %s\n\tAcceptEmpty: %t, \n\tExpected: %d, \n\tGot: %d,", tst.name, tst.acceptEmpty, tst.expectedOutput, tr)
-			}
-		})
-	}
-}
-
-func TestCheckCPF(t *testing.T) {
-	testlist := []TestDefaultTestStruct{
-		{"send empty string", "", false},
-		{"send wrong length string (10)", "153.255.555.4", false},
-		{"send wrong length string (12)", "153.255.555.455", false},
-		{"send cheating cpf", "55555555555", false},
-		{"send invalid string", "153.278.966.A6", false},
-		{"send alright string", "03818534110", true},
-		{"send wrong cpf", "12345678910", false},
-	}
-
-	for _, tst := range testlist {
-		t.Run(tst.summary, func(t *testing.T) {
-			tr := CheckCPF(tst.input.(string))
-
-			if tr != tst.expectedOutput {
-				t.Errorf("Test has failed!\n\tCPF: %s,\n\tExpected: %t,\n\tGot: %t", tst.input, tst.expectedOutput, tr)
-			}
-		})
-	}
-}
-
-func TestCheckCNPJ(t *testing.T) {
-	testlist := []TestDefaultTestStruct{
-		{"send empty string", "", false},
-		{"send wrong length string (13)", "88.015.315/0001-5", false},
-		{"send wrong length string (15)", "88.015.315/0001-5003", false},
-		{"send cheating cnpj", "55555555555555", false},
-		{"send invalid string", "88.015.315/0001-5A", false},
-		{"send alright string with punctuation", "88.015.315/0001-53", true},
-		{"send alright string", "88015315000153", true},
-	}
-
-	for _, tst := range testlist {
-		t.Run(tst.summary, func(t *testing.T) {
-			tr := CheckCNPJ(tst.input.(string))
-
-			if tr != tst.expectedOutput {
-				t.Errorf("Test has failed!\n\tCNPJ: %s,\n\tExpected: %t, \n\tGot: %t", tst.input, tst.expectedOutput, tr)
-			}
-		})
-	}
-}
-
-func TestCheckDate(t *testing.T) {
-	type TestStructForCheckDate struct {
-		summary        string
-		format         string
-		date           string
-		expectedOutput bool
-	}
-
-	testlist := []TestStructForCheckDate{
-		{"empty string", "", "", false},
-		{"invalid date", "2006-01-02", "2018-02-29", false},
-		{"invalid date", "2006-01-02", "2018-13-01", false},
-		{"invalid date", "2006-01-02", "2018-12-32", false},
-		{"valid date 1", "2006-01-02", "2018-12-31", true},
-		{"valid date 2", "20060102", "20180101", true},
-		{"invalid date format 1", "20060102", "2018-01-01", false},
-		{"invalid date format 1", "2006-01-02", "20180201", false},
-	}
-
-	for _, tst := range testlist {
-		t.Run(tst.summary, func(t *testing.T) {
-			tr := CheckDate(tst.format, tst.date)
-
-			if tr != tst.expectedOutput {
-				t.Errorf("Test has failed!\n\tDate: %s,\n\tExpected: %t, \n\tGot: %t, \n\tFormat: %s", tst.date, tst.expectedOutput, tr, tst.format)
-			}
-		})
-	}
-}
-
-func TestAmountAsWord(t *testing.T) {
-	testlist := []TestDefaultTestStruct{
-		{"zero", 0, "zero"},
-		{"-125", -125, "menos cento e vinte e cinco"},
-		{"-987654321", -987654321, "menos novecentos e oitenta e sete milhões seicentos e cinquenta e quatro mil trezentos e vinte e um"},
-	}
-	for _, tst := range testlist {
-		t.Run(tst.summary, func(t *testing.T) {
-			tr := AmountAsWord(int64(tst.input.(int)))
-
-			if tr != tst.expectedOutput {
-				t.Errorf("Test has failed!\n\tInput: %d,\n\tExpected: %s, \n\tGot: %s", tst.input, tst.expectedOutput, tr)
 			}
 		})
 	}
@@ -199,7 +69,7 @@ func TestCheckNewPassword(t *testing.T) {
 }
 
 func TestStringHash(t *testing.T) {
-	testcases := []TestDefaultTestStruct{
+	testcases := []defaultTestStruct{
 		{"Normal Test", "Handy", "E80649A6418B6C24FCCB199DAB7CB5BD6EC37593EA0285D52D717FCC7AEE5FB3"},
 		{"string with number", "123456", "8D969EEF6ECAD3C29A3A629280E686CF0C3F5D5A86AFF3CA12020C923ADC6C92"},
 		{"mashup", "Handy12345", "C82333DB3A6D91F98BE188C6C7B928DF4960B9EC3F3EB8CB50293368C673BE3D"},
@@ -218,7 +88,7 @@ func TestStringHash(t *testing.T) {
 }
 
 func TestOnlyLetters(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"empty", "", ""},
 		{"only letters", "haoplhu", "haoplhu"},
 		{"letters and numbers", "hlo1234", "hlo"},
@@ -240,7 +110,7 @@ func TestOnlyLetters(t *testing.T) {
 }
 
 func TestOnlyDigits(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"empty", "", ""},
 		{"only letters", "haoplhu", ""},
 		{"letters and numbers", "hlo1234", "1234"},
@@ -262,7 +132,7 @@ func TestOnlyDigits(t *testing.T) {
 }
 
 func TestOnlyLettersAndNumbers(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"empty", "", ""},
 		{"only letters", "haoplhu", "haoplhu"},
 		{"letters and numbers", "hlo1234", "hlo1234"},
@@ -305,30 +175,6 @@ func TestRandomInt(t *testing.T) {
 	}
 }
 
-func TestCheckPhone(t *testing.T) {
-	tcs := []struct {
-		summary        string
-		input          string
-		allowEmpty     bool
-		expectedOutput bool
-	}{
-		{"Normal input", "948034118", false, true},
-		{"Empty return false", "", false, false},
-		{"Empty allowing empty", "", true, true},
-		{"Normal input but allowing empty", "948034118", true, true},
-		{"invalid input", "48034118", false, false},
-	}
-
-	for _, tc := range tcs {
-		t.Run(tc.summary, func(t *testing.T) {
-			tr := CheckPhone(tc.input, tc.allowEmpty)
-			if tr != tc.expectedOutput {
-				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %s\n\tAllowEmpty: %t", tc.expectedOutput, tr, tc.input, tc.allowEmpty)
-			}
-		})
-	}
-}
-
 func TestStringAsFloat(t *testing.T) {
 	tcs := []struct {
 		summary           string
@@ -356,7 +202,7 @@ func TestStringAsFloat(t *testing.T) {
 }
 
 func TestStringAsInteger(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"default test", "30", 30},
 		{"negative", "-30", -30},
 		{"double", "30.5", 0},
@@ -478,35 +324,6 @@ func TestTransform(t *testing.T) {
 	for _, tc := range tcs {
 		t.Run(tc.summary, func(t *testing.T) {
 			tr := Transform(tc.input, tc.max, tc.flags)
-
-			if tr != tc.expectedOutput {
-				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\tflags: %d", tc.expectedOutput, tr, tc.input, tc.max, tc.flags)
-			}
-		})
-	}
-}
-
-func TestTransformSerially(t *testing.T) {
-	tcs := []struct {
-		summary        string
-		input          string
-		max            int
-		flags          []uint8
-		expectedOutput string
-	}{
-		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformNone}, "The Go programming l"},
-		{"with trim and lowercase", "   The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagTrim, TransformFlagLowerCase}, "the go programming l"},
-		{"with lower case and only letters", "The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagLowerCase, TransformFlagOnlyLetters}, "thegoprogramminglang"},
-		{"with Only Hash and letters", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagHash, TransformFlagOnlyLetters}, "eefecebcfdbceccbbbcb"},
-		{"without string", "", 20, []uint8{TransformNone}, ""},
-		{"Only letters and numbers", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagOnlyLettersAndDigits}, "TheGoisthe1ºprogramm"},
-		{"Only numbers", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagOnlyDigits}, "1"},
-		{"Go Upper!", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagUpperCase}, "THE GO IS THE 1º! PR"},
-	}
-
-	for _, tc := range tcs {
-		t.Run(tc.summary, func(t *testing.T) {
-			tr := TransformSerially(tc.input, tc.max, tc.flags...)
 
 			if tr != tc.expectedOutput {
 				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\tflags: %d", tc.expectedOutput, tr, tc.input, tc.max, tc.flags)
@@ -672,7 +489,7 @@ func TestIsNumericType(t *testing.T) {
 }
 
 func TestBit(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"normal test", 0, uint8(0)},
 		{"normal test with 1", 1, uint8(1)},
 		{"String", "ha", uint8(0)},
@@ -690,7 +507,7 @@ func TestBit(t *testing.T) {
 }
 
 func TestBoolean(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"normal test", 0, false},
 		{"normal test with 1", 1, true},
 		{"String", "ha", false},
@@ -711,7 +528,7 @@ func TestBoolean(t *testing.T) {
 }
 
 func TestReverse(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"normal test", "Miguel", "leugiM"},
 		{"2 chars", "Fe", "eF"},
 		{"With spaces", "Lorem ipsum nibh sem laoreet taciti mattis neque ut, ornare cursus aenean inceptos suspendisse est hac hendrerit malesuada, luctus malesuada sit maecenas lorem arcu justo.", ".otsuj ucra merol saneceam tis adauselam sutcul ,adauselam tirerdneh cah tse essidnepsus sotpecni naenea susruc eranro ,tu euqen sittam iticat teeroal mes hbin muspi meroL"},
@@ -724,6 +541,218 @@ func TestReverse(t *testing.T) {
 			tr := Reverse(tc.input.(string))
 			if tr != tc.expectedOutput {
 				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
+
+func TestCheckPersonName(t *testing.T) {
+	type TestStructForCheckPersonName struct {
+		summary        string
+		name           string
+		acceptEmpty    bool
+		expectedOutput uint8
+	}
+
+	testlist := []TestStructForCheckPersonName{
+		{"Only two letters", "T S", false, CheckPersonNameResultTooSimple},
+		{"only four letters", "AB CD", false, CheckPersonNameResultTooSimple},
+		{"five letters with non-ascii runes", "ça vá", false, CheckPersonNameResultTooSimple},
+		{"mixing letters and numbers", "W0RDS W1TH NUMB3RS", false, CheckPersonNameResultPolluted},
+		{"Sending and accepting empty string", "", true, CheckPersonNameResultOK},
+		{"Sending spaces-only string and accepting empty", "     ", true, CheckPersonNameResultOK},
+		{"Sending but not accepting empty string", " ", false, CheckPersonNameResultTooShort},
+		{"Sending spaces-only string and refusing empty", "     ", false, CheckPersonNameResultTooShort},
+		{"Sending numbers, expecting false", " 5454 ", true, CheckPersonNameResultPolluted},
+		{"OneWorded string", "ONEWORD", false, CheckPersonNameResultTooFewWords},
+		{"Minimum acceptable", "AB CDE", false, CheckPersonNameResultOK},
+		{"Non-ascii stuff", "ÑÔÑÀSÇÏÏ ÇÃO ÀË", false, CheckPersonNameResultOK},
+		{"Words with symbols. Expecting true", "WORDS-WITH SYMBOLS'", false, CheckPersonNameResultOK},
+		{"Words with symbols. Expecting false", "WORDS WITH SYMBOLS`", false, CheckPersonNameResultPolluted},
+		{"less than two letters", "a", false, CheckPersonNameResultTooFewWords},
+		{"Sending numbers, expecting false", "5454", false, CheckPersonNameResultPolluted},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckPersonName(tst.name, tst.acceptEmpty)
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tName: %s\n\tAcceptEmpty: %t, \n\tExpected: %d, \n\tGot: %d,", tst.name, tst.acceptEmpty, tst.expectedOutput, tr)
+			}
+		})
+	}
+}
+
+func TestInArray(t *testing.T) {
+	tcs := []struct {
+		summary    string
+		inputArray interface{}
+		input      interface{}
+		output     bool
+	}{
+		{"int test", []int{40, 50, 35}, 40, true},
+		{"int test false", []int8{40, 50, 35}, int8(47), false},
+		{"int test empty", []int16{}, int16(47), false},
+		{"float test false", []float32{40.5, 50.60, 35.98}, float32(47.5), false},
+		{"float test", []float64{40.5, 50.60, 35.98}, float64(50.60), true},
+		{"float test false", []float64{}, float64(50.60), false},
+		{"string test", []string{"ha", "bla", "cle"}, "bla", true},
+		{"string test false", []string{"ha", "bla", "cle"}, "pla", false},
+		{"string test empty", []string{"", "PLA", "plá"}, "pla", false},
+		{"boolean values test", []bool{true, true, true}, false, false},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := InArray(tc.inputArray, tc.input)
+
+			if tr != tc.output {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tarray: %#v, \n\tItem: %v", tc.output, tr, tc.inputArray, tc.input)
+			}
+		})
+	}
+}
+
+func TestCheckCPF(t *testing.T) {
+	testlist := []defaultTestStruct{
+		{"send empty string", "", false},
+		{"send wrong length string (10)", "153.255.555.4", false},
+		{"send wrong length string (12)", "153.255.555.455", false},
+		{"send cheating cpf", "55555555555", false},
+		{"send invalid string", "153.278.966.A6", false},
+		{"send alright string", "03818534110", true},
+		{"send wrong cpf", "12345678910", false},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckCPF(tst.input.(string))
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tCPF: %s,\n\tExpected: %t,\n\tGot: %t", tst.input, tst.expectedOutput, tr)
+			}
+		})
+	}
+}
+
+func TestCheckCNPJ(t *testing.T) {
+	testlist := []defaultTestStruct{
+		{"send empty string", "", false},
+		{"send wrong length string (13)", "88.015.315/0001-5", false},
+		{"send wrong length string (15)", "88.015.315/0001-5003", false},
+		{"send cheating cnpj", "55555555555555", false},
+		{"send invalid string", "88.015.315/0001-5A", false},
+		{"send alright string with punctuation", "88.015.315/0001-53", true},
+		{"send alright string", "88015315000153", true},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckCNPJ(tst.input.(string))
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tCNPJ: %s,\n\tExpected: %t, \n\tGot: %t", tst.input, tst.expectedOutput, tr)
+			}
+		})
+	}
+}
+
+func TestCheckDate(t *testing.T) {
+	type TestStructForCheckDate struct {
+		summary        string
+		format         string
+		date           string
+		expectedOutput bool
+	}
+
+	testlist := []TestStructForCheckDate{
+		{"empty string", "", "", false},
+		{"invalid date", "2006-01-02", "2018-02-29", false},
+		{"invalid date", "2006-01-02", "2018-13-01", false},
+		{"invalid date", "2006-01-02", "2018-12-32", false},
+		{"valid date 1", "2006-01-02", "2018-12-31", true},
+		{"valid date 2", "20060102", "20180101", true},
+		{"invalid date format 1", "20060102", "2018-01-01", false},
+		{"invalid date format 1", "2006-01-02", "20180201", false},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := CheckDate(tst.format, tst.date)
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tDate: %s,\n\tExpected: %t, \n\tGot: %t, \n\tFormat: %s", tst.date, tst.expectedOutput, tr, tst.format)
+			}
+		})
+	}
+}
+
+func TestAmountAsWord(t *testing.T) {
+	testlist := []defaultTestStruct{
+		{"zero", 0, "zero"},
+		{"-125", -125, "menos cento e vinte e cinco"},
+		{"-987654321", -987654321, "menos novecentos e oitenta e sete milhões seicentos e cinquenta e quatro mil trezentos e vinte e um"},
+	}
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			tr := AmountAsWord(int64(tst.input.(int)))
+
+			if tr != tst.expectedOutput {
+				t.Errorf("Test has failed!\n\tInput: %d,\n\tExpected: %s, \n\tGot: %s", tst.input, tst.expectedOutput, tr)
+			}
+		})
+	}
+}
+
+func TestCheckPhone(t *testing.T) {
+	tcs := []struct {
+		summary        string
+		input          string
+		allowEmpty     bool
+		expectedOutput bool
+	}{
+		{"Normal input", "948034118", false, true},
+		{"Empty return false", "", false, false},
+		{"Empty allowing empty", "", true, true},
+		{"Normal input but allowing empty", "948034118", true, true},
+		{"invalid input", "48034118", false, false},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := CheckPhone(tc.input, tc.allowEmpty)
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tInput: %s\n\tAllowEmpty: %t", tc.expectedOutput, tr, tc.input, tc.allowEmpty)
+			}
+		})
+	}
+}
+
+func TestTransformSerially(t *testing.T) {
+	tcs := []struct {
+		summary        string
+		input          string
+		max            int
+		flags          []uint8
+		expectedOutput string
+	}{
+		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformNone}, "The Go programming l"},
+		{"with trim and lowercase", "   The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagTrim, TransformFlagLowerCase}, "the go programming l"},
+		{"with lower case and only letters", "The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagLowerCase, TransformFlagOnlyLetters}, "thegoprogramminglang"},
+		{"with Only Hash and letters", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagHash, TransformFlagOnlyLetters}, "eefecebcfdbceccbbbcb"},
+		{"without string", "", 20, []uint8{TransformNone}, ""},
+		{"Only letters and numbers", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagOnlyLettersAndDigits}, "TheGoisthe1ºprogramm"},
+		{"Only numbers", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagOnlyDigits}, "1"},
+		{"Go Upper!", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagUpperCase}, "THE GO IS THE 1º! PR"},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := TransformSerially(tc.input, tc.max, tc.flags...)
+
+			if tr != tc.expectedOutput {
+				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %s, \n\tInput: %s, \n\tlimit: %d, \n\tflags: %d", tc.expectedOutput, tr, tc.input, tc.max, tc.flags)
 			}
 		})
 	}
@@ -748,35 +777,6 @@ func TestStringReplaceAll(t *testing.T) {
 
 			if tr != tc.output {
 				t.Errorf("Error! Expected: %s, Got: %s, Input: %s, Pairs: %s", tc.output, tr, tc.input, tc.pairs)
-			}
-		})
-	}
-}
-
-func TestInArray(t *testing.T) {
-	tcs := []struct {
-		summary    string
-		inputArray []interface{}
-		input      interface{}
-		output     bool
-	}{
-		{"int test", []interface{}{40, 50, 35}, int(40), true},
-		{"int test false", []interface{}{40, 50, 35}, int8(47), false},
-		{"int test empty", []interface{}{}, int16(47), false},
-		{"float test false", []interface{}{40.5, 50.60, 35.98}, float32(47.5), false},
-		{"float test", []interface{}{40.5, 50.60, 35.98}, float64(50.60), true},
-		{"float test false", []interface{}{}, float64(50.60), false},
-		{"string test", []interface{}{"ha", "bla", "cle"}, string("bla"), true},
-		{"string test false", []interface{}{"ha", "bla", "cle"}, string("pla"), false},
-		{"string test empty", []interface{}{}, string("pla"), false},
-	}
-
-	for _, tc := range tcs {
-		t.Run(tc.summary, func(t *testing.T) {
-			tr := InArray(tc.inputArray, tc.input)
-
-			if tr != tc.output {
-				t.Errorf("Test has failed!\n\tExpected: %t, \n\tGot: %t, \n\tarray: %#v, \n\tItem: %v", tc.output, tr, tc.inputArray, tc.input)
 			}
 		})
 	}
@@ -870,7 +870,7 @@ func TestDateTimeAsString(t *testing.T) {
 }
 
 func TestCheckDateYMD(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"normal test", "20181031", true},
 		{"test with another format", "31102018", false},
 	}
@@ -910,7 +910,7 @@ func TestYMDasDateUTC(t *testing.T) {
 }
 
 func TestYMDasDate(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"normal test", "20181031", time.Date(2018, 10, 31, 00, 00, 00, 0, time.UTC)},
 		{"test with another format", "31102018", time.Date(0001, 01, 01, 00, 00, 00, 0, time.UTC)},
 	}
@@ -971,7 +971,7 @@ func TestElapsedYears(t *testing.T) {
 }
 
 func TestYearsAge(t *testing.T) {
-	tcs := []TestDefaultTestStruct{
+	tcs := []defaultTestStruct{
 		{"normal test", time.Date(2018, 10, 31, 00, 00, 00, 0, time.UTC), 0},
 		{"test with another format", time.Date(1995, 10, 31, 00, 00, 00, 0, time.UTC), 23},
 	}
