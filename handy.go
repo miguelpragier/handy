@@ -14,7 +14,7 @@ import (
 	"unicode/utf8"
 )
 
-func init(){
+func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
