@@ -14,6 +14,10 @@ import (
 	"unicode/utf8"
 )
 
+func init(){
+	rand.Seed(time.Now().UTC().UnixNano())
+}
+
 // CheckEmail returns true if the given sequence is a valid email address
 // See https://tools.ietf.org/html/rfc2822#section-3.4.1 for details about email address anatomy
 func CheckEmail(email string) bool {
@@ -212,7 +216,7 @@ func OnlyLettersAndNumbers(sequence string) string {
 
 // RandomInt returns a rondom integer within the given (inclusive) range
 func RandomInt(min, max int) int {
-	rand.Seed(time.Now().UTC().UnixNano())
+	//rand.Seed(time.Now().UTC().UnixNano())
 
 	return rand.Intn(max-min) + min
 }

@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var lastDayArray=[]int{31,29,31,30,31,30,31,31,30,31,30,31}
+
 // golangDateFormat translate handy's arbitrary date format to Go's eccentric format
 func golangDateTimeFormat(format string) string {
 	if format == "" {
@@ -117,4 +119,17 @@ func ElapsedYears(from, to time.Time) int {
 // YearsAge returns the number of years past since a given date
 func YearsAge(birthdate time.Time) int {
 	return ElapsedYears(birthdate, time.Now())
+}
+
+// MonthLastDay returns the last day of month, considering the year for cover february in leap years
+func MonthLastDay(year int, month int) int{
+	if month!=2{
+		return lastDayArray[month]
+	}
+
+	if ( ( year % 4 == 0 ) && ( year % 100 != 0 ) ) || ( year % 400 == 0 ){
+		return 29
+	}
+
+	return 28
 }
