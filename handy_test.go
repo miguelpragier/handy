@@ -1,6 +1,7 @@
 package handy
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -994,6 +995,60 @@ func TestYearsAge(t *testing.T) {
 
 			if tr != tc.expectedOutput {
 				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %v, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+			}
+		})
+	}
+}
+
+func TestArrayDifference(t *testing.T) {
+	type arrayDiffTestStruct struct {
+		summary        string
+		inputA         []int
+		inputB         []int
+		expectedOutput []int
+	}
+
+	ts := []arrayDiffTestStruct{
+		{"difference from a to b", []int{1,2,3,4,5,6},[]int{5,6,7,8,9,0},[]int{1,2,3,4,7,8,9}},
+		{"difference from b to a", []int{5,6,7,8,9,0},[]int{1,2,3,4,5,6},[]int{7,8,9,0,1,2,3,4}},
+		{"empty difference", []int{101,1007,5009,10128,-15},[]int{101,1007,5009,10128,-15},[]int{}},
+		{"empty slices comparison", []int{},[]int{},[]int{}},
+		{"comparing a with empty b", []int{-1,3,4,500},[]int{},[]int{-1,3,4,500}},
+	}
+
+	for _, tc := range ts {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := ArrayDifference(tc.inputA,tc.inputB)
+
+			if fmt.Sprint( tr) != fmt.Sprint( tc.expectedOutput) {
+				t.Errorf("Test has failed!\n\tExpected: %v, \n\tGot: %v, \n", tc.expectedOutput, tr)
+			}
+		})
+	}
+}
+
+func TestArrayDifferenceAtoB(t *testing.T) {
+	type arrayDiffTestStruct struct {
+		summary        string
+		inputA         []int
+		inputB         []int
+		expectedOutput []int
+	}
+
+	ts := []arrayDiffTestStruct{
+		{"difference from a to b", []int{1,2,3,4,5,6},[]int{5,6,7,8,9,0},[]int{1,2,3,4}},
+		{"difference from b to a", []int{5,6,7,8,9,0},[]int{1,2,3,4,5,6},[]int{7,8,9,0}},
+		{"empty difference", []int{101,1007,5009,10128,-15},[]int{101,1007,5009,10128,-15},[]int{}},
+		{"empty slices comparison", []int{},[]int{},[]int{}},
+		{"comparing a with empty b", []int{-1,3,4,500},[]int{},[]int{-1,3,4,500}},
+	}
+
+	for _, tc := range ts {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := ArrayDifferenceAtoB(tc.inputA,tc.inputB)
+
+			if fmt.Sprint( tr) != fmt.Sprint( tc.expectedOutput) {
+				t.Errorf("Test has failed!\n\tExpected: %v, \n\tGot: %v, \n", tc.expectedOutput, tr)
 			}
 		})
 	}
