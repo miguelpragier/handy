@@ -16,7 +16,7 @@ func CheckCPF(cpf string) bool {
 	}
 
 	// Sanitiza a string de modo agressivo, retirando qualquer runa que não seja dígito
-	re, _ := regexp.Compile("[\\D]")
+	re, _ := regexp.Compile(`[\D]`)
 
 	cpf = re.ReplaceAllString(cpf, "")
 
@@ -69,7 +69,7 @@ func CheckCNPJ(cnpj string) bool {
 
 	algs := []int{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
 
-	algProdCpfDig1 := make([]int, 12, 12)
+	algProdCpfDig1 := make([]int, 12)
 
 	for key, val := range algs {
 		intParsed, _ := strconv.Atoi(string(cnpj[key]))
@@ -99,7 +99,7 @@ func CheckCNPJ(cnpj string) bool {
 
 	algs = append([]int{6}, algs...)
 
-	var algProdCpfDig2 = make([]int, 13, 13)
+	var algProdCpfDig2 = make([]int, 13)
 
 	for key, val := range algs {
 		intParsed, _ := strconv.Atoi(string(cnpj[key]))
@@ -123,11 +123,7 @@ func CheckCNPJ(cnpj string) bool {
 
 	char13, _ := strconv.Atoi(string(cnpj[13]))
 
-	if char13 != digit2 {
-		return false
-	}
-
-	return true
+	return char13 == digit2
 }
 
 // AmountAsWord receives an int64 e returns the value as its text representation
@@ -154,6 +150,8 @@ func AmountAsWord(n int64) string {
 		mil       = 1000
 		cem       = 100
 		vinte     = 20
+
+		conjuncaoE = " e "
 	)
 
 	if n < vinte {
@@ -170,7 +168,7 @@ func AmountAsWord(n int64) string {
 		e := " "
 
 		if resto > 0 {
-			e = " e "
+			e = conjuncaoE
 		}
 
 		return strings.Replace(fmt.Sprintf("%s%s%s%s", menos, a[quantos], e, AmountAsWord(resto)), "  ", " ", -1)
@@ -188,7 +186,7 @@ func AmountAsWord(n int64) string {
 		e := " "
 
 		if resto > 0 {
-			e = " e "
+			e = conjuncaoE
 		}
 
 		return strings.Replace(fmt.Sprintf("%s%s%s%s", menos, a[quantos], e, AmountAsWord(resto)), "  ", " ", -1)
@@ -204,7 +202,7 @@ func AmountAsWord(n int64) string {
 		e := " "
 
 		if (resto > 0) && (resto < cem) {
-			e = " e "
+			e = conjuncaoE
 		}
 
 		return strings.Replace(fmt.Sprintf("%s%s mil %s%s", menos, AmountAsWord(quantos), e, AmountAsWord(resto)), "  ", " ", -1)
@@ -246,7 +244,7 @@ func AmountAsWord(n int64) string {
 		}
 
 		if (resto > 0) && (resto < mil) {
-			e = " e "
+			e = conjuncaoE
 		}
 
 		return strings.Replace(fmt.Sprintf("%s%s%s%s%s", menos, AmountAsWord(quantos), u, e, AmountAsWord(resto)), "  ", " ", -1)

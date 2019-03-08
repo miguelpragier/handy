@@ -159,10 +159,13 @@ func RuneHasSymbol(ru rune) bool {
 }
 
 // StringHash simply generates a SHA256 hash from the given string
+// In case of error, return ""
 func StringHash(s string) string {
 	h := sha256.New()
 
-	h.Write([]byte(s))
+	if _, err := h.Write([]byte(s)); err != nil {
+		return ""
+	}
 
 	sum := h.Sum(nil)
 
@@ -177,7 +180,7 @@ func OnlyLetters(sequence string) string {
 
 	var letters []rune
 
-	for _, r := range []rune(sequence) {
+	for _, r := range sequence {
 		if unicode.IsLetter(r) {
 			letters = append(letters, r)
 		}
@@ -189,7 +192,7 @@ func OnlyLetters(sequence string) string {
 // OnlyDigits returns only the numbers from the given string, after strip all the rest ( letters, spaces, etc. )
 func OnlyDigits(sequence string) string {
 	if utf8.RuneCountInString(sequence) > 0 {
-		re, _ := regexp.Compile("[\\D]")
+		re, _ := regexp.Compile(`[\D]`)
 
 		sequence = re.ReplaceAllString(sequence, "")
 	}
@@ -203,20 +206,29 @@ func OnlyLettersAndNumbers(sequence string) string {
 		return ""
 	}
 
-	var aplhanumeric []rune
+	var alphanumeric []rune
 
 	for _, r := range []rune(sequence) {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
-			aplhanumeric = append(aplhanumeric, r)
+			alphanumeric = append(alphanumeric, r)
 		}
 	}
 
-	return string(aplhanumeric)
+	return string(alphanumeric)
 }
 
-// RandomInt returns a rondom integer within the given (inclusive) range
+// RandomInt returns a random integer within the given (inclusive) range
 func RandomInt(min, max int) int {
 	//rand.Seed(time.Now().UTC().UnixNano())
+
+	return rand.Intn(max-min) + min
+}
+
+// RandomReseed restarts the randonSeeder and returns a random integer within the given (inclusive) range
+func RandomReseed(min, max int) int {
+	x := time.Now().UTC().UnixNano() + int64(rand.Int())
+
+	rand.Seed(x)
 
 	return rand.Intn(max-min) + min
 }
@@ -437,7 +449,7 @@ func HasOnlyNumbers(sequence string) bool {
 		return false
 	}
 
-	for _, r := range []rune(sequence) {
+	for _, r := range sequence {
 		if !unicode.IsDigit(r) {
 			return false
 		}
@@ -452,7 +464,7 @@ func HasOnlyLetters(sequence string) bool {
 		return false
 	}
 
-	for _, r := range []rune(sequence) {
+	for _, r := range sequence {
 		if !unicode.IsLetter(r) {
 			return false
 		}
@@ -592,7 +604,7 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {
 	}
 
 	// Person names doesn't accept other than letters, spaces and single quotes
-	for _, r := range []rune(name) {
+	for _, r := range name {
 		if !unicode.IsLetter(r) && r != ' ' && r != '\'' && r != '-' {
 			return CheckPersonNameResultPolluted
 		}

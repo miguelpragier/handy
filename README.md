@@ -15,8 +15,11 @@ Documentation :green_book:|
 [GoDocs](https://godoc.org/github.com/miguelpragier/handy)|
 ___
 
-### Quality
--- [GoCover](https://gocover.io/github.com/miguelpragier/handy)
+___
+Quality :point_left:      |
+--------------------------|
+[GoCover](https://gocover.io/github.com/miguelpragier/handy)|
+___
 
 
 # Functions
@@ -115,6 +118,13 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {}
 // This func resides here alone only because its long size.
 // TODO Embrace/comprise all native scalar/primitive types
 func InArray(array interface{}, item interface{}) bool {}
+
+// ArrayDifferenceAtoB returns the items from A that doesn't exist in B
+func ArrayDifferenceAtoB(a, b []int) []int {}
+
+// ArrayDifference returns all items that doesn't exist in both given arrays
+func ArrayDifference(a, b []int) []int {}
+
 
 /* DateTime Routines */
 
