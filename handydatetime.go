@@ -44,6 +44,13 @@ func DateTimeAsString(dt time.Time, format string) string {
 	return dt.Format(newFormat)
 }
 
+// NowAsString formats time.Now() as string, considering the format directive
+func NowAsString(format string) string {
+	newFormat := golangDateTimeFormat(format)
+
+	return time.Now().Format(newFormat)
+}
+
 // StringAsDateTime formats time.Time variables as strings, considering the format directive
 func StringAsDateTime(s string, format string) time.Time {
 	goFormat := golangDateTimeFormat(format)
