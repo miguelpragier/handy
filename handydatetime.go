@@ -51,6 +51,39 @@ func NowAsString(format string) string {
 	return time.Now().Format(newFormat)
 }
 
+// Today returns today's date at zero hours, minutes, seconds, etc.
+// It returns a time and a yyyy-mm-dd formated string
+func Today() (time.Time, string) {
+	newFormat := golangDateTimeFormat("yyyy-mm-dd")
+
+	t := time.Now()
+	y := t.Year()
+	m := t.Month()
+	d := t.Day()
+
+	return time.Date(y, m, d, 0, 0, 0, 0, time.Local), t.Format(newFormat)
+}
+
+// Todayf returns today's date at zero hours, minutes, seconds, etc.
+// It returns a time and a custom formated string
+func Todayf(format string) (time.Time, string) {
+	newFormat := golangDateTimeFormat(format)
+
+	t := time.Now()
+	y := t.Year()
+	m := t.Month()
+	d := t.Day()
+
+	return time.Date(y, m, d, 0, 0, 0, 0, time.Local), t.Format(newFormat)
+}
+
+// YMD returns today's date tokenized as year, month and day of month
+func YMD() (int, int, int) {
+	t := time.Now()
+
+	return t.Year(), int(t.Month()), t.Day()
+}
+
 // StringAsDateTime formats time.Time variables as strings, considering the format directive
 func StringAsDateTime(s string, format string) time.Time {
 	goFormat := golangDateTimeFormat(format)
