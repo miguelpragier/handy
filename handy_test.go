@@ -160,9 +160,9 @@ func TestRandomInt(t *testing.T) {
 		min     int
 		max     int
 	}{
-		{"normal test", int(10), int(20)},
-		{"big range", int(10), int(1000)},
-		{"negative", int(-10), int(1000)},
+		{"normal test", 10, 20},
+		{"big range", 10, 1000},
+		{"negative", -10, 1000},
 	}
 
 	for _, tc := range tcs {
