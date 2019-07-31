@@ -306,7 +306,7 @@ func TestTransform(t *testing.T) {
 		summary        string
 		input          string
 		max            int
-		flags          uint8
+		flags          uint
 		expectedOutput string
 	}{
 		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, TransformNone, "The Go programming l"},
@@ -547,44 +547,6 @@ func TestReverse(t *testing.T) {
 	}
 }
 
-func TestCheckPersonName(t *testing.T) {
-	type TestStructForCheckPersonName struct {
-		summary        string
-		name           string
-		acceptEmpty    bool
-		expectedOutput uint8
-	}
-
-	testlist := []TestStructForCheckPersonName{
-		{"Only two letters", "T S", false, CheckPersonNameResultTooSimple},
-		{"only four letters", "AB CD", false, CheckPersonNameResultTooSimple},
-		{"five letters with non-ascii runes", "ça vá", false, CheckPersonNameResultTooSimple},
-		{"mixing letters and numbers", "W0RDS W1TH NUMB3RS", false, CheckPersonNameResultPolluted},
-		{"Sending and accepting empty string", "", true, CheckPersonNameResultOK},
-		{"Sending spaces-only string and accepting empty", "     ", true, CheckPersonNameResultOK},
-		{"Sending but not accepting empty string", " ", false, CheckPersonNameResultTooShort},
-		{"Sending spaces-only string and refusing empty", "     ", false, CheckPersonNameResultTooShort},
-		{"Sending numbers, expecting false", " 5454 ", true, CheckPersonNameResultPolluted},
-		{"OneWorded string", "ONEWORD", false, CheckPersonNameResultTooFewWords},
-		{"Minimum acceptable", "AB CDE", false, CheckPersonNameResultOK},
-		{"Non-ascii stuff", "ÑÔÑÀSÇÏÏ ÇÃO ÀË", false, CheckPersonNameResultOK},
-		{"Words with symbols. Expecting true", "WORDS-WITH SYMBOLS'", false, CheckPersonNameResultOK},
-		{"Words with symbols. Expecting false", "WORDS WITH SYMBOLS`", false, CheckPersonNameResultPolluted},
-		{"less than two letters", "a", false, CheckPersonNameResultTooFewWords},
-		{"Sending numbers, expecting false", "5454", false, CheckPersonNameResultPolluted},
-	}
-
-	for _, tst := range testlist {
-		t.Run(tst.summary, func(t *testing.T) {
-			tr := CheckPersonName(tst.name, tst.acceptEmpty)
-
-			if tr != tst.expectedOutput {
-				t.Errorf("Test has failed!\n\tName: %s\n\tAcceptEmpty: %t, \n\tExpected: %d, \n\tGot: %d,", tst.name, tst.acceptEmpty, tst.expectedOutput, tr)
-			}
-		})
-	}
-}
-
 func TestInArray(t *testing.T) {
 	tcs := []struct {
 		summary    string
@@ -747,17 +709,17 @@ func TestTransformSerially(t *testing.T) {
 		summary        string
 		input          string
 		max            int
-		flags          []uint8
+		flags          []uint
 		expectedOutput string
 	}{
-		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformNone}, "The Go programming l"},
-		{"with trim and lowercase", "   The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagTrim, TransformFlagLowerCase}, "the go programming l"},
-		{"with lower case and only letters", "The Go programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagLowerCase, TransformFlagOnlyLetters}, "thegoprogramminglang"},
-		{"with Only Hash and letters", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, []uint8{TransformFlagHash, TransformFlagOnlyLetters}, "eefecebcfdbceccbbbcb"},
-		{"without string", "", 20, []uint8{TransformNone}, ""},
-		{"Only letters and numbers", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagOnlyLettersAndDigits}, "TheGoisthe1ºprogramm"},
-		{"Only numbers", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagOnlyDigits}, "1"},
-		{"Go Upper!", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint8{TransformFlagUpperCase}, "THE GO IS THE 1º! PR"},
+		{"without flags", "The Go programming language is an open source project to make programmers more productive.", 20, []uint{TransformNone}, "The Go programming l"},
+		{"with trim and lowercase", "   The Go programming language is an open source project to make programmers more productive.", 20, []uint{TransformFlagTrim, TransformFlagLowerCase}, "the go programming l"},
+		{"with lower case and only letters", "The Go programming language is an open source project to make programmers more productive.", 20, []uint{TransformFlagLowerCase, TransformFlagOnlyLetters}, "thegoprogramminglang"},
+		{"with Only Hash and letters", "The Go is the 1º programming language is an open source project to make programmers more productive.", 20, []uint{TransformFlagHash, TransformFlagOnlyLetters}, "eefecebcfdbceccbbbcb"},
+		{"without string", "", 20, []uint{TransformNone}, ""},
+		{"Only letters and numbers", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint{TransformFlagOnlyLettersAndDigits}, "TheGoisthe1ºprogramm"},
+		{"Only numbers", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint{TransformFlagOnlyDigits}, "1"},
+		{"Go Upper!", "The Go is the 1º! programming language is an open source project to make programmers more productive!", 20, []uint{TransformFlagUpperCase}, "THE GO IS THE 1º! PR"},
 	}
 
 	for _, tc := range tcs {
@@ -984,17 +946,36 @@ func TestElapsedYears(t *testing.T) {
 }
 
 func TestYearsAge(t *testing.T) {
+	today := time.Now()
+	yesterday := time.Now()
+	lessThanOneYear := time.Now().AddDate(0, 0, -11)
+	oneYearAgo := time.Now().AddDate(-1, 0, 0)
+	almostTwoYears := time.Now().AddDate(-1, -11, -15)
+	twoYears := time.Now().AddDate(-2, 0, 0)
+	moreThanTwoYears := time.Now().AddDate(-2, -11, 0)
+	tenYears := time.Now().AddDate(-10, 0, 0)
+	hundredYears := time.Now().AddDate(-100, 0, 0)
+	bornOnFuture := time.Now().AddDate(1, 0, 0)
+
 	tcs := []defaultTestStruct{
-		{"normal test", time.Date(2018, 10, 31, 00, 00, 00, 0, time.UTC), 0},
-		{"test with another format", time.Date(1995, 10, 31, 00, 00, 00, 0, time.UTC), 23},
+		{"today - zero", today, 0},
+		{"yesterday - zero", yesterday, 0},
+		{"less than 1 year - zero", lessThanOneYear, 0},
+		{"one year - 1", oneYearAgo, 1},
+		{"less than 2 years - 1", almostTwoYears, 1},
+		{"2 years - 2", twoYears, 2},
+		{"more than 2 years - 2", moreThanTwoYears, 2},
+		{"10 years - 10", tenYears, 10},
+		{"100 years - 100", hundredYears, 100},
+		{"future born - 0", bornOnFuture, 0},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.summary, func(t *testing.T) {
-			tr := YearsAge(tc.input.(time.Time))
+			tr := YearsAge(tc.input.(time.Time).Truncate(24 * time.Hour))
 
 			if tr != tc.expectedOutput {
-				t.Errorf("Test has failed!\n\tExpected: %s, \n\tGot: %v, \n\tInput: %s", tc.expectedOutput, tr, tc.input)
+				t.Errorf("[%s] Test has failed with input %#v! Expected: %d and got: %d", tc.summary, tc.input, tc.expectedOutput, tr)
 			}
 		})
 	}

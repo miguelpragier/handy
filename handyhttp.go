@@ -8,7 +8,7 @@ import (
 
 // HTTPRequestAsString gets a parameter coming from a http request as string, truncated to maxLength
 // Only maxLength >= 1 is considered. Otherwise, it's ignored
-func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOptions ...uint8) string {
+func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOptions ...uint) string {
 	if err := r.ParseForm(); err != nil {
 		return ""
 	}

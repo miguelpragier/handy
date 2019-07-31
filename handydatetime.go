@@ -134,8 +134,68 @@ func YMDasDate(yyyymmdd string) (time.Time, error) {
 	return YMDasDateUTC(yyyymmdd, false)
 }
 
+// ElapsedTime returns difference between two dates in years, months, days, hours, monutes and seconds
+// Thanks to icza@https://stackoverflow.com/a/36531443/1301019
+func ElapsedTime(dtx, dty time.Time) (int, int, int, int, int, int) {
+	// If locations are different, convert one to make them the same
+	if dtx.Location() != dty.Location() {
+		dty = dty.In(dtx.Location())
+	}
+
+	if dtx.Equal(dty) {
+		return 0, 0, 0, 0, 0, 0
+	}
+
+	// For correct calculations, assure dtx is before or equal
+	if dtx.After(dty) {
+		dtx, dty = dty, dtx
+	}
+	y1, M1, d1 := dtx.Date()
+	y2, M2, d2 := dty.Date()
+
+	h1, m1, s1 := dtx.Clock()
+	h2, m2, s2 := dty.Clock()
+
+	year = int(y2 - y1)
+	month = int(M2 - M1)
+	day = int(d2 - d1)
+	hour = int(h2 - h1)
+	min = int(m2 - m1)
+	sec = int(s2 - s1)
+
+	// Normalize negative values
+	if sec < 0 {
+		sec += 60
+		min--
+	}
+	if min < 0 {
+		min += 60
+		hour--
+	}
+	if hour < 0 {
+		hour += 24
+		day--
+	}
+	if day < 0 {
+		// days in month:
+		t := time.Date(y1, M1, 32, 0, 0, 0, 0, time.UTC)
+		day += 32 - t.Day()
+		month--
+	}
+	if month < 0 {
+		month += 12
+		year--
+	}
+
+	return
+}
+
 // ElapsedMonths returns the number of elapsed months between two given dates
 func ElapsedMonths(from, to time.Time) int {
+	if from.Location() != to.Location() {
+		from = from.In(to.Location())
+	}
+
 	// To produce calculations, "to" must be greater than "from"
 	if to.Before(from) || (from.Year() == to.Year() && from.Month() == to.Month()) {
 		return 0
@@ -153,12 +213,13 @@ func ElapsedMonths(from, to time.Time) int {
 // ElapsedYears returns the number of elapsed years between two given dates
 func ElapsedYears(from, to time.Time) int {
 	months := float64(ElapsedMonths(from, to))
+
 	return int(math.Abs(months / 12))
 }
 
 // YearsAge returns the number of years past since a given date
 func YearsAge(birthdate time.Time) int {
-	return ElapsedYears(birthdate, time.Now())
+	return PositiveOrZero(ElapsedYears(birthdate, time.Now()))
 }
 
 // MonthLastDay returns the last day of month, considering the year for cover february in leap years

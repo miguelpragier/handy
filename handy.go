@@ -86,9 +86,7 @@ func CheckNewPassword(password, passwordConfirmation string, minimumlength uint,
 	upperCaseFound := false
 
 	if flagComplexity&CheckNewPasswordComplexityLowest != CheckNewPasswordComplexityLowest {
-		s := []rune(password)
-
-		for _, r := range s {
+		for _, r := range password {
 			if unicode.IsLetter(r) {
 				letterFound = true
 
@@ -147,7 +145,7 @@ func CheckNewPassword(password, passwordConfirmation string, minimumlength uint,
 
 //RuneHasSymbol returns true if the given rune contains a symbol
 func RuneHasSymbol(ru rune) bool {
-	allowedSymbols := []rune("!\"#$%&'()*+´-./:;<=>?@[\\]^_`{|}~")
+	allowedSymbols := "!\"#$%&'()*+´-./:;<=>?@[\\]^_`{|}~"
 
 	for _, r := range allowedSymbols {
 		if ru == r {
@@ -208,13 +206,30 @@ func OnlyLettersAndNumbers(sequence string) string {
 
 	var alphanumeric []rune
 
-	for _, r := range []rune(sequence) {
+	for _, r := range sequence {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			alphanumeric = append(alphanumeric, r)
 		}
 	}
 
 	return string(alphanumeric)
+}
+
+// RemoveDigits returns the given string without digit/numeric runes
+func RemoveDigits(sequence string) string {
+	if utf8.RuneCountInString(sequence) == 0 {
+		return ""
+	}
+
+	var rs []rune
+
+	for _, r := range sequence {
+		if !unicode.IsDigit(r) {
+			rs = append(rs, r)
+		}
+	}
+
+	return string(rs)
 }
 
 // RandomInt returns a random integer within the given (inclusive) range
@@ -311,32 +326,38 @@ func Truncate(s string, maxLen int, trim bool) string {
 const (
 	// TransformNone No transformations are ordered. Only constraints maximum length
 	// TransformNone turns all other flags OFF.
-	TransformNone = uint8(1)
+	TransformNone = 1
 	// TransformFlagTrim Trim spaces before and after process the input
 	// TransformFlagTrim Trims the string, removing leading and trailing spaces
-	TransformFlagTrim = uint8(2)
+	TransformFlagTrim = 2
 	// TransformFlagLowerCase Makes the string lowercase
-	// If it's combined with TransformFlagUpperCase, only uppercase remains, once is executed later.
-	TransformFlagLowerCase = uint8(4)
+	// If case transformation flags are combined, the last one remains, considering the following order: TransformFlagTitleCase, TransformFlagLowerCase and TransformFlagUpperCase.
+	TransformFlagLowerCase = 4
 	// TransformFlagUpperCase Makes the string uppercase
-	// If it's combined with TransformFlagLowerCase, only uppercase remains, once it's executed later.
-	TransformFlagUpperCase = uint8(8)
+	// If case transformation flags are combined, the last one remains, considering the following order: TransformFlagTitleCase, TransformFlagLowerCase and TransformFlagUpperCase.
+	TransformFlagUpperCase = 8
 	// TransformFlagOnlyDigits Removes all non-numeric characters
-	TransformFlagOnlyDigits = uint8(16)
+	TransformFlagOnlyDigits = 16
 	// TransformFlagOnlyLetters Removes all non-letter characters
-	TransformFlagOnlyLetters = uint8(32)
+	TransformFlagOnlyLetters = 32
 	// TransformFlagOnlyLettersAndDigits Leaves only letters and numbers
-	TransformFlagOnlyLettersAndDigits = uint8(64)
+	TransformFlagOnlyLettersAndDigits = 64
 	// TransformFlagHash After process all other flags, applies SHA256 hashing on string for output
 	// 	The routine applies handy.StringHash() on given string
-	TransformFlagHash = uint8(128)
+	TransformFlagHash = 128
+	// TransformFlagTitleCase Makes the string uppercase
+	// If case transformation flags are combined, the last one remains, considering the following order: TransformFlagTitleCase, TransformFlagLowerCase and TransformFlagUpperCase.
+	TransformFlagTitleCase = 256
+	// TransformFlagRemoveDigits Removes all digit characters, without to touch on any other
+	// If combined with TransformFlagOnlyLettersAndDigits, TransformFlagOnlyDigits or TransformFlagOnlyLetters, it's ineffective
+	TransformFlagRemoveDigits = 512
 )
 
 // Transform handles a string according given flags/parametrization, as follows:
 // The transformations are made in arbitrary order, what can result in unexpected output. It the sequence matters, use TransformSerially instead.
 // If maxLen==0, truncation is skipped
 // The last operations are, by order, truncation and trimming.
-func Transform(s string, maxLen int, transformFlags uint8) string {
+func Transform(s string, maxLen int, transformFlags uint) string {
 	if s == "" {
 		return s
 	}
@@ -361,9 +382,17 @@ func Transform(s string, maxLen int, transformFlags uint8) string {
 		s = OnlyLetters(s)
 	}
 
+	if (transformFlags & TransformFlagRemoveDigits) == TransformFlagRemoveDigits {
+		s = RemoveDigits(s)
+	}
+
 	// Have to trim before and after, to avoid issues with string truncation and new leading/trailing spaces
 	if (transformFlags & TransformFlagTrim) == TransformFlagTrim {
 		s = strings.TrimSpace(s)
+	}
+
+	if (transformFlags & TransformFlagTitleCase) == TransformFlagTitleCase {
+		s = strings.Title(strings.ToLower(s))
 	}
 
 	if (transformFlags & TransformFlagLowerCase) == TransformFlagLowerCase {
@@ -399,7 +428,7 @@ func Transform(s string, maxLen int, transformFlags uint8) string {
 //          First remove non-digits, then hashes string and after make it all uppercase.
 // If maxLen==0, truncation is skipped
 // Truncation is the last operation
-func TransformSerially(s string, maxLen int, transformFlags ...uint8) string {
+func TransformSerially(s string, maxLen int, transformFlags ...uint) string {
 	if s == "" {
 		return s
 	}
@@ -414,6 +443,8 @@ func TransformSerially(s string, maxLen int, transformFlags ...uint8) string {
 			s = OnlyLetters(s)
 		case TransformFlagTrim:
 			s = strings.TrimSpace(s)
+		case TransformFlagTitleCase:
+			s = strings.ToTitle(s)
 		case TransformFlagLowerCase:
 			s = strings.ToLower(s)
 		case TransformFlagUpperCase:
@@ -576,70 +607,6 @@ func Reverse(s string) string {
 	return string(buffer)
 }
 
-const (
-	// CheckPersonNameResultOK means the name was validated
-	CheckPersonNameResultOK = 0
-	// CheckPersonNameResultPolluted The routine only accepts letters, single quotes and spaces
-	CheckPersonNameResultPolluted = 1
-	// CheckPersonNameResultTooFewWords The funcion requires at least 2 words
-	CheckPersonNameResultTooFewWords = 2
-	// CheckPersonNameResultTooShort the sum of all characters must be >= 6
-	CheckPersonNameResultTooShort = 3
-	// CheckPersonNameResultTooSimple The name rule requires that at least one word
-	CheckPersonNameResultTooSimple = 4
-)
-
-// CheckPersonName returns true if the name contains at least two words, one >= 3 chars and one >=2 chars.
-// I understand that this is a particular criteria, but this is the OpenSourceMagic, where you can change and adapt to your own specs.
-func CheckPersonName(name string, acceptEmpty bool) uint8 {
-	name = strings.TrimSpace(name)
-
-	// If name is empty, AND it's accepted, return ok. Else, cry!
-	if name == "" {
-		if !acceptEmpty {
-			return CheckPersonNameResultTooShort
-		}
-
-		return CheckPersonNameResultOK
-	}
-
-	// Person names doesn't accept other than letters, spaces and single quotes
-	for _, r := range name {
-		if !unicode.IsLetter(r) && r != ' ' && r != '\'' && r != '-' {
-			return CheckPersonNameResultPolluted
-		}
-	}
-
-	// A complete name has to be at least 2 words.
-	a := strings.Fields(name)
-
-	if len(a) < 2 {
-		return CheckPersonNameResultTooFewWords
-	}
-
-	// At least two words, one with 3 chars and other with 2
-	found2 := false
-	found3 := false
-
-	for _, s := range a {
-		if !found3 && utf8.RuneCountInString(s) >= 3 {
-			found3 = true
-			continue
-		}
-
-		if !found2 && utf8.RuneCountInString(s) >= 2 {
-			found2 = true
-			continue
-		}
-	}
-
-	if !found2 || !found3 {
-		return CheckPersonNameResultTooSimple
-	}
-
-	return CheckPersonNameResultOK
-}
-
 // StringReplaceAll keeps replacing until there's no more ocurrences to replace.
 func StringReplaceAll(original string, replacementPairs ...string) string {
 	if original == "" {
@@ -687,4 +654,13 @@ func ArrayDifference(a, b []int) []int {
 	diffB := ArrayDifferenceAtoB(b, a)
 
 	return append(diffB, diffA...)
+}
+
+// PositiveOrZero checks if a signed number is negative, and in this case returns zero.
+func PositiveOrZero(n int) int {
+	if n < 0 {
+		return 0
+	}
+
+	return n
 }
