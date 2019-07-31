@@ -1034,3 +1034,29 @@ func TestArrayDifferenceAtoB(t *testing.T) {
 		})
 	}
 }
+
+func TestPositiveOrZero(t *testing.T) {
+	type testStruct struct {
+		summary        string
+		input          int
+		expectedOutput int
+	}
+
+	ts := []testStruct{
+		{summary: "zero - 0", input: 0, expectedOutput: 0},
+		{summary: "one positive - 1", input: 1, expectedOutput: 1},
+		{summary: "one negative - 0", input: 0, expectedOutput: 0},
+		{summary: "-100,000 - 0", input: 0, expectedOutput: 0},
+		{summary: "100,000 - 100,000", input: 100000, expectedOutput: 100000},
+	}
+
+	for _, tc := range ts {
+		t.Run(tc.summary, func(t *testing.T) {
+			tr := PositiveOrZero(tc.input)
+
+			if fmt.Sprint(tr) != fmt.Sprint(tc.expectedOutput) {
+				t.Errorf("[%s] Test has failed with input %d! Expected: %d and got: %d", tc.summary, tc.input, tc.expectedOutput, tr)
+			}
+		})
+	}
+}

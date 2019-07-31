@@ -95,3 +95,38 @@ func TestNameFirstAndLast(t *testing.T) {
 		})
 	}
 }
+
+func TestNameInitials(t *testing.T) {
+	type tStruct struct {
+		summary        string
+		name           string
+		transformFlags uint
+		expectedOutput string
+	}
+
+	testlist := []tStruct{
+		{`simplest 2 words name`, `miguel pragier`, TransformNone, `m p`},
+		{`3 words name separated`, `ivan alexandrovitch kleshtakov`, TransformNone, `i a k`},
+		{`3 words with unicode`, `Ívän Âlexandrovitch Çzelyatchenko`, TransformNone, `Í Â Ç`},
+		{`3 words with unicode title-case`, `ívän âlexandrovitch çzelyatchenko`, TransformFlagTitleCase, `Í Â Ç`},
+		{`empty string`, ``, TransformNone, ``},
+		{`dot`, `.`, TransformNone, `.`},
+		{`spaces and tabs`, "  \t\t \n", TransformNone, ``},
+		{`name with tabs`, "richard\t\tstallmann", TransformNone, `r s`},
+		{`noble name with 1`, `dom pedro 1`, TransformNone, `d p 1`},
+		{`noble name with I uppercase`, `dom pedro I`, TransformFlagUpperCase, `D P I`},
+		{`3 letters`, `x y z`, TransformNone, `x y z`},
+		{`one word`, `asingleword`, TransformNone, `a`},
+		{`comma separators`, `name,with,comma,separators`, TransformNone, `n`},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			s := NameInitials(tst.name, tst.transformFlags)
+
+			if s != tst.expectedOutput {
+				t.Errorf(`[%s] Test has failed! Given name: "%s", Expected string: "%s", Got: "%s"`, tst.summary, tst.name, tst.expectedOutput, s)
+			}
+		})
+	}
+}

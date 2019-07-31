@@ -73,13 +73,13 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {
 
 // NameFirstAndLast returns the first and last words/names from the given sequence, optionally transformed by transformFlags
 func NameFirstAndLast(name string, transformFlags uint) (string, []string) {
-	name = strings.TrimSpace(name)
-
 	name = strings.Replace(name, "\t", ` `, -1)
 
 	if transformFlags != TransformNone {
 		name = Transform(name, utf8.RuneCountInString(name), transformFlags)
 	}
+
+	name = strings.TrimSpace(name)
 
 	if name == `` {
 		return ``, []string{}
@@ -101,7 +101,7 @@ func NameFirstAndLast(name string, transformFlags uint) (string, []string) {
 }
 
 // NameInitials returns the first and last words/names from the given sequence, optionally transformed by transformFlags
-func NameInitials(name string, separator string, transformFlags uint) string {
+func NameInitials(name string, transformFlags uint) string {
 	name = strings.TrimSpace(name)
 
 	name = strings.Replace(name, "\t", ` `, -1)
@@ -122,15 +122,14 @@ func NameInitials(name string, separator string, transformFlags uint) string {
 		return ``
 	}
 
-	if wl == 1 {
-		return words[0][:1]
-	}
-
 	var a []string
 
 	for _, s := range words {
-		a = append(a, s[:1])
+		for _, letter := range s {
+			a = append(a, string(letter))
+			break
+		}
 	}
 
-	return strings.Join(a, separator)
+	return strings.Join(a, ` `)
 }

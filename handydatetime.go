@@ -1,12 +1,9 @@
 package handy
 
 import (
-	"math"
 	"strings"
 	"time"
 )
-
-var lastDayArrayZeroBased = []int{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
 // golangDateFormat translate handy's arbitrary date format to Go's eccentric format
 func golangDateTimeFormat(format string) string {
@@ -142,6 +139,7 @@ func ElapsedTime(dtx, dty time.Time) (int, int, int, int, int, int) {
 		dty = dty.In(dtx.Location())
 	}
 
+	// if the dates are equal,
 	if dtx.Equal(dty) {
 		return 0, 0, 0, 0, 0, 0
 	}
@@ -150,82 +148,102 @@ func ElapsedTime(dtx, dty time.Time) (int, int, int, int, int, int) {
 	if dtx.After(dty) {
 		dtx, dty = dty, dtx
 	}
+
 	y1, M1, d1 := dtx.Date()
+
 	y2, M2, d2 := dty.Date()
 
 	h1, m1, s1 := dtx.Clock()
+
 	h2, m2, s2 := dty.Clock()
 
-	year = int(y2 - y1)
-	month = int(M2 - M1)
-	day = int(d2 - d1)
-	hour = int(h2 - h1)
-	min = int(m2 - m1)
-	sec = int(s2 - s1)
+	year := y2 - y1
+	month := int(M2 - M1)
+	day := d2 - d1
+	hour := h2 - h1
+	min := m2 - m1
+	sec := s2 - s1
 
 	// Normalize negative values
 	if sec < 0 {
 		sec += 60
 		min--
 	}
+
 	if min < 0 {
 		min += 60
 		hour--
 	}
+
 	if hour < 0 {
 		hour += 24
 		day--
 	}
+
 	if day < 0 {
 		// days in month:
 		t := time.Date(y1, M1, 32, 0, 0, 0, 0, time.UTC)
+
 		day += 32 - t.Day()
+
 		month--
 	}
+
 	if month < 0 {
 		month += 12
+
 		year--
 	}
 
-	return
+	return year, month, day, hour, min, sec
 }
 
 // ElapsedMonths returns the number of elapsed months between two given dates
 func ElapsedMonths(from, to time.Time) int {
-	if from.Location() != to.Location() {
-		from = from.In(to.Location())
-	}
-
 	// To produce calculations, "to" must be greater than "from"
 	if to.Before(from) || (from.Year() == to.Year() && from.Month() == to.Month()) {
 		return 0
 	}
 
-	diff := to.Sub(from)
+	_, months, _, _, _, _ := ElapsedTime(from, to)
 
-	hours := diff.Hours()
-
-	days := hours / 24
-
-	return int(math.Abs(days / 30))
+	return months
 }
 
 // ElapsedYears returns the number of elapsed years between two given dates
 func ElapsedYears(from, to time.Time) int {
-	months := float64(ElapsedMonths(from, to))
+	// To produce calculations, "to" must be greater than "from"
+	if to.Before(from) || (from.Year() == to.Year()) {
+		return 0
+	}
 
-	return int(math.Abs(months / 12))
+	years, _, _, _, _, _ := ElapsedTime(from, to)
+
+	return years
 }
 
 // YearsAge returns the number of years past since a given date
 func YearsAge(birthdate time.Time) int {
-	return PositiveOrZero(ElapsedYears(birthdate, time.Now()))
+	return ElapsedYears(birthdate, time.Now())
 }
 
 // MonthLastDay returns the last day of month, considering the year for cover february in leap years
+// Month is one-based, then january=1
+// If month is different of 2 (february) year is ignored
+// Of month is february, year have to be valid
 func MonthLastDay(year int, month int) int {
+	if month < 1 || month > 12 {
+		return 0
+	}
+
+	var lastDayArrayZeroBased = []int{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+
 	if month != 2 {
 		return lastDayArrayZeroBased[month-1]
+	}
+
+	if year <= 0 {
+		return 0
 	}
 
 	if ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0) {
