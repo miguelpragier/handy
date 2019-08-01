@@ -60,37 +60,32 @@ func TestNameFirstAndLast(t *testing.T) {
 		name            string
 		transformFlags  uint
 		expectedOutputS string
-		expectedOutputA []string
 	}
 
 	testlist := []TestNameFirstAndLastStruct{
-		{"Only two letters", "x Y", TransformNone, `x Y`, []string{"x", "Y"}},
-		{"one word name", "namë", TransformNone, `namë`, []string{`namë`}},
-		{"all non-ascii runes", "çá öáã àÿ", TransformNone, `çá àÿ`, []string{`çá`, `àÿ`}},
-		{"all non-ascii runes to upper", "çá öáã àÿ", TransformFlagUpperCase, `ÇÁ ÀŸ`, []string{`ÇÁ`, `ÀŸ`}},
-		{"mixing letters and numbers and then filtering digits off", "W0RDS W1TH NUMB3RS", TransformFlagRemoveDigits, `WRDS NUMBRS`, []string{`WRDS`, `NUMBRS`}},
-		{"empty string", "", TransformNone, ``, []string{}},
-		{"only spaces", "     ", TransformNone, ``, []string{}},
-		{"with spaces and tabs", " FIRST NAME - MIDDLENAME 	LAST	 ", TransformNone, `FIRST LAST`, []string{`FIRST`, `LAST`}},
-		{"last name single rune", "NAME X", TransformNone, `NAME X`, []string{`NAME`, `X`}},
-		{"only symbols", "5454#@$", TransformNone, `5454#@$`, []string{`5454#@$`}},
-		{"single letter", "x", TransformNone, `x`, []string{`x`}},
-		{"only spaces empty return", " 		 ", TransformNone, ``, []string{}},
-		{"regular name to upper", "name lastname", TransformFlagUpperCase, `NAME LASTNAME`, []string{`NAME`, `LASTNAME`}},
-		{"regular name to title", "name LASTNAME", TransformFlagTitleCase, `Name Lastname`, []string{`Name`, `Lastname`}},
-		{"REGULAR Name to lOwEr", "name LASTNAME", TransformFlagLowerCase, `name lastname`, []string{`name`, `lastname`}},
+		{"Only two letters", "x Y", TransformNone, `x Y`},
+		{"one word name", "namë", TransformNone, `namë`},
+		{"all non-ascii runes", "çá öáã àÿ", TransformNone, `çá àÿ`},
+		{"all non-ascii runes to upper", "çá öáã àÿ", TransformFlagUpperCase, `ÇÁ ÀŸ`},
+		{"mixing letters and numbers and then filtering digits off", "W0RDS W1TH NUMB3RS", TransformFlagRemoveDigits, `WRDS NUMBRS`},
+		{"empty string", "", TransformNone, ``},
+		{"only spaces", "     ", TransformNone, ``},
+		{"with spaces and tabs", " FIRST NAME - MIDDLENAME 	LAST	 ", TransformNone, `FIRST LAST`},
+		{"last name single rune", "NAME X", TransformNone, `NAME X`},
+		{"only symbols", "5454#@$", TransformNone, `5454#@$`},
+		{"single letter", "x", TransformNone, `x`},
+		{"only spaces empty return", " 		 ", TransformNone, ``},
+		{"regular name to upper", "name lastname", TransformFlagUpperCase, `NAME LASTNAME`},
+		{"regular name to title", "name LASTNAME", TransformFlagTitleCase, `Name Lastname`},
+		{"REGULAR Name to lOwEr", "name LASTNAME", TransformFlagLowerCase, `name lastname`},
 	}
 
 	for _, tst := range testlist {
 		t.Run(tst.summary, func(t *testing.T) {
-			s, a := NameFirstAndLast(tst.name, tst.transformFlags)
+			s := NameFirstAndLast(tst.name, tst.transformFlags)
 
 			if s != tst.expectedOutputS {
 				t.Errorf(`[%s] Test has failed! Given name: "%s", Expected string: "%s", Got: "%s"`, tst.summary, tst.name, tst.expectedOutputS, s)
-			}
-
-			if !stringSlicesAreEqual(a, tst.expectedOutputA) {
-				t.Errorf(`[%s] Test has failed! Given name: "%s", Expected array: %#v, Got: %#v`, tst.summary, tst.name, tst.expectedOutputA, a)
 			}
 		})
 	}
