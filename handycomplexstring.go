@@ -220,16 +220,16 @@ func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
 }
 
 const (
-	StrFindNoneFound  = 0
-	StrFindEmailFound = -1
+	StrSniffNoneFound  = 0
+	StrSniffEmailFound = -1
 )
 
-// StrFind checks given string to find contained/hidden substrings
-func StrFind(seq string, substr uint64) int8 {
+// StrSniff checks given string to find contained/hidden substrings
+func StrSniff(seq string, substr uint64) int8 {
 
 	if reEmailFinder.MatchString(seq) {
-		return StrFindEmailFound
+		return StrSniffEmailFound
 	}
 
-	return StrFindNoneFound
+	return StrSniffNoneFound
 }
