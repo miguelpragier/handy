@@ -14,20 +14,45 @@ import (
 	"unicode/utf8"
 )
 
+var (
+	reEmail     = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+	reDupSpaces = regexp.MustCompile(`\s+`)
+)
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
+// DedupSpaces removes duplicated spaces, tabs and newLine characters
+// I.E: Replaces two tabs for one single tab
+func DedupSpaces(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	s = reDupSpaces.ReplaceAllString(s, " ")
+
+	return s
+}
+
+// CleanSpaces removes duplicated spaces, tabs and newLine characters and then trim string's both sides
+func CleanSpaces(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	return strings.TrimSpace(DedupSpaces(s))
+}
+
 // CheckEmail returns true if the given sequence is a valid email address
+// Observe that CheckEmail doesn't trim nor sanitize string before check
 // See https://tools.ietf.org/html/rfc2822#section-3.4.1 for details about email address anatomy
 func CheckEmail(email string) bool {
 	if email == "" {
 		return false
 	}
 
-	re := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-
-	return re.MatchString(email)
+	return reEmail.MatchString(email)
 }
 
 const (
