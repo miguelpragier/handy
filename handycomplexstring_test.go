@@ -41,10 +41,10 @@ func TestCheckStr(t *testing.T) {
 
 	for _, tst := range testlist {
 		t.Run(tst.summary, func(t *testing.T) {
-			tr:=CheckStr(tst.input,tst.minLen,tst.maxLen,tst.flags)
+			tr := CheckStr(tst.input, tst.minLen, tst.maxLen, tst.flags)
 
 			if tr != tst.expectedOutput {
-				t.Errorf("Failed with input %s, want %d and got %d instead", tst.input, tst.expectedOutput,tr)
+				t.Errorf("Failed with input %s, want %d and got %d instead", tst.input, tst.expectedOutput, tr)
 			}
 		})
 	}

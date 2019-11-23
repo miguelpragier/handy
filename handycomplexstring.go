@@ -9,73 +9,73 @@ import (
 
 const (
 	// CheckStrAllowEmpty allows empty string ""
-	CheckStrAllowEmpty          = 1
+	CheckStrAllowEmpty = 1
 	// CheckStrDenySpaces forbids spaces, tabs, new lines and carriage return
-	CheckStrDenySpaces          = 2
+	CheckStrDenySpaces = 2
 	// CheckStrDenyNumbers forbids digits/numbers
-	CheckStrDenyNumbers         = 4
+	CheckStrDenyNumbers = 4
 	// CheckStrDenyLetters forbids letters
-	CheckStrDenyLetters         = 8
+	CheckStrDenyLetters = 8
 	// CheckStrDenySymbols forbids symbols. if it's not a number, letter or space, is considered a symbol
-	CheckStrDenySymbols         = 16
+	CheckStrDenySymbols = 16
 	// CheckStrDenyMoreThanOneWord forbids more than one word
 	CheckStrDenyMoreThanOneWord = 32
 	// CheckStrDenyUpperCase forbids uppercase letters
-	CheckStrDenyUpperCase       = 64
+	CheckStrDenyUpperCase = 64
 	// CheckStrDenyLowercase forbids lowercase letters
-	CheckStrDenyLowercase       = 128
+	CheckStrDenyLowercase = 128
 	// CheckStrDenyUnicode forbids non-ASCII characters
-	CheckStrDenyUnicode         = 256
+	CheckStrDenyUnicode = 256
 	// CheckStrRequireNumbers demands at least 1 number within string
-	CheckStrRequireNumbers         = 512
+	CheckStrRequireNumbers = 512
 	// CheckStrRequireLetters demands at least 1 letter within string
-	CheckStrRequireLetters         = 1024
+	CheckStrRequireLetters = 1024
 	// CheckStrRequireSymbols demands at least 1 symbol within string. if it's not a number, letter or space, is considered a symbol
-	CheckStrRequireSymbols         = 2048
+	CheckStrRequireSymbols = 2048
 	// CheckStrRequireMoreThanOneWord demands at least 2 words in given string input
 	CheckStrRequireMoreThanOneWord = 4096
 	// CheckStrRequireUpperCase demands at least 1 uppercase letter within string
-	CheckStrRequireUpperCase       = 8192
+	CheckStrRequireUpperCase = 8192
 	// CheckStrRequireLowercase demands at least 1 lowercase letter within string
-	CheckStrRequireLowercase       = 16384
+	CheckStrRequireLowercase = 16384
 
 	// CheckStrOk means "alright"
-	CheckStrOk                    = 0
+	CheckStrOk = 0
 	// CheckStrEmptyDenied is self explained
-	CheckStrEmptyDenied           = -1
+	CheckStrEmptyDenied = -1
 	// CheckStrTooShort is self explained
-	CheckStrTooShort              = -2
+	CheckStrTooShort = -2
 	// CheckStrTooLong is self explained
-	CheckStrTooLong               = -4
+	CheckStrTooLong = -4
 	// CheckStrSpaceDenied is self explained
-	CheckStrSpaceDenied           = -5
+	CheckStrSpaceDenied = -5
 	// CheckStrNubersDenied is self explained
-	CheckStrNubersDenied          = -6
+	CheckStrNubersDenied = -6
 	// CheckStrLettersDenied is self explained
-	CheckStrLettersDenied         = -7
+	CheckStrLettersDenied = -7
 	// CheckStrSymbolsDenied is self explained
-	CheckStrSymbolsDenied         = -8
+	CheckStrSymbolsDenied = -8
 	// CheckStrMoreThanOneWordDenied is self explained
 	CheckStrMoreThanOneWordDenied = -9
 	// CheckStrUpperCaseDenied is self explained
-	CheckStrUpperCaseDenied       = -10
+	CheckStrUpperCaseDenied = -10
 	// CheckStrLowercaseDenied is self explained
-	CheckStrLowercaseDenied       = -11
+	CheckStrLowercaseDenied = -11
 	// CheckStrUnicodeDenied is self explained
-	CheckStrUnicodeDenied         = -12
+	CheckStrUnicodeDenied = -12
 
 	// CheckStrNumbersNotFound is self explained
-	CheckStrNumbersNotFound         = -13
+	CheckStrNumbersNotFound = -13
 	// CheckStrLettersNotFound is self explained
-	CheckStrLettersNotFound         = -14
+	CheckStrLettersNotFound = -14
 	// CheckStrSymbolsNotFound is self explained
-	CheckStrSymbolsNotFound         = -15
+	CheckStrSymbolsNotFound = -15
 	// CheckStrMoreThanOneWordNotFound is self explained
 	CheckStrMoreThanOneWordNotFound = -16
 	// CheckStrUpperCaseNotFound is self explained
-	CheckStrUpperCaseNotFound       = -17
+	CheckStrUpperCaseNotFound = -17
 	// CheckStrLowercaseNotFound is self explained
-	CheckStrLowercaseNotFound       = -18
+	CheckStrLowercaseNotFound = -18
 )
 
 var (
@@ -145,7 +145,7 @@ func CheckStr(seq string, minLen, maxLen uint, rules uint64) int8 {
 
 	containsSymbols := func(s string) bool {
 		for _, s := range s {
-			if unicode.IsSymbol(s) || ( !unicode.IsLetter(s) && !unicode.IsNumber(s) && !unicode.IsSpace(s) ) {
+			if unicode.IsSymbol(s) || (!unicode.IsLetter(s) && !unicode.IsNumber(s) && !unicode.IsSpace(s)) {
 				return true
 			}
 		}
