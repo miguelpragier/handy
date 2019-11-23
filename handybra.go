@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// CheckCPF returns true if the given sequence is a valid cpf
+// CheckCPF returns true if the given input is a valid cpf
 // CPF is the Brazilian TAXPayerID document for persons
 func CheckCPF(cpf string) bool {
 	// Se já chegar vazio, falha

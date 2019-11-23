@@ -18,7 +18,7 @@ func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOp
 	if s == "" {
 		vars := mux.Vars(r)
 
-		var ok bool
+		ok:=false
 
 		if s, ok = vars[key]; !ok {
 			return ""

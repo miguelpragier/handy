@@ -103,13 +103,13 @@ func CheckDate(format, dateTime string) bool {
 	return err == nil
 }
 
-// CheckDateYMD returns true if given sequence is a valid date in format yyyymmdd
+// CheckDateYMD returns true if given input is a valid date in format yyyymmdd
 // The function removes non-digit characters like "yyyy/mm/dd" or "yyyy-mm-dd", filtering to "yyyymmdd"
 func CheckDateYMD(yyyymmdd string) bool {
 	return CheckDate("yyyymmdd", yyyymmdd)
 }
 
-// YMDasDateUTC returns a valid UTC time from the given yyymmdd-formatted sequence
+// YMDasDateUTC returns a valid UTC time from the given yyymmdd-formatted input
 func YMDasDateUTC(yyyymmdd string, utc bool) (time.Time, error) {
 	yyyymmdd = OnlyDigits(yyyymmdd)
 
@@ -126,7 +126,7 @@ func YMDasDateUTC(yyyymmdd string, utc bool) (time.Time, error) {
 	return t, nil
 }
 
-// YMDasDate returns a valid time from the given yyymmdd-formatted sequence
+// YMDasDate returns a valid time from the given yyymmdd-formatted input
 func YMDasDate(yyyymmdd string) (time.Time, error) {
 	return YMDasDateUTC(yyyymmdd, false)
 }

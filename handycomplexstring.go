@@ -4,12 +4,13 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 const (
 	CheckStrAllowEmpty          = 1
 	CheckStrDenySpaces          = 2
-	CheckStrDenyDigits          = 4
+	CheckStrDenyNumbers         = 4
 	CheckStrDenyLetters         = 8
 	CheckStrDenySymbols         = 16
 	CheckStrDenyMoreThanOneWord = 32
@@ -17,19 +18,19 @@ const (
 	CheckStrDenyLowercase       = 128
 	CheckStrDenyUnicode         = 256
 
-	CheckStrRequireDigits          = 512
+	CheckStrRequireNumbers         = 512
 	CheckStrRequireLetters         = 1024
 	CheckStrRequireSymbols         = 2048
-	CheckStrRequireMoreThanOneWord = 5096
-	CheckStrRequireUpperCase       = 10192
-	CheckStrRequireLowercase       = 20384
+	CheckStrRequireMoreThanOneWord = 4096
+	CheckStrRequireUpperCase       = 8192
+	CheckStrRequireLowercase       = 16384
 
 	CheckStrOk                    = 0
 	CheckStrEmptyDenied           = -1
 	CheckStrTooShort              = -2
 	CheckStrTooLong               = -4
 	CheckStrSpaceDenied           = -5
-	CheckStrDigitsDenied          = -6
+	CheckStrNubersDenied          = -6
 	CheckStrLettersDenied         = -7
 	CheckStrSymbolsDenied         = -8
 	CheckStrMoreThanOneWordDenied = -9
@@ -37,7 +38,7 @@ const (
 	CheckStrLowercaseDenied       = -11
 	CheckStrUnicodeDenied         = -12
 
-	CheckStrDigitsNotFound          = -13
+	CheckStrNumbersNotFound         = -13
 	CheckStrLettersNotFound         = -14
 	CheckStrSymbolsNotFound         = -15
 	CheckStrMoreThanOneWordNotFound = -16
@@ -46,17 +47,15 @@ const (
 )
 
 var (
-	reEmailFinder = regexp.MustCompile(`/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi`)
+	reEmailFinder = regexp.MustCompile(`([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)`)
 )
 
 // CheckStr validates a string according given complexity rules
 // CheckStr first evaluates "Deny" rules, and then "Require" rules.
 // minLen=0 means there's no minimum lenght
 // maxLen=0 means there's no maximum lenght
-func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
-	if rules == 0 {
-		return CheckStrOk
-	}
+func CheckStr(seq string, minLen, maxLen uint, rules uint64) int8 {
+	strLen := uint(utf8.RuneCountInString(seq))
 
 	if seq == "" {
 		if rules&CheckStrAllowEmpty == CheckStrAllowEmpty {
@@ -66,11 +65,11 @@ func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
 		return CheckStrEmptyDenied
 	}
 
-	if len(seq) < minLen {
+	if strLen < minLen {
 		return CheckStrTooShort
 	}
 
-	if maxLen > 0 && len(seq) > maxLen {
+	if maxLen > 0 && strLen > maxLen {
 		return CheckStrTooLong
 	}
 
@@ -90,9 +89,9 @@ func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
 		return false
 	}(seq)
 
-	if rules&CheckStrDenyDigits == CheckStrDenyDigits {
+	if rules&CheckStrDenyNumbers == CheckStrDenyNumbers {
 		if containsNumbers {
-			return CheckStrDigitsDenied
+			return CheckStrNubersDenied
 		}
 	}
 
@@ -114,7 +113,7 @@ func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
 
 	containsSymbols := func(s string) bool {
 		for _, s := range s {
-			if unicode.IsSymbol(s) {
+			if unicode.IsSymbol(s) || ( !unicode.IsLetter(s) && !unicode.IsNumber(s) && !unicode.IsSpace(s) ) {
 				return true
 			}
 		}
@@ -128,7 +127,7 @@ func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
 		}
 	}
 
-	containsMoreThanOneWord := len(strings.Fields(seq)) > 0
+	containsMoreThanOneWord := len(strings.Fields(seq)) > 1
 
 	if rules&CheckStrDenyMoreThanOneWord == CheckStrDenyMoreThanOneWord {
 		if containsMoreThanOneWord {
@@ -157,7 +156,7 @@ func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
 	containsLowercase := func(s string) bool {
 		if containsLetters {
 			for _, s := range s {
-				if unicode.IsUpper(s) {
+				if unicode.IsLower(s) {
 					return true
 				}
 			}
@@ -180,9 +179,9 @@ func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
 		}
 	}
 
-	if rules&CheckStrRequireDigits == CheckStrRequireDigits {
+	if rules&CheckStrRequireNumbers == CheckStrRequireNumbers {
 		if !containsNumbers {
-			return CheckStrDigitsNotFound
+			return CheckStrNumbersNotFound
 		}
 	}
 
@@ -219,17 +218,8 @@ func CheckStr(seq string, minLen, maxLen int, rules uint64) int8 {
 	return CheckStrOk
 }
 
-const (
-	StrSniffNoneFound  = 0
-	StrSniffEmailFound = -1
-)
+// StrContainsEmail returns true if given string contains an email address
+func StrContainsEmail(seq string) bool {
 
-// StrSniff checks given string to find contained/hidden substrings
-func StrSniff(seq string, substr uint64) int8 {
-
-	if reEmailFinder.MatchString(seq) {
-		return StrSniffEmailFound
-	}
-
-	return StrSniffNoneFound
+	return reEmailFinder.MatchString(seq)
 }

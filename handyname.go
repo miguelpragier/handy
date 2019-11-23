@@ -71,7 +71,7 @@ func CheckPersonName(name string, acceptEmpty bool) uint8 {
 	return CheckPersonNameResultOK
 }
 
-//	NameFirstAndLast returns the first and last words/names from the given sequence, optionally transformed by transformFlags
+//	NameFirstAndLast returns the first and last words/names from the given input, optionally transformed by transformFlags
 //	Example:
 //		handy.NameFirstAndLast("friedrich wilhelm nietzsche", handy.TransformFlagTitleCase) // returns "Friedrich Nietzsche"
 func NameFirstAndLast(name string, transformFlags uint) string {
@@ -102,7 +102,7 @@ func NameFirstAndLast(name string, transformFlags uint) string {
 	return fmt.Sprintf(`%s %s`, words[0], words[wl-1])
 }
 
-// NameInitials returns the first and last words/names from the given sequence, optionally transformed by transformFlags
+// NameInitials returns the first and last words/names from the given input, optionally transformed by transformFlags
 func NameInitials(name string, transformFlags uint) string {
 	name = strings.TrimSpace(name)
 

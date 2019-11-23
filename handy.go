@@ -44,7 +44,7 @@ func CleanSpaces(s string) string {
 	return strings.TrimSpace(DedupSpaces(s))
 }
 
-// CheckEmail returns true if the given sequence is a valid email address
+// CheckEmail returns true if the given input is a valid email address
 // Observe that CheckEmail doesn't trim nor sanitize string before check
 // See https://tools.ietf.org/html/rfc2822#section-3.4.1 for details about email address anatomy
 func CheckEmail(email string) bool {
@@ -273,7 +273,7 @@ func RandomReseed(min, max int) int {
 	return rand.Intn(max-min) + min
 }
 
-// CheckPhone returns true if a given sequence has between 9 and 14 digits
+// CheckPhone returns true if a given input has between 9 and 14 digits
 func CheckPhone(phone string, acceptEmpty bool) bool {
 	phone = OnlyDigits(phone)
 
@@ -379,7 +379,7 @@ const (
 )
 
 // Transform handles a string according given flags/parametrization, as follows:
-// The transformations are made in arbitrary order, what can result in unexpected output. It the sequence matters, use TransformSerially instead.
+// The transformations are made in arbitrary order, what can result in unexpected output. It the input matters, use TransformSerially instead.
 // If maxLen==0, truncation is skipped
 // The last operations are, by order, truncation and trimming.
 func Transform(s string, maxLen int, transformFlags uint) string {
@@ -499,7 +499,7 @@ func MatchesAny(search interface{}, items ...interface{}) bool {
 	return false
 }
 
-// HasOnlyNumbers returns true if the sequence is entirely numeric
+// HasOnlyNumbers returns true if the input is entirely numeric
 func HasOnlyNumbers(sequence string) bool {
 	if utf8.RuneCountInString(sequence) == 0 {
 		return false
@@ -514,7 +514,7 @@ func HasOnlyNumbers(sequence string) bool {
 	return true
 }
 
-// HasOnlyLetters returns true if the sequence is entirely composed by letters
+// HasOnlyLetters returns true if the input is entirely composed by letters
 func HasOnlyLetters(sequence string) bool {
 	if utf8.RuneCountInString(sequence) == 0 {
 		return false
