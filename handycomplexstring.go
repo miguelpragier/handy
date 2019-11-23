@@ -7,6 +7,40 @@ import (
 	"unicode/utf8"
 )
 
+// HasNumber returns true if input string contains at least one digit/number
+func HasNumber(s string) bool {
+	for _, s := range s {
+		if unicode.IsNumber(s) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// HasLetter returns true if input string contains at least one letter
+func HasLetter(s string) bool {
+	for _, s := range s {
+		if unicode.IsLetter(s) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// HasSymbol returns true if input string contains at least one symbol
+// If rune is not a space, letter nor a number, it's considered a symbol
+func HasSymbol(s string) bool {
+	for _, s := range s {
+		if unicode.IsSymbol(s) || (!unicode.IsLetter(s) && !unicode.IsNumber(s) && !unicode.IsSpace(s)) {
+			return true
+		}
+	}
+
+	return false
+}
+
 const (
 	// CheckStrAllowEmpty allows empty string ""
 	CheckStrAllowEmpty = 1
@@ -111,15 +145,7 @@ func CheckStr(seq string, minLen, maxLen uint, rules uint64) int8 {
 		}
 	}
 
-	containsNumbers := func(s string) bool {
-		for _, s := range s {
-			if unicode.IsNumber(s) {
-				return true
-			}
-		}
-
-		return false
-	}(seq)
+	containsNumbers := HasNumber(seq)
 
 	if rules&CheckStrDenyNumbers == CheckStrDenyNumbers {
 		if containsNumbers {
@@ -127,15 +153,7 @@ func CheckStr(seq string, minLen, maxLen uint, rules uint64) int8 {
 		}
 	}
 
-	containsLetters := func(s string) bool {
-		for _, s := range s {
-			if unicode.IsLetter(s) {
-				return true
-			}
-		}
-
-		return false
-	}(seq)
+	containsLetters := HasLetter(seq)
 
 	if rules&CheckStrDenyLetters == CheckStrDenyLetters {
 		if containsLetters {
@@ -143,15 +161,7 @@ func CheckStr(seq string, minLen, maxLen uint, rules uint64) int8 {
 		}
 	}
 
-	containsSymbols := func(s string) bool {
-		for _, s := range s {
-			if unicode.IsSymbol(s) || (!unicode.IsLetter(s) && !unicode.IsNumber(s) && !unicode.IsSpace(s)) {
-				return true
-			}
-		}
-
-		return false
-	}(seq)
+	containsSymbols := HasSymbol(seq)
 
 	if rules&CheckStrDenySymbols == CheckStrDenySymbols {
 		if containsSymbols {
