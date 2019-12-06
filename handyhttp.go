@@ -3,6 +3,7 @@ package handy
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -10,6 +11,7 @@ import (
 // Only maxLength >= 1 is considered. Otherwise, it's ignored
 func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOptions ...uint) string {
 	if err := r.ParseForm(); err != nil {
+		log.Println(r.RequestURI, err)
 		return ""
 	}
 
@@ -18,12 +20,31 @@ func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOp
 	if s == "" {
 		vars := mux.Vars(r)
 
-		var ok bool
-
-		if s, ok = vars[key]; !ok {
+		if _s, ok := vars[key]; ok {
+			s = _s
+		} else {
 			return ""
 		}
 	}
+
+	//// preparing version without Gorilla Mux
+	//if s == "" {
+	//	if vars, ok := r.URL.Query()[key];!ok {
+	//		return ""
+	//	}else{
+	//		if len(vars)==1 {
+	//			s = vars[0]
+	//		}else if len(vars)>0{
+	//			s = strings.Join(vars,"")
+	//		}else {
+	//			return ""
+	//		}
+	//	}
+	//
+	//	if s==""{
+	//		return ""
+	//	}
+	//}
 
 	if len(transformOptions) > 0 {
 		s = Transform(s, maxLength, transformOptions[0])

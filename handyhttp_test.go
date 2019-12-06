@@ -11,7 +11,7 @@ import (
 )
 
 func Test_HTTPRequestAsString(t *testing.T) {
-	const habemosPapa = "HABEMUS---PAPAM"
+	const habemosPapa = "[9,8,7,5]"
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t.Run("testing parsed value", func(t *testing.T) {
@@ -26,6 +26,10 @@ func Test_HTTPRequestAsString(t *testing.T) {
 	defer ts.Close()
 
 	if _, err := http.PostForm(ts.URL, url.Values{"status": {habemosPapa}}); err != nil {
+		t.Errorf("Test has failed! %v", err)
+	}
+
+	if _, err := http.Get(fmt.Sprintf("%s?status=%s", ts.URL, habemosPapa)); err != nil {
 		t.Errorf("Test has failed! %v", err)
 	}
 }
