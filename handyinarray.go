@@ -1,5 +1,146 @@
 package handy
 
+import (
+	"math/big"
+)
+
+func intToBigint(i interface{}) *big.Int {
+	bi := big.NewInt(0)
+
+	switch i.(type) {
+	case int:
+		bi.SetInt64(int64(i.(int)))
+	case int8:
+		bi.SetInt64(int64(i.(int8)))
+	case int16:
+		bi.SetInt64(int64(i.(int16)))
+	case int32:
+		bi.SetInt64(int64(i.(int32)))
+	case int64:
+		bi.SetInt64(i.(int64))
+	case uint:
+		bi.SetUint64(uint64(i.(uint)))
+	case uint8:
+		bi.SetUint64(uint64(i.(uint8)))
+	case uint16:
+		bi.SetUint64(uint64(i.(uint16)))
+	case uint32:
+		bi.SetUint64(uint64(i.(uint32)))
+	case uint64:
+		bi.SetUint64(i.(uint64))
+	}
+
+	return bi
+}
+
+// InArrayIntFlex returns true if "item" exists in "array"
+// item and array can be of different kinds, since they're integer types
+// array param should be an array of any integer type (int,int8,int16,int32,int64,uint,uint8,uint16,uint32 and uint64)
+// The function uses bigInt type convertions previous to values comparison
+func InArrayIntFlex(item interface{}, array interface{}) bool {
+	if array == nil || item == nil {
+		return false
+	}
+
+	b1 := intToBigint(item)
+
+	b2 := big.NewInt(0)
+
+	switch array.(type) {
+	case []int:
+		for _, x := range array.([]int) {
+			b2.SetInt64(int64(x))
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []int8:
+		for _, x := range array.([]int8) {
+			b2.SetInt64(int64(x))
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []int16:
+		for _, x := range array.([]int16) {
+			b2.SetInt64(int64(x))
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []int32:
+		for _, x := range array.([]int32) {
+			b2.SetInt64(int64(x))
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []int64:
+		for _, x := range array.([]int64) {
+			b2.SetInt64(x)
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []uint:
+		for _, x := range array.([]uint) {
+			b2.SetUint64(uint64(x))
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []uint8:
+		for _, x := range array.([]uint8) {
+			b2.SetUint64(uint64(x))
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []uint16:
+		for _, x := range array.([]uint16) {
+			b2.SetUint64(uint64(x))
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []uint32:
+		for _, x := range array.([]uint32) {
+			b2.SetUint64(uint64(x))
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+
+	case []uint64:
+		for _, x := range array.([]uint64) {
+			b2.SetUint64(x)
+
+			if b1.Cmp(b2) == 0 {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 // InArray searches for "item" in "array" and returns true if it's found
 // This func resides here alone only because its long size.
 // TODO Embrace/comprise all native scalar/primitive types
