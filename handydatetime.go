@@ -252,3 +252,12 @@ func MonthLastDay(year int, month int) int {
 
 	return 28
 }
+
+// DateReformat gets a date string in a given currentFormat, and transform it according newFormat
+func DateReformat(dt1 string, currentFormat, newFormat string) string {
+	if dx := StringAsDateTime(dt1, currentFormat); !dx.IsZero() {
+		return DateTimeAsString(dx, newFormat)
+	}
+
+	return ""
+}
