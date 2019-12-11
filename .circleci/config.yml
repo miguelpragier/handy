@@ -6,6 +6,7 @@ jobs:
     working_directory: /go/src/github.com/miguelpragier/handy
     steps:
       - checkout
+      - run: go get
       - run:
           name: Tests Suite
           command: go test .
