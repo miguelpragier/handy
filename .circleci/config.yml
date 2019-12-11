@@ -3,6 +3,9 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.10
+    working_directory: /go/src/github.com/miguelpragier/handy
     steps:
       - checkout
-      - run: go test ./handy
+      - run:
+          name: Tests Suite
+          command: go test .
