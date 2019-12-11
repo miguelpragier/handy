@@ -1,0 +1,8 @@
+version: 2.1
+  jobs:
+    build:
+      docker:
+          - image: circleci/golang:1.10
+      steps:
+        - checkout # check out the code in the project directory
+        - run: go test handy
