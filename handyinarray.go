@@ -7,27 +7,27 @@ import (
 func intToBigint(i interface{}) *big.Int {
 	bi := big.NewInt(0)
 
-	switch i.(type) {
+	switch x := i.(type) {
 	case int:
-		bi.SetInt64(int64(i.(int)))
+		bi.SetInt64(int64(x))
 	case int8:
-		bi.SetInt64(int64(i.(int8)))
+		bi.SetInt64(int64(x))
 	case int16:
-		bi.SetInt64(int64(i.(int16)))
+		bi.SetInt64(int64(x))
 	case int32:
-		bi.SetInt64(int64(i.(int32)))
+		bi.SetInt64(int64(x))
 	case int64:
-		bi.SetInt64(i.(int64))
+		bi.SetInt64(x)
 	case uint:
-		bi.SetUint64(uint64(i.(uint)))
+		bi.SetUint64(uint64(x))
 	case uint8:
-		bi.SetUint64(uint64(i.(uint8)))
+		bi.SetUint64(uint64(x))
 	case uint16:
-		bi.SetUint64(uint64(i.(uint16)))
+		bi.SetUint64(uint64(x))
 	case uint32:
-		bi.SetUint64(uint64(i.(uint32)))
+		bi.SetUint64(uint64(x))
 	case uint64:
-		bi.SetUint64(i.(uint64))
+		bi.SetUint64(x)
 	}
 
 	return bi
@@ -46,9 +46,9 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 
 	b2 := big.NewInt(0)
 
-	switch array.(type) {
+	switch a := array.(type) {
 	case []int:
-		for _, x := range array.([]int) {
+		for _, x := range a {
 			b2.SetInt64(int64(x))
 
 			if b1.Cmp(b2) == 0 {
@@ -57,7 +57,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []int8:
-		for _, x := range array.([]int8) {
+		for _, x := range a {
 			b2.SetInt64(int64(x))
 
 			if b1.Cmp(b2) == 0 {
@@ -66,7 +66,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []int16:
-		for _, x := range array.([]int16) {
+		for _, x := range a {
 			b2.SetInt64(int64(x))
 
 			if b1.Cmp(b2) == 0 {
@@ -75,7 +75,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []int32:
-		for _, x := range array.([]int32) {
+		for _, x := range a {
 			b2.SetInt64(int64(x))
 
 			if b1.Cmp(b2) == 0 {
@@ -84,7 +84,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []int64:
-		for _, x := range array.([]int64) {
+		for _, x := range a {
 			b2.SetInt64(x)
 
 			if b1.Cmp(b2) == 0 {
@@ -93,7 +93,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []uint:
-		for _, x := range array.([]uint) {
+		for _, x := range a {
 			b2.SetUint64(uint64(x))
 
 			if b1.Cmp(b2) == 0 {
@@ -102,7 +102,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []uint8:
-		for _, x := range array.([]uint8) {
+		for _, x := range a {
 			b2.SetUint64(uint64(x))
 
 			if b1.Cmp(b2) == 0 {
@@ -111,7 +111,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []uint16:
-		for _, x := range array.([]uint16) {
+		for _, x := range a {
 			b2.SetUint64(uint64(x))
 
 			if b1.Cmp(b2) == 0 {
@@ -120,7 +120,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []uint32:
-		for _, x := range array.([]uint32) {
+		for _, x := range a {
 			b2.SetUint64(uint64(x))
 
 			if b1.Cmp(b2) == 0 {
@@ -129,7 +129,7 @@ func InArrayIntFlex(item interface{}, array interface{}) bool {
 		}
 
 	case []uint64:
-		for _, x := range array.([]uint64) {
+		for _, x := range a {
 			b2.SetUint64(x)
 
 			if b1.Cmp(b2) == 0 {

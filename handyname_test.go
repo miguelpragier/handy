@@ -40,7 +40,8 @@ func TestCheckPersonName(t *testing.T) {
 	}
 }
 
-func stringSlicesAreEqual(x, y []string) bool {
+// StringSlicesAreEqual compares two string slices and returns true if they have the same elements, in same order
+func StringSlicesAreEqual(x, y []string) bool {
 	if ((x == nil) != (y == nil)) || (len(x) != len(y)) {
 		return false
 	}
