@@ -34,7 +34,7 @@ func RandomString(minLen, maxLen int, allowUnicode, allowNumbers, allowSymbols, 
 	maxRune := utf8.MaxRune
 
 	if !allowUnicode {
-		maxRune = 127
+		maxRune = unicode.MaxASCII
 	}
 
 	// Checks if the space is at beggining or at string end
