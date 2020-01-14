@@ -9,32 +9,33 @@ import (
 
 // RandomString generates a string sequence based on given params/rules
 func RandomString(minLen, maxLen int, allowUnicode, allowNumbers, allowSymbols, allowSpaces bool) string {
-	if minLen > maxLen {
+	switch {
+	case minLen > maxLen:
 		log.Println("handy.RandomString(minLen is greater than maxLen)")
 		return ""
-	}
 
-	if maxLen == 0 {
+	case maxLen == 0:
 		log.Println("handy.RandomString(maxLen should be greater than zero)")
 		return ""
-	}
 
-	if minLen == 0 {
+	case minLen == 0:
 		minLen = 1
 	}
 
-	strLen := rand.Intn(maxLen-1) + 1
+	// string length must be between minLen and maxLen
+	strLen := rand.Intn(maxLen-minLen) + minLen
 
-	if minLen < maxLen {
-		strLen = rand.Intn(maxLen-minLen) + minLen
-	}else if minLen==maxLen{
-		strLen=maxLen
+	// If minLen==maxLen, force fixed size string
+	if minLen == maxLen {
+		strLen = maxLen
 	}
 
 	str := make([]rune, strLen)
 
+	// Highest rune should be in UTF8 range
 	maxRune := utf8.MaxRune
 
+	// But if utf8 is disallowed, set to ascii range
 	if !allowUnicode {
 		maxRune = unicode.MaxASCII
 	}

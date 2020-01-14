@@ -40,20 +40,20 @@ func TestCheckPersonName(t *testing.T) {
 	}
 }
 
-// StringSlicesAreEqual compares two string slices and returns true if they have the same elements, in same order
-func StringSlicesAreEqual(x, y []string) bool {
-	if ((x == nil) != (y == nil)) || (len(x) != len(y)) {
-		return false
-	}
-
-	for i := range y {
-		if x[i] != y[i] {
-			return false
-		}
-	}
-
-	return true
-}
+//// StringSlicesAreEqual compares two string slices and returns true if they have the same elements, in same order
+//func StringSlicesAreEqual(x, y []string) bool {
+//	if ((x == nil) != (y == nil)) || (len(x) != len(y)) {
+//		return false
+//	}
+//
+//	for i := range y {
+//		if x[i] != y[i] {
+//			return false
+//		}
+//	}
+//
+//	return true
+//}
 
 func TestNameFirstAndLast(t *testing.T) {
 	type TestNameFirstAndLastStruct struct {
