@@ -32,22 +32,27 @@ func RandomString(minLen, maxLen int, allowUnicode, allowNumbers, allowSymbols, 
 
 	str := make([]rune, strLen)
 
-	// Highest rune should be in UTF8 range
-	maxRune := utf8.MaxRune
-
-	// But if utf8 is disallowed, set to ascii range
-	if !allowUnicode {
-		maxRune = unicode.MaxASCII
-	}
-
 	// Checks if the space is at beggining or at string end
 	// to avoid leading or trailing spaces
 	firstOrLast := func(i int) bool {
 		return i == 0 || i == strLen-1
 	}
 
+	const minimumPrintableRune = 32
+
+	var (
+		asciiTable    = []rune(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~")
+		asciiTableLen = int32(len(asciiTable))
+		r             rune
+	)
+
 	for i := 0; i < strLen; {
-		r := rand.Int31n(maxRune-1) + 1
+		if !allowUnicode {
+			p := rand.Int31n(asciiTableLen)
+			r = asciiTable[p]
+		} else {
+			r = rand.Int31n(utf8.MaxRune-minimumPrintableRune) + minimumPrintableRune
+		}
 
 		switch {
 		case !unicode.IsPrint(r):
