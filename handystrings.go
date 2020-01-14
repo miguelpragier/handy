@@ -22,12 +22,12 @@ func RandomString(minLen, maxLen int, allowUnicode, allowNumbers, allowSymbols, 
 		minLen = 1
 	}
 
-	// string length must be between minLen and maxLen
-	strLen := rand.Intn(maxLen-minLen) + minLen
-
 	// If minLen==maxLen, force fixed size string
-	if minLen == maxLen {
-		strLen = maxLen
+	strLen := maxLen
+
+	// but if minLen<>maxLen, string length must be between minLen and maxLen
+	if minLen < maxLen {
+		strLen = rand.Intn(maxLen-minLen) + minLen
 	}
 
 	str := make([]rune, strLen)
