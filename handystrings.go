@@ -27,6 +27,8 @@ func RandomString(minLen, maxLen int, allowUnicode, allowNumbers, allowSymbols, 
 
 	if minLen < maxLen {
 		strLen = rand.Intn(maxLen-minLen) + minLen
+	}else if minLen==maxLen{
+		strLen=maxLen
 	}
 
 	str := make([]rune, strLen)
