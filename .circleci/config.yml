@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     environment:
-    CC_TEST_REPORTER_ID: baa911c0045dcda6ab23744c3c17ac8abecb4643937bb55f41beaf80e334de49
+      - CC_TEST_REPORTER_ID: baa911c0045dcda6ab23744c3c17ac8abecb4643937bb55f41beaf80e334de49
     docker:
       - image: circleci/golang:1.10
     working_directory: /go/src/github.com/miguelpragier/handy
@@ -12,3 +12,4 @@ jobs:
       - run:
           name: Tests Suite
           command: go test .
+      - store_test_results
