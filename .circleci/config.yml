@@ -12,4 +12,4 @@ jobs:
       - run:
           name: Tests Suite
           command: go test .
-      - store_test_results
+#      - store_test_results
