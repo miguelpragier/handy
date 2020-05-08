@@ -118,3 +118,20 @@ func HTTPJSONToStruct(r *http.Request, targetStruct interface{}, closeBody bool)
 
 	return err
 }
+
+// HTTPAnswerJSON converts the given data as json, set the content-type header and write it to requester
+func HTTPAnswerJSON(w http.ResponseWriter, data interface{}) error {
+	jb, err := json.Marshal(data)
+
+	if err != nil {
+		return err
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	if _, errw := w.Write(jb); errw != nil {
+		return errw
+	}
+
+	return nil
+}
