@@ -101,3 +101,36 @@ func Test_HTTPJSONBodyToStruct(t *testing.T) {
 		t.Errorf("Test has failed! %v", err)
 	}
 }
+
+func TestHTTPJSONToStruct(t *testing.T) {
+	const (
+		testName  = "Forty Two"
+		testAge   = 42
+		closeBody = true
+	)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Run("testing parsed value", func(t *testing.T) {
+			var testDummy struct {
+				Name string `json:"name"`
+				Age  int    `json:"age"`
+			}
+
+			if err := HTTPJSONToStruct(r, &testDummy, closeBody); err != nil {
+				t.Error(err)
+			}
+
+			if (testDummy.Name != testName) || (testDummy.Age != testAge) {
+				t.Errorf("Test has failed!\n\tExpected: (%v,%v)\n\tGot: %v", testName, testAge, testDummy)
+			}
+		})
+	}))
+
+	defer ts.Close()
+
+	j := []byte(fmt.Sprintf(`{"name":"%s","age":%d}`, testName, testAge))
+
+	if _, err := http.Post(ts.URL, "application/json;charset=utf-8", bytes.NewBuffer(j)); err != nil {
+		t.Errorf("Test has failed! %v", err)
+	}
+}

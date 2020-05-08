@@ -2,7 +2,6 @@ package handy
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
@@ -18,33 +17,12 @@ func HTTPRequestAsString(r *http.Request, key string, maxLength int, transformOp
 	s := r.FormValue(key)
 
 	if s == "" {
-		vars := mux.Vars(r)
+		s = r.URL.Query().Get(key)
 
-		if _s, ok := vars[key]; ok {
-			s = _s
-		} else {
+		if s == "" {
 			return ""
 		}
 	}
-
-	//// preparing version without Gorilla Mux
-	//if s == "" {
-	//	if vars, ok := r.URL.Query()[key];!ok {
-	//		return ""
-	//	}else{
-	//		if len(vars)==1 {
-	//			s = vars[0]
-	//		}else if len(vars)>0{
-	//			s = strings.Join(vars,"")
-	//		}else {
-	//			return ""
-	//		}
-	//	}
-	//
-	//	if s==""{
-	//		return ""
-	//	}
-	//}
 
 	if len(transformOptions) > 0 {
 		s = Transform(s, maxLength, transformOptions[0])
@@ -71,11 +49,9 @@ func HTTPRequestAsInteger(r *http.Request, key string) int {
 	s := r.FormValue(key)
 
 	if s == "" {
-		vars := mux.Vars(r)
+		s = r.URL.Query().Get(key)
 
-		var ok bool
-
-		if s, ok = vars[key]; !ok {
+		if s == "" {
 			return 0
 		}
 	}
@@ -102,11 +78,9 @@ func HTTPRequestAsFloat64(r *http.Request, key string, decimalSeparator rune) fl
 	s := r.FormValue(key)
 
 	if s == "" {
-		vars := mux.Vars(r)
+		s = r.URL.Query().Get(key)
 
-		var ok bool
-
-		if s, ok = vars[key]; !ok {
+		if s == "" {
 			return 0
 		}
 	}
@@ -123,4 +97,24 @@ func HTTPJSONBodyToStruct(r *http.Request, targetStruct interface{}) bool {
 	err := decoder.Decode(targetStruct)
 
 	return err == nil
+}
+
+// HTTPJSONToStruct decode json to a given anatomically compatible struct
+// the differences to HTTPJSONBodyToStruct is that:
+// - HTTPJSONToStruct can condittionally close body after unmarshalling
+// - HTTPJSONToStruct returns an error instead of a bool
+func HTTPJSONToStruct(r *http.Request, targetStruct interface{}, closeBody bool) error {
+	decoder := json.NewDecoder(r.Body)
+
+	err := decoder.Decode(targetStruct)
+
+	if closeBody {
+		defer func() {
+			if err0 := r.Body.Close(); err0 != nil {
+				log.Println(err0)
+			}
+		}()
+	}
+
+	return err
 }
