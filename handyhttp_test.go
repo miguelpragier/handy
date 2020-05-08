@@ -134,3 +134,23 @@ func TestHTTPJSONToStruct(t *testing.T) {
 		t.Errorf("Test has failed! %v", err)
 	}
 }
+func TestHTTPAnswerJSON(t *testing.T) {
+	const (
+		testName = "Forty Two"
+		testAge  = 42
+	)
+
+	httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var testDummy struct {
+			Name string `json:"name"`
+			Age  int    `json:"age"`
+		}
+
+		testDummy.Name = testName
+		testDummy.Age = testAge
+
+		if err := HTTPAnswerJSON(w, testDummy); err != nil {
+			t.Error(err)
+		}
+	}))
+}
