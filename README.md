@@ -8,7 +8,7 @@ GO Golang Utilities and helpers like validators, sanitizers and string formatter
 
 
 # Dependencies
-If you want to use HTTPHelpers, github.com/gorilla/mux. Otherwise, none.
+None, since v1.1.1
 
 ___
 Documentation :green_book:|
