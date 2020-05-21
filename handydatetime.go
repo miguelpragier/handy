@@ -261,3 +261,70 @@ func DateReformat(dt1 string, currentFormat, newFormat string) string {
 
 	return ""
 }
+
+type DateStrCheck uint8
+
+const (
+	DateStrCheckOk            DateStrCheck = 0
+	DateStrCheckErrInvalid    DateStrCheck = 1
+	DateStrCheckErrOutOfRange DateStrCheck = 2
+	DateStrCheckErrEmpty      DateStrCheck = 3
+)
+
+// DateStrCheckAge checks a date string considering minimum and maximum age
+// The resulting code can be translated to text, according prefered idiom, with DateStrCheckErrMessage
+func DateStrCheckAge(date, format string, yearsAgeMin, yearsAgeMax int, acceptEmpty bool) DateStrCheck {
+	if date == "" {
+		if !acceptEmpty {
+			return DateStrCheckErrEmpty
+		}
+
+		return DateStrCheckOk
+	}
+
+	dt := StringAsDateTime(date, format)
+
+	if dt.IsZero() {
+		return DateStrCheckErrInvalid
+	}
+
+	yearsAge := YearsAge(dt)
+
+	if !Between(yearsAge, yearsAgeMin, yearsAgeMax) {
+		return DateStrCheckErrOutOfRange
+	}
+
+	return DateStrCheckOk
+}
+
+// DateStrCheckRange checks a date string considering minimum and maximum date range
+// The resulting code can be translated to text, according prefered idiom, with DateStrCheckErrMessage
+func DateStrCheckRange(date, format string, dateMin, dateMax time.Time, acceptEmpty bool) DateStrCheck {
+	if date == "" {
+		if !acceptEmpty {
+			return DateStrCheckErrEmpty
+		}
+
+		return DateStrCheckOk
+	}
+
+	dt := StringAsDateTime(date, format)
+
+	if dt.IsZero() {
+		return DateStrCheckErrInvalid
+	}
+
+	if !dateMin.IsZero() {
+		if dt.Before(dateMin) {
+			return DateStrCheckErrOutOfRange
+		}
+	}
+
+	if !dateMax.IsZero() {
+		if dt.After(dateMax) {
+			return DateStrCheckErrOutOfRange
+		}
+	}
+
+	return DateStrCheckOk
+}
