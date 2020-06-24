@@ -91,6 +91,7 @@ func HTTPRequestAsFloat64(r *http.Request, key string, decimalSeparator rune) fl
 }
 
 // HTTPJSONBodyToStruct decode json to a given anatomically compatible struct
+// THIS ROUTINE IS BEEN DEPRECATED. Use HTTPJSONToStruct() instead.
 func HTTPJSONBodyToStruct(r *http.Request, targetStruct interface{}) bool {
 	decoder := json.NewDecoder(r.Body)
 
@@ -121,10 +122,16 @@ func HTTPJSONToStruct(r *http.Request, targetStruct interface{}, closeBody bool)
 
 // HTTPAnswerJSON converts the given data as json, set the content-type header and write it to requester
 func HTTPAnswerJSON(w http.ResponseWriter, data interface{}) error {
-	jb, err := json.Marshal(data)
+	var jb []byte
 
-	if err != nil {
-		return err
+	if j1, ok := data.(string); ok {
+		jb = []byte(j1)
+	} else {
+		if j2, err := json.Marshal(data); err != nil {
+			return err
+		} else {
+			jb = j2
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
