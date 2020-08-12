@@ -103,7 +103,7 @@ func EnvIntS(key, separator string, defaultValue []int) []int {
 }
 
 // EnvFloat64 returns the env var value as float64
-func EnvFloat64(prefix, key string, defaultValue float64) float64 {
+func EnvFloat64(key string, defaultValue float64) float64 {
 	if os.Getenv(key) != `` {
 		if f, err := strconv.ParseFloat(os.Getenv(key), 64); err == nil {
 			return f
