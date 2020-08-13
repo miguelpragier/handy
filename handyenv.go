@@ -8,6 +8,13 @@ import (
 	"strings"
 )
 
+type EnvChecker struct {
+	VarName      string
+	DefaultValue string
+	Mandatory    bool
+	DebugPrint   bool
+}
+
 func debugLog(msg string, debugPrint bool) {
 	if debugPrint {
 		log.Println(msg)
@@ -122,4 +129,25 @@ func EnvBool(key string, defaultValue bool) bool {
 	}
 
 	return defaultValue
+}
+
+// EnvCheckerNew returns a new instance of EnvChecker to be used with EnvCheckMany()
+func EnvCheckerNew(varName, defaultValue string, mandatory, debugPrint bool) EnvChecker {
+	return EnvChecker{
+		VarName:      varName,
+		DefaultValue: defaultValue,
+		Mandatory:    mandatory,
+		DebugPrint:   debugPrint,
+	}
+}
+
+// EnvCheckMany Test multiple environment variables at once
+func EnvCheckMany(envCheckers []EnvChecker) error {
+	for _, c := range envCheckers {
+		if err := EnvCheck(c.VarName, c.DefaultValue, c.Mandatory, c.DebugPrint); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
