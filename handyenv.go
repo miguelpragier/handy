@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// EnvChecker holds instructions to assert an environment variable
 type EnvChecker struct {
 	VarName      string
 	DefaultValue string
