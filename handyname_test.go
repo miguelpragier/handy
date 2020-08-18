@@ -92,6 +92,43 @@ func TestNameFirstAndLast(t *testing.T) {
 	}
 }
 
+func TestNameFirst(t *testing.T) {
+	type TestNameFirstStruct struct {
+		summary         string
+		name            string
+		transformFlags  uint
+		expectedOutputS string
+	}
+
+	testlist := []TestNameFirstStruct{
+		{"Only two letters", "x Y", TransformNone, `x`},
+		{"one word name", "namë", TransformNone, `namë`},
+		{"all non-ascii runes", "çá öáã àÿ", TransformNone, `çá`},
+		{"all non-ascii runes to upper", "çá öáã àÿ", TransformFlagUpperCase, `ÇÁ`},
+		{"mixing letters and numbers and then filtering digits off", "W0RDS W1TH NUMB3RS", TransformFlagRemoveDigits, `WRDS`},
+		{"empty string", "", TransformNone, ``},
+		{"only spaces", "     ", TransformNone, ``},
+		{"with spaces and tabs", " FIRST NAME - MIDDLENAME 	LAST	 ", TransformNone, `FIRST`},
+		{"last name single rune", "NAME X", TransformNone, `NAME`},
+		{"only symbols", "5454#@$", TransformNone, `5454#@$`},
+		{"single letter", "x", TransformNone, `x`},
+		{"only spaces empty return", " 		 ", TransformNone, ``},
+		{"regular name to upper", "name lastname", TransformFlagUpperCase, `NAME`},
+		{"regular name to title", "name LASTNAME", TransformFlagTitleCase, `Name`},
+		{"REGULAR Name to lOwEr", "name LASTNAME", TransformFlagLowerCase, `name`},
+	}
+
+	for _, tst := range testlist {
+		t.Run(tst.summary, func(t *testing.T) {
+			s := NameFirst(tst.name, tst.transformFlags)
+
+			if s != tst.expectedOutputS {
+				t.Errorf(`[%s] Test has failed! Given name: "%s", Expected string: "%s", Got: "%s"`, tst.summary, tst.name, tst.expectedOutputS, s)
+			}
+		})
+	}
+}
+
 func TestNameInitials(t *testing.T) {
 	type tStruct struct {
 		summary        string

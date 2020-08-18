@@ -101,6 +101,30 @@ func NameFirstAndLast(name string, transformFlags uint) string {
 	return fmt.Sprintf(`%s %s`, words[0], words[wl-1])
 }
 
+// NameFirst returns the first word/name from the given input, optionally transformed by transformFlags
+// Example: handy.NameFirst("friedrich wilhelm nietzsche", handy.TransformFlagTitleCase) // returns "Friedrich"
+func NameFirst(name string, transformFlags uint) string {
+	name = strings.Replace(name, "\t", ` `, -1)
+
+	if transformFlags != TransformNone {
+		name = Transform(name, utf8.RuneCountInString(name), transformFlags)
+	}
+
+	name = strings.TrimSpace(name)
+
+	if name == `` {
+		return ``
+	}
+
+	words := strings.Split(name, ` `)
+
+	if len(words) >= 1 {
+		return words[0]
+	}
+
+	return ``
+}
+
 // NameInitials returns the first and last words/names from the given input, optionally transformed by transformFlags
 func NameInitials(name string, transformFlags uint) string {
 	name = strings.TrimSpace(name)
