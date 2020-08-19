@@ -2,8 +2,10 @@ package handy
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -147,6 +149,51 @@ func EnvCheckMany(envCheckers []EnvChecker) error {
 	for _, c := range envCheckers {
 		if err := EnvCheck(c.VarName, c.DefaultValue, c.Mandatory, c.DebugPrint); err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+var reEnvVarRow = regexp.MustCompile(`^([A-Za-z][0-9A-Za-z_]*)=(\S+)\n`)
+
+// EnvLoadFromDisk loads a file from disk, containing variables written in KEY=VALUE format
+// fileName is the file name with complete path
+// mustHave forces an error if the file doesn't exist
+// overwriteValue when false, makes the engine skip env vars that are already definied
+func EnvLoadFromDisk(fileName string, mustHave, overwriteValues bool) error {
+	content, err := ioutil.ReadFile(fileName)
+
+	if err != nil {
+		if mustHave {
+			return err
+		}
+
+		return nil
+	}
+
+	text := string(content)
+
+	text = strings.ReplaceAll(text, "\r\n", "\n")
+
+	rows := strings.Split(text, "\n")
+
+	for _, row := range rows {
+		row = strings.TrimSpace(row)
+
+		if matches := reEnvVarRow.FindStringSubmatch(row); len(matches) == 3 {
+			key := matches[1]
+			value := matches[2]
+
+			if os.Getenv(key) != "" {
+				if !overwriteValues {
+					continue
+				}
+			}
+
+			if err := os.Setenv(key, value); err != nil {
+				return err
+			}
 		}
 	}
 
