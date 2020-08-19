@@ -32,7 +32,7 @@ func RandomString(minLen, maxLen int, allowUnicode, allowNumbers, allowSymbols, 
 
 	str := make([]rune, strLen)
 
-	// Checks if the space is at beggining or at string end
+	// Checks if the space is at begining or at string end
 	// to avoid leading or trailing spaces
 	firstOrLast := func(i int) bool {
 		return i == 0 || i == strLen-1
