@@ -153,3 +153,32 @@ func TestEnvInt(t *testing.T) {
 //
 //	return defaultValue
 //}
+
+func TestEnvLoadFromDisk(t *testing.T) {
+	type test struct {
+		envVar    string
+		assertion string
+	}
+
+	tests := []test{
+		{"#THISIS", ""},
+		{"STARTWITH", "SPACE"},
+		{"_INVALIDXX1", ""},
+		{"VALIDXX1", "NORMAL"},
+		{"lowercase", "111"},
+		{"10INVALIDXX11", ""},
+		{"INVALIDXX2", ""},
+	}
+
+	if err := EnvLoadFromDisk(`./env_test.txt`, true, true); err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+
+	for _, tx := range tests {
+		if v := os.Getenv(tx.envVar); v != tx.assertion {
+			t.Logf("expected value %v, got %v\n", tx.assertion, v)
+			t.Fail()
+		}
+	}
+}

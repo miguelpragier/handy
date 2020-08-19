@@ -155,7 +155,7 @@ func EnvCheckMany(envCheckers []EnvChecker) error {
 	return nil
 }
 
-var reEnvVarRow = regexp.MustCompile(`^([A-Za-z][0-9A-Za-z_]*)=(\S+)\n`)
+var reEnvVarRow = regexp.MustCompile(`^([A-Za-z][0-9A-Za-z_]*)=(\S+)`)
 
 // EnvLoadFromDisk loads a file from disk, containing variables written in KEY=VALUE format
 // fileName is the file name with complete path
@@ -181,19 +181,23 @@ func EnvLoadFromDisk(fileName string, mustHave, overwriteValues bool) error {
 	for _, row := range rows {
 		row = strings.TrimSpace(row)
 
-		if matches := reEnvVarRow.FindStringSubmatch(row); len(matches) == 3 {
-			key := matches[1]
-			value := matches[2]
+		matches := reEnvVarRow.FindStringSubmatch(row)
 
-			if os.Getenv(key) != "" {
-				if !overwriteValues {
-					continue
-				}
-			}
+		if len(matches) != 3 {
+			continue
+		}
 
-			if err := os.Setenv(key, value); err != nil {
-				return err
+		key := matches[1]
+		value := matches[2]
+
+		if os.Getenv(key) != "" {
+			if !overwriteValues {
+				continue
 			}
+		}
+
+		if err := os.Setenv(key, value); err != nil {
+			return err
 		}
 	}
 
