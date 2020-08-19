@@ -262,13 +262,18 @@ func DateReformat(dt1 string, currentFormat, newFormat string) string {
 	return ""
 }
 
+// DateStrCheck holds return status code of DateStrCheck functions
 type DateStrCheck uint8
 
 const (
-	DateStrCheckOk            DateStrCheck = 0
-	DateStrCheckErrInvalid    DateStrCheck = 1
+	// DateStrCheckOk indicates an alright result
+	DateStrCheckOk DateStrCheck = 0
+	// DateStrCheckErrInvalid indicates the date is not valid
+	DateStrCheckErrInvalid DateStrCheck = 1
+	// DateStrCheckErrOutOfRange indicates the date is out of the supported range
 	DateStrCheckErrOutOfRange DateStrCheck = 2
-	DateStrCheckErrEmpty      DateStrCheck = 3
+	// DateStrCheckErrEmpty indicates the date string is empty
+	DateStrCheckErrEmpty DateStrCheck = 3
 )
 
 // DateStrCheckAge checks a date string considering minimum and maximum age

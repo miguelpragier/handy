@@ -1,5 +1,6 @@
 package handy
 
+// DateStrCheckErrMessage translates the given error code into a plain string message
 func DateStrCheckErrMessage(idiom string, errCode DateStrCheck) string {
 	if idiom == "bra" {
 		switch errCode {
