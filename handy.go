@@ -48,6 +48,8 @@ func CleanSpaces(s string) string {
 // Observe that CheckEmail doesn't trim nor sanitize string before check
 // See https://tools.ietf.org/html/rfc2822#section-3.4.1 for details about email address anatomy
 func CheckEmail(email string) bool {
+	email = strings.TrimSpace(email)
+	
 	if email == "" {
 		return false
 	}
