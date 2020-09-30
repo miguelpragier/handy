@@ -5,41 +5,10 @@ package handy
 import (
 	"crypto/sha256"
 	"fmt"
-	"math/rand"
-	"regexp"
-	"strconv"
 	"strings"
-	"time"
 	"unicode"
 	"unicode/utf8"
 )
-
-var reDupSpaces = regexp.MustCompile(`\s+`)
-
-func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
-}
-
-// DedupSpaces removes duplicated spaces, tabs and newLine characters
-// I.E: Replaces two tabs for one single tab
-func DedupSpaces(s string) string {
-	if s == "" {
-		return ""
-	}
-
-	s = reDupSpaces.ReplaceAllString(s, " ")
-
-	return s
-}
-
-// CleanSpaces removes duplicated spaces, tabs and newLine characters and then trim string's both sides
-func CleanSpaces(s string) string {
-	if s == "" {
-		return ""
-	}
-
-	return strings.TrimSpace(DedupSpaces(s))
-}
 
 //RuneHasSymbol returns true if the given rune contains a symbol
 func RuneHasSymbol(ru rune) bool {
@@ -68,135 +37,11 @@ func StringHash(s string) string {
 	return fmt.Sprintf("%x", sum)
 }
 
-// OnlyLetters returns only the letters from the given string, after strip all the rest ( numbers, spaces, etc. )
-func OnlyLetters(sequence string) string {
-	if utf8.RuneCountInString(sequence) == 0 {
-		return ""
-	}
-
-	var letters []rune
-
-	for _, r := range sequence {
-		if unicode.IsLetter(r) {
-			letters = append(letters, r)
-		}
-	}
-
-	return string(letters)
-}
-
-// OnlyDigits returns only the numbers from the given string, after strip all the rest ( letters, spaces, etc. )
-func OnlyDigits(sequence string) string {
-	if utf8.RuneCountInString(sequence) > 0 {
-		re, _ := regexp.Compile(`[\D]`)
-
-		sequence = re.ReplaceAllString(sequence, "")
-	}
-
-	return sequence
-}
-
-// OnlyLettersAndNumbers returns only the letters and numbers from the given string, after strip all the rest, like spaces and special symbols.
-func OnlyLettersAndNumbers(sequence string) string {
-	if utf8.RuneCountInString(sequence) == 0 {
-		return ""
-	}
-
-	var alphanumeric []rune
-
-	for _, r := range sequence {
-		if unicode.IsLetter(r) || unicode.IsDigit(r) {
-			alphanumeric = append(alphanumeric, r)
-		}
-	}
-
-	return string(alphanumeric)
-}
-
-// RemoveDigits returns the given string without digit/numeric runes
-func RemoveDigits(sequence string) string {
-	if utf8.RuneCountInString(sequence) == 0 {
-		return ""
-	}
-
-	var rs []rune
-
-	for _, r := range sequence {
-		if !unicode.IsDigit(r) {
-			rs = append(rs, r)
-		}
-	}
-
-	return string(rs)
-}
-
-// RandomInt returns a random integer within the given (inclusive) range
-func RandomInt(min, max int) int {
-	return rand.Intn(max-min) + min
-}
-
-// RandomIntArray returns an array filled with random integer numbers
-func RandomIntArray(min, max, howMany int) []int {
-	var a []int
-
-	for i := 0; i < howMany; i++ {
-		a = append(a, RandomInt(min, max))
-	}
-
-	return a
-}
-
-// RandomReseed restarts the randonSeeder and returns a random integer within the given (inclusive) range
-func RandomReseed(min, max int) int {
-	x := time.Now().UTC().UnixNano() + int64(rand.Int())
-
-	rand.Seed(x)
-
-	return rand.Intn(max-min) + min
-}
-
 // CheckPhone returns true if a given input has between 9 and 14 digits
 func CheckPhone(phone string, acceptEmpty bool) bool {
 	phone = OnlyDigits(phone)
 
 	return (acceptEmpty && (phone == "")) || ((len([]rune(phone)) >= 9) && (len([]rune(phone)) <= 14))
-}
-
-// StringAsFloat tries to convert a string to float, and if it can't, just returns zero
-// It's limited to one billion
-func StringAsFloat(s string, decimalSeparator, thousandsSeparator rune) float64 {
-	if s == "" {
-		return 0.0
-	}
-
-	const maxLength = 20
-
-	if len([]rune(s)) > maxLength {
-		s = s[0:maxLength]
-	}
-
-	s = strings.Replace(s, string(thousandsSeparator), "", -1)
-
-	s = strings.Replace(s, string(decimalSeparator), ".", -1)
-
-	if f, err := strconv.ParseFloat(s, 64); err == nil {
-		return f
-	}
-
-	return 0.0
-}
-
-// StringAsInteger returns the integer value extracted from string, or zero
-func StringAsInteger(s string) int {
-	if s == "" {
-		return 0
-	}
-
-	if i, err := strconv.ParseInt(s, 10, 32); err == nil {
-		return int(i)
-	}
-
-	return 0
 }
 
 // Between checks if param n in between low and high integer params
@@ -401,34 +246,6 @@ func StringReplaceAll(original string, replacementPairs ...string) string {
 	}
 
 	return original
-}
-
-// ArrayDifferenceAtoB returns the items from A that doesn't exist in B
-func ArrayDifferenceAtoB(a, b []int) []int {
-	m := make(map[int]bool)
-
-	for _, item := range b {
-		m[item] = true
-	}
-
-	var diff []int
-
-	for _, item := range a {
-		if _, ok := m[item]; !ok {
-			diff = append(diff, item)
-		}
-	}
-
-	return diff
-}
-
-// ArrayDifference returns all items that doesn't exist in both given arrays
-func ArrayDifference(a, b []int) []int {
-	diffA := ArrayDifferenceAtoB(a, b)
-
-	diffB := ArrayDifferenceAtoB(b, a)
-
-	return append(diffB, diffA...)
 }
 
 // PositiveOrZero checks if a signed number is negative, and in this case returns zero.
