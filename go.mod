@@ -1,3 +1,3 @@
-module github.com/miguelpragier/handy
+module github.com/miguelpragier/handy/v2
 
-go 1.13
+go 1.27

@@ -1,0 +1,38 @@
+version: '3'
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+  fmt:
+    desc: Format Go source files
+    cmds:
+      - gofmt -w .
+  fmt-check:
+    desc: Check Go formatting
+    cmds:
+      - test -z "$(gofmt -l .)"
+  build:
+    desc: Build all packages
+    cmds:
+      - go build ./...
+  test:
+    desc: Run tests
+    cmds:
+      - go test -count=1 ./...
+  race:
+    desc: Run tests with the race detector
+    cmds:
+      - go test -race -count=1 ./...
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+  check:
+    desc: Run formatting, build, vet, and tests
+    cmds:
+      - task: fmt-check
+      - task: build
+      - task: vet
+      - task: test
