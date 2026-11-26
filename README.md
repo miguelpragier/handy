@@ -1,5 +1,10 @@
 # Handy v2
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/miguelpragier/handy/v2.svg)](https://pkg.go.dev/github.com/miguelpragier/handy/v2)
+[![Latest release](https://img.shields.io/github/v/release/miguelpragier/handy)](https://github.com/miguelpragier/handy/releases/latest)
+[![Go 1.27+](https://img.shields.io/badge/go-1.27%2B-00ADD8?logo=go&logoColor=white)](https://github.com/miguelpragier/handy/blob/main/go.mod)
+[![License](https://img.shields.io/github/license/miguelpragier/handy)](https://github.com/miguelpragier/handy/blob/main/LICENSE)
+
 **Turn raw strings into values your application can use.**
 
 Normalize usernames, validate fixed-format codes, and check secrets with
