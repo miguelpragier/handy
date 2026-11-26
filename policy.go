@@ -15,6 +15,15 @@ type Violation struct {
 // Rule reports violations in their presentation order.
 type Rule func(string) []Violation
 
+const invalidUTF8 = "invalid_utf8"
+
+func applyRules(violations []Violation, value string, rules []Rule) []Violation {
+	for _, rule := range rules {
+		violations = append(violations, rule(value)...)
+	}
+	return violations
+}
+
 // Transform changes a string before the normalized rules run.
 type Transform func(string) string
 
@@ -49,25 +58,21 @@ func (r Result) Valid() bool { return len(r.Violations) == 0 }
 func (p Policy) Check(input string) Result {
 	result := Result{Original: input, Value: input}
 	if !utf8.ValidString(input) {
-		result.Violations = append(result.Violations, Violation{Code: "invalid_utf8"})
+		result.Violations = append(result.Violations, Violation{Code: invalidUTF8})
 		return result
 	}
-	for _, rule := range p.OriginalRules {
-		result.Violations = append(result.Violations, rule(input)...)
-	}
+	result.Violations = applyRules(result.Violations, input, p.OriginalRules)
 	for _, transform := range p.Transforms {
 		result.Value = transform(result.Value)
 		if !utf8.ValidString(result.Value) {
-			result.Violations = append(result.Violations, Violation{Code: "invalid_utf8"})
+			result.Violations = append(result.Violations, Violation{Code: invalidUTF8})
 			return result
 		}
 	}
 	if p.Optional && result.Value == "" {
 		return result
 	}
-	for _, rule := range p.NormalizedRules {
-		result.Violations = append(result.Violations, rule(result.Value)...)
-	}
+	result.Violations = applyRules(result.Violations, result.Value, p.NormalizedRules)
 	return result
 }
 

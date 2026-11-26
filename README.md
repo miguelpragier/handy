@@ -1,7 +1,11 @@
-# Handy
+# Handy v2
 
-Handy is a Go library for reusable string validation and normalization policies.
-It requires Go 1.27.
+**Turn raw strings into values your application can use.**
+
+Normalize usernames, validate fixed-format codes, and check secrets with
+reusable rules. Handy requires Go 1.27 and uses only the standard library.
+
+[Quick start](#quick-start) · [Code masks](#code-masks) · [Passwords and secrets](#passwords-and-secrets) · [More policies](#more-policies)
 
 ## Installation
 
@@ -9,7 +13,9 @@ It requires Go 1.27.
 go get github.com/miguelpragier/handy/v2
 ```
 
-## Username
+## Quick start
+
+Trim a username, lowercase it, and return every rule violation in one pass.
 
 ```go
 package main
@@ -30,6 +36,7 @@ func main() {
 	)
 	result := username.Check("  Ana.Silva  ")
 	fmt.Println(result.Value, result.Valid()) // ana.silva true
+	fmt.Println(username.Check("  9 Ana!  ").Violations) // [{prefix} {characters}]
 }
 ```
 
@@ -45,6 +52,68 @@ Violations contain stable codes and do not contain the input. Result.Original
 and Result.Value contain the original and normalized strings, respectively.
 Invalid UTF-8 stops processing with the code `invalid_utf8`. Applications
 should decide how to handle and display results containing sensitive input.
+
+## Code masks
+
+Use `#` for an ASCII digit and `@` for an ASCII letter. Every other character
+matches literally, including `0`. Handy checks the entire string.
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/miguelpragier/handy/v2"
+)
+
+func main() {
+	code := handy.New(nil, handy.Mask("##@0"))
+	fmt.Println(code.Check("12A0").Valid())   // true
+	fmt.Println(code.Check("12A1").Violations) // [{mask}]
+
+	ticket := handy.New(nil, handy.Mask(`\#-@@-##`))
+	fmt.Println(ticket.Check("#-AB-27").Valid()) // true
+}
+```
+
+Use `\#`, `\@` and `\\` for literal placeholder characters and
+backslashes. Use `CompileMask(pattern)` for patterns loaded from configuration
+so you can handle syntax errors. `Mask(pattern)` panics on invalid syntax.
+
+## Passwords and secrets
+
+`CheckSecret` applies rules to the exact value received, preserving spaces
+and case. It returns only violations. Supply your application's length
+limits and blocklist. Use `Confirm` to check a separate confirmation field.
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/miguelpragier/handy/v2"
+)
+
+func main() {
+	rules := []handy.Rule{
+		handy.RuneLen(15, 128),
+		handy.Blocklist([]string{"passwordpassword"}),
+	}
+
+	password := "violet rivers under cloud"
+	fmt.Println(len(handy.CheckSecret(password, rules...)) == 0) // true
+	fmt.Println(handy.CheckSecret("passwordpassword", rules...)) // [{blocklist}]
+	fmt.Println(handy.Confirm(password, "violet rivers"))         // [{confirmation}]
+}
+```
+
+When an existing system requires character classes, add a rule such as
+`handy.MinRunes(2, unicode.IsDigit)` using Go's `unicode` package. This rule
+counts digits across Unicode. The blocklist compares exact values. Built-in
+violations contain only codes. Custom rules should also avoid including
+secrets in their violation codes.
 
 ## More policies
 
@@ -74,16 +143,6 @@ Custom rules are functions of type `func(string) []handy.Violation`.
 Custom transforms are functions of type `func(string) string`. Policies should
 be configured before concurrent use and their slices should not be modified
 while checks are running.
-
-## Migration from v1
-
-Change the import path to `github.com/miguelpragier/handy/v2` and the Go
-version to 1.27 or later. The v1 functions have been removed from v2. For validation, replace `CheckStr` flags with named rules,
-and replace implicit transformations with ordered policy transforms. Length
-rules explicitly count bytes or Unicode code points. Code points do not
-necessarily correspond to user-perceived characters.
-
-Run `go test ./...` to validate your integration.
 
 ## Character and separator rules
 
