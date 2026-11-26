@@ -21,19 +21,21 @@ import (
 )
 
 func main() {
-	username := handy.Policy{
-		Transforms: []handy.StringTransform{handy.TrimSpace, handy.Lower},
-		NormalizedRules: []handy.Rule{
-			handy.Required,
-			handy.RuneLength(3, 24),
-			handy.StartsWithASCIIAlpha,
-			handy.AllowedRunes("abcdefghijklmnopqrstuvwxyz0123456789._"),
-		},
-	}
+	username := handy.New(
+		[]handy.Transform{handy.Trim, handy.Lower},
+		handy.Required,
+		handy.RuneLen(3, 24),
+		handy.ASCIIAlphaStart,
+		handy.Allow("abcdefghijklmnopqrstuvwxyz0123456789._"),
+	)
 	result := username.Check("  Ana.Silva  ")
 	fmt.Println(result.Value, result.Valid()) // ana.silva true
 }
 ```
+
+New creates a policy with transformations and normalized rules. Use Policy directly
+when original-input rules or optional values are needed. The earlier names remain
+available for existing v2 callers.
 
 Rules run in declaration order and return all violations. OriginalRules run
 before transforms and NormalizedRules run afterwards. Set Optional to skip
@@ -48,20 +50,20 @@ should decide how to handle and display results containing sensitive input.
 
 ```go
 displayName := handy.Policy{
-	Transforms: []handy.StringTransform{handy.CompactSpace},
+	Transforms: []handy.Transform{handy.Compact},
 	NormalizedRules: []handy.Rule{
 		handy.Required,
-		handy.RuneLength(2, 80),
-		handy.RunesMatching(handy.LettersAndSpaces),
+		handy.RuneLen(2, 80),
+		handy.MatchRunes(handy.LettersAndSpaces),
 	},
 }
 
 reference := handy.Policy{
-	Transforms: []handy.StringTransform{handy.TrimSpace, handy.Upper},
+	Transforms: []handy.Transform{handy.Trim, handy.Upper},
 	NormalizedRules: []handy.Rule{
 		handy.Required,
-		handy.ByteLength(3, 32),
-		handy.AllowedRunes("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"),
+		handy.ByteLen(3, 32),
+		handy.Allow("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"),
 	},
 }
 
@@ -85,7 +87,7 @@ Run `go test ./...` to validate your integration.
 
 ## Character and separator rules
 
-`ForbiddenRunes` rejects any listed character. `Separators("-_.")`
+`Deny` rejects any listed character. `Separators("-_.")`
 allows the listed separators between nonempty segments and rejects leading,
 trailing, or adjacent separators. Combine these rules with `Required` when
 an empty value is invalid.

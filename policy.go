@@ -15,8 +15,11 @@ type Violation struct {
 // Rule reports violations in their presentation order.
 type Rule func(string) []Violation
 
-// StringTransform changes a string before the normalized rules run.
-type StringTransform func(string) string
+// Transform changes a string before the normalized rules run.
+type Transform func(string) string
+
+// StringTransform is the original name of Transform.
+type StringTransform = Transform
 
 // Policy validates the original input, applies transforms, then validates the result.
 // Empty optional values bypass NormalizedRules.
@@ -25,6 +28,11 @@ type Policy struct {
 	Transforms      []StringTransform
 	NormalizedRules []Rule
 	Optional        bool
+}
+
+// New creates a policy that transforms input before applying its rules.
+func New(transforms []Transform, rules ...Rule) Policy {
+	return Policy{Transforms: transforms, NormalizedRules: rules}
 }
 
 // Result contains both representations and the rule failures.
@@ -194,3 +202,27 @@ func Separators(separators string) Rule {
 		return failure("separators", !previous)
 	}
 }
+
+// Trim removes leading and trailing Unicode whitespace.
+func Trim(s string) string { return TrimSpace(s) }
+
+// Compact replaces runs of Unicode whitespace with one ASCII space.
+func Compact(s string) string { return CompactSpace(s) }
+
+// ByteLen checks an inclusive byte length interval.
+func ByteLen(min, max int) Rule { return ByteLength(min, max) }
+
+// RuneLen checks an inclusive Unicode code point length interval.
+func RuneLen(min, max int) Rule { return RuneLength(min, max) }
+
+// Allow accepts strings containing only the specified runes.
+func Allow(runes string) Rule { return AllowedRunes(runes) }
+
+// Deny rejects strings containing any of the specified runes.
+func Deny(runes string) Rule { return ForbiddenRunes(runes) }
+
+// MatchRunes accepts strings whose runes all satisfy predicate.
+func MatchRunes(predicate func(rune) bool) Rule { return RunesMatching(predicate) }
+
+// ASCIIAlphaStart requires an ASCII letter as the first character.
+func ASCIIAlphaStart(s string) []Violation { return StartsWithASCIIAlpha(s) }
